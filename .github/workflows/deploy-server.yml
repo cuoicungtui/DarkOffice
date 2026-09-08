@@ -203,7 +203,10 @@ jobs:
             fi
             ln -sfn '${RELEASE_DIR}' '${DARKOFFICE_SERVER_ROOT}/current'
             docker pull '${DARKOFFICE_BASE_IMAGE}'
-            \$COMPOSE --env-file '${DARKOFFICE_SERVER_ROOT}/.env' -f '${DARKOFFICE_SERVER_ROOT}/docker-compose.yml' up -d --remove-orphans
+            # The source bind mount uses a release symlink. Recreate so Docker
+            # resolves the new symlink target instead of keeping the retired
+            # release directory mounted in the existing container.
+            \$COMPOSE --env-file '${DARKOFFICE_SERVER_ROOT}/.env' -f '${DARKOFFICE_SERVER_ROOT}/docker-compose.yml' up -d --force-recreate --remove-orphans
             ls -1dt '${DARKOFFICE_SERVER_ROOT}'/releases/* | tail -n +6 | xargs -r rm -rf
           "
 
