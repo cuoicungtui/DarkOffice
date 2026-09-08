@@ -47,5 +47,8 @@ agent_history.gif
 
 .agent/**
 .agents/**
+/AGENT.md
+/AGENT.local.md
+/AGENTS.local.md
 .claude/**
 .playwright-cli/

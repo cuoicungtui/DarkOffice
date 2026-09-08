@@ -93,6 +93,9 @@ jobs:
             --exclude='.pytest_cache' \
             --exclude='__pycache__' \
             --exclude='.agents' \
+            --exclude='AGENT.md' \
+            --exclude='AGENT.local.md' \
+            --exclude='AGENTS.local.md' \
             --exclude='tmp' \
             --exclude='usr' \
             -czf "$RUNNER_TEMP/darkoffice-release.tgz" .
