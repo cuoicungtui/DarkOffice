@@ -203,10 +203,12 @@ jobs:
             fi
             ln -sfn '${RELEASE_DIR}' '${DARKOFFICE_SERVER_ROOT}/current'
             docker pull '${DARKOFFICE_BASE_IMAGE}'
-            # The source bind mount uses a release symlink. Recreate so Docker
-            # resolves the new symlink target instead of keeping the retired
-            # release directory mounted in the existing container.
-            \$COMPOSE --env-file '${DARKOFFICE_SERVER_ROOT}/.env' -f '${DARKOFFICE_SERVER_ROOT}/docker-compose.yml' up -d --force-recreate --remove-orphans
+            # The source bind mount uses a release symlink. Remove the old
+            # container first so Compose resolves the new symlink target. This
+            # also works with the server's legacy Docker Compose v1, whose
+            # recreate path fails on modern image metadata.
+            docker rm -f '${DARKOFFICE_CONTAINER_NAME:-darkoffice}' >/dev/null 2>&1 || true
+            \$COMPOSE --env-file '${DARKOFFICE_SERVER_ROOT}/.env' -f '${DARKOFFICE_SERVER_ROOT}/docker-compose.yml' up -d --remove-orphans
             ls -1dt '${DARKOFFICE_SERVER_ROOT}'/releases/* | tail -n +6 | xargs -r rm -rf
           "
 
