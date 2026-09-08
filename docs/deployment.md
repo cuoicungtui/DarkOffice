@@ -38,6 +38,7 @@ Local defaults can be overridden with environment variables:
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `DARKOFFICE_BASE_IMAGE` | `agent0ai/agent-zero:latest` | Runtime image to pull. |
+| `COMPOSE_PROJECT_NAME` | unset locally, `darkoffice` on server | Compose project name for deploy state. |
 | `DARKOFFICE_CONTAINER_NAME` | `darkoffice` | Container name. |
 | `DARKOFFICE_SOURCE_DIR` | `../..` | Host source mounted at `/a0`. |
 | `DARKOFFICE_DATA_DIR` | `../../usr` | Persistent data mounted at `/a0/usr`. |

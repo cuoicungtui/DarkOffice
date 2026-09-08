@@ -165,6 +165,7 @@ jobs:
 
           {
             printf 'DARKOFFICE_BASE_IMAGE=%s\n' "$DARKOFFICE_BASE_IMAGE"
+            printf 'COMPOSE_PROJECT_NAME=darkoffice\n'
             printf 'DARKOFFICE_CONTAINER_NAME=darkoffice\n'
             printf 'DARKOFFICE_SOURCE_DIR=%s/current\n' "$DARKOFFICE_SERVER_ROOT"
             printf 'DARKOFFICE_DATA_DIR=%s/usr\n' "$DARKOFFICE_SERVER_ROOT"
