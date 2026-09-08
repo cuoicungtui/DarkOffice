@@ -44,4 +44,5 @@ Direct child DOX files:
 | [a0-plugin-router/AGENTS.md](a0-plugin-router/AGENTS.md) | Routing plugin-related user requests to specialist skills. |
 | [a0-review-plugin/AGENTS.md](a0-review-plugin/AGENTS.md) | Full plugin audit workflow and checklists. |
 | [build-skill/AGENTS.md](build-skill/AGENTS.md) | Building and improving Agent Zero skills. |
+| [darkoffice-gitflow/AGENTS.md](darkoffice-gitflow/AGENTS.md) | DarkOffice Gitflow, GitHub Actions, Docker deploy, and rollback workflow. |
 | [scheduled-tasks/AGENTS.md](scheduled-tasks/AGENTS.md) | Managing scheduled, planned, and adhoc tasks. |

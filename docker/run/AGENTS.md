@@ -9,6 +9,8 @@
 
 - `Dockerfile` owns branch-based image assembly, exposed ports, and container startup command.
 - `docker-compose.yml` owns the local compose service example.
+- `docker-compose.darkoffice.yml` owns the DarkOffice pull-mount runtime template
+  for local dev, CI smoke checks, and server deploy.
 - `build.txt` owns maintainer build and push command notes.
 - `fs/exe/` owns runtime entrypoint, supervisor, self-update, Node eval, and service scripts.
 - `fs/ins/` owns preinstall, installation, virtualenv, Playwright, SSH, and postinstall scripts.
@@ -17,6 +19,12 @@
 ## Local Contracts
 
 - `BRANCH` is required for branch-based Docker builds.
+- DarkOffice pull-mount deploy must use a pulled runtime image by default:
+  `agent0ai/agent-zero:latest`. Mount the checked-out DarkOffice source at `/a0`
+  and persistent runtime data at `/a0/usr`.
+- Do not build or publish a DarkOffice image for deploy unless Dockerfiles or
+  runtime filesystem under `docker/` changed and docs/workflows are updated in
+  the same change.
 - Preserve exposed ports for SSH, HTTP, and tunneled services unless docs and workflows are updated together.
 - Keep the two-runtime Python model aligned with the root contract.
 - Keep runtime desktop packages on `kali-last-snapshot`; carry the rolling base's matching ATK introspection package into that transaction, then pin the verified Python 3.13-compatible LibreOffice and complete Xpra runtime versions in `fs/ins/install_additional.sh` for both published architectures.
@@ -35,6 +43,9 @@
 ## Verification
 
 - Build `docker/run` when changing Dockerfile or install scripts.
+- For pull-mount-only compose changes, validate with
+  `docker compose -f docker/run/docker-compose.darkoffice.yml config` and smoke
+  test the pulled image with this repository mounted at `/a0`.
 - Smoke-test container startup after entrypoint, supervisor, port, or compose changes.
 
 ## Child DOX Index

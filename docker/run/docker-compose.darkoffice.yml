@@ -1,0 +1,25 @@
+name: darkoffice
+
+services:
+  darkoffice:
+    container_name: ${DARKOFFICE_CONTAINER_NAME:-darkoffice}
+    image: ${DARKOFFICE_BASE_IMAGE:-agent0ai/agent-zero:latest}
+    pull_policy: always
+    restart: unless-stopped
+    volumes:
+      - ${DARKOFFICE_SOURCE_DIR:-../..}:/a0
+      - ${DARKOFFICE_DATA_DIR:-../../usr}:/a0/usr
+    ports:
+      - "${DARKOFFICE_HTTP_PORT:-5080}:80"
+    environment:
+      BRANCH: ${BRANCH:-local}
+      A0_NOFILE_LIMIT: ${A0_NOFILE_LIMIT:-65535}
+      A0_SELF_UPDATE_HEALTH_TIMEOUT_SECONDS: ${A0_SELF_UPDATE_HEALTH_TIMEOUT_SECONDS:-180}
+      AUTH_LOGIN: ${AUTH_LOGIN:-}
+      AUTH_PASSWORD: ${AUTH_PASSWORD:-}
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

@@ -1,0 +1,185 @@
+name: Deploy DarkOffice Server
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref to deploy, for example main, develop, release/v0.1.0, or v0.1.0"
+        required: false
+        default: main
+        type: string
+      enable_auth:
+        description: "Enable WebUI username/password from AUTH_LOGIN and AUTH_PASSWORD secrets"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: darkoffice-server
+  cancel-in-progress: false
+
+env:
+  DARKOFFICE_BASE_IMAGE: agent0ai/agent-zero:latest
+  DARKOFFICE_SERVER_ROOT: /opt/darkoffice
+  DARKOFFICE_HTTP_PORT: "5080"
+
+jobs:
+  deploy:
+    name: Test, Upload, And Restart
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out deploy ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+
+      - name: Resolve deploy revision
+        id: revision
+        run: |
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "short_sha=$(git rev-parse --short=12 HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Pull runtime image
+        run: docker pull "$DARKOFFICE_BASE_IMAGE"
+
+      - name: Validate compose config
+        env:
+          DARKOFFICE_SOURCE_DIR: /opt/darkoffice/current
+          DARKOFFICE_DATA_DIR: /opt/darkoffice/usr
+          DARKOFFICE_CONTAINER_NAME: darkoffice
+          AUTH_LOGIN: placeholder
+          AUTH_PASSWORD: placeholder
+        run: docker compose -f docker/run/docker-compose.darkoffice.yml config
+
+      - name: Run focused pytest suite in runtime image
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/a0" \
+            -w /a0 \
+            "$DARKOFFICE_BASE_IMAGE" \
+            bash -lc 'source /opt/venv-a0/bin/activate && python -m pip install pytest && python -m pytest tests/test_skills_runtime.py tests/test_docker_initialize_limits.py tests/test_run_ui_config.py -q'
+
+      - name: Configure SSH
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          test -n "$SERVER_HOST"
+          test -n "$SERVER_PORT"
+          test -n "$SERVER_SSH_KEY"
+          test -n "$SERVER_USER"
+
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SERVER_SSH_KEY" > ~/.ssh/darkoffice_key
+          chmod 600 ~/.ssh/darkoffice_key
+          ssh-keyscan -p "$SERVER_PORT" -H "$SERVER_HOST" >> ~/.ssh/known_hosts
+
+      - name: Package release source
+        run: |
+          tar \
+            --exclude='.git' \
+            --exclude='.github/workflows/*.log' \
+            --exclude='.conda' \
+            --exclude='.venv' \
+            --exclude='.pytest_cache' \
+            --exclude='__pycache__' \
+            --exclude='tmp' \
+            --exclude='usr' \
+            -czf "$RUNNER_TEMP/darkoffice-release.tgz" .
+
+      - name: Upload release and compose file
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          RELEASE_SHA: ${{ steps.revision.outputs.short_sha }}
+        run: |
+          SSH_TARGET="${SERVER_USER}@${SERVER_HOST}"
+          SSH_OPTS="-i ~/.ssh/darkoffice_key -p ${SERVER_PORT}"
+          RELEASE_DIR="${DARKOFFICE_SERVER_ROOT}/releases/${RELEASE_SHA}"
+
+          ssh $SSH_OPTS "$SSH_TARGET" "mkdir -p '${DARKOFFICE_SERVER_ROOT}/releases' '${DARKOFFICE_SERVER_ROOT}/usr' '${RELEASE_DIR}'"
+          tar -xOf "$RUNNER_TEMP/darkoffice-release.tgz" ./docker/run/docker-compose.darkoffice.yml \
+            | ssh $SSH_OPTS "$SSH_TARGET" "cat > '${DARKOFFICE_SERVER_ROOT}/docker-compose.yml'"
+          cat "$RUNNER_TEMP/darkoffice-release.tgz" \
+            | ssh $SSH_OPTS "$SSH_TARGET" "rm -rf '${RELEASE_DIR:?}'/* && tar -xzf - -C '${RELEASE_DIR}'"
+
+      - name: Write server environment
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          AUTH_LOGIN: ${{ secrets.AUTH_LOGIN }}
+          AUTH_PASSWORD: ${{ secrets.AUTH_PASSWORD }}
+        run: |
+          SSH_TARGET="${SERVER_USER}@${SERVER_HOST}"
+          SSH_OPTS="-i ~/.ssh/darkoffice_key -p ${SERVER_PORT}"
+
+          if [ "${{ inputs.enable_auth }}" = "true" ]; then
+            test -n "$AUTH_LOGIN"
+            test -n "$AUTH_PASSWORD"
+            DEPLOY_AUTH_LOGIN="$AUTH_LOGIN"
+            DEPLOY_AUTH_PASSWORD="$AUTH_PASSWORD"
+          else
+            DEPLOY_AUTH_LOGIN=""
+            DEPLOY_AUTH_PASSWORD=""
+          fi
+
+          {
+            printf 'DARKOFFICE_BASE_IMAGE=%s\n' "$DARKOFFICE_BASE_IMAGE"
+            printf 'DARKOFFICE_CONTAINER_NAME=darkoffice\n'
+            printf 'DARKOFFICE_SOURCE_DIR=%s/current\n' "$DARKOFFICE_SERVER_ROOT"
+            printf 'DARKOFFICE_DATA_DIR=%s/usr\n' "$DARKOFFICE_SERVER_ROOT"
+            printf 'DARKOFFICE_HTTP_PORT=%s\n' "$DARKOFFICE_HTTP_PORT"
+            printf 'BRANCH=local\n'
+            printf 'AUTH_LOGIN=%s\n' "$DEPLOY_AUTH_LOGIN"
+            printf 'AUTH_PASSWORD=%s\n' "$DEPLOY_AUTH_PASSWORD"
+          } | ssh $SSH_OPTS "$SSH_TARGET" "umask 077 && cat > '${DARKOFFICE_SERVER_ROOT}/.env'"
+
+      - name: Switch release and restart
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          RELEASE_SHA: ${{ steps.revision.outputs.short_sha }}
+        run: |
+          SSH_TARGET="${SERVER_USER}@${SERVER_HOST}"
+          SSH_OPTS="-i ~/.ssh/darkoffice_key -p ${SERVER_PORT}"
+          RELEASE_DIR="${DARKOFFICE_SERVER_ROOT}/releases/${RELEASE_SHA}"
+
+          ssh $SSH_OPTS "$SSH_TARGET" "
+            set -eu
+            ln -sfn '${RELEASE_DIR}' '${DARKOFFICE_SERVER_ROOT}/current'
+            docker pull '${DARKOFFICE_BASE_IMAGE}'
+            docker compose --env-file '${DARKOFFICE_SERVER_ROOT}/.env' -f '${DARKOFFICE_SERVER_ROOT}/docker-compose.yml' up -d --remove-orphans
+            ls -1dt '${DARKOFFICE_SERVER_ROOT}'/releases/* | tail -n +6 | xargs -r rm -rf
+          "
+
+      - name: Smoke test server
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          SSH_TARGET="${SERVER_USER}@${SERVER_HOST}"
+          SSH_OPTS="-i ~/.ssh/darkoffice_key -p ${SERVER_PORT}"
+
+          ssh $SSH_OPTS "$SSH_TARGET" "
+            set -eu
+            for attempt in \$(seq 1 60); do
+              if curl -fsS 'http://127.0.0.1:${DARKOFFICE_HTTP_PORT}/api/health'; then
+                curl -fsS 'http://127.0.0.1:${DARKOFFICE_HTTP_PORT}/login' >/dev/null
+                exit 0
+              fi
+              sleep 5
+            done
+            docker logs darkoffice --tail=200
+            exit 1
+          "

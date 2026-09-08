@@ -13,7 +13,20 @@
 
 ## Local Contracts
 
+- DarkOffice deployment automation uses the pull-mount model in
+  `workflows/ci.yml`, `workflows/deploy-server.yml`, and `workflows/rollback.yml`:
+  pull `agent0ai/agent-zero:latest`, verify this repository source mounted at
+  `/a0`, and deploy the tested source over SSH to Docker Compose on the server.
+- DarkOffice server deploys keep source releases under `/opt/darkoffice/releases/`,
+  switch `/opt/darkoffice/current`, and preserve runtime data under
+  `/opt/darkoffice/usr`.
+- DarkOffice deploy and rollback workflows default to no WebUI login; write
+  `AUTH_LOGIN` and `AUTH_PASSWORD` only when their explicit workflow auth input
+  is enabled.
 - Docker publishing lives in `workflows/docker-publish.yml` and delegates planning to `scripts/docker_release_plan.py`.
+- `workflows/docker-publish.yml` is the upstream Agent Zero image-publishing path;
+  do not adapt it for DarkOffice server deploy unless the project intentionally
+  switches from pull-mount deploy to publishing its own image.
 - Releasable tags are `vX.Y` tags at or above `v1.0`, matching the workflow environment.
 - On `main`, the newest eligible tag publishes both the version tag and `latest`, then creates or updates its GitHub release after the image push succeeds; other allowed branches publish only their branch tag.
 - Manual dispatch without a tag backfills missing Docker Hub tags. Manual dispatch with a tag rebuilds that target and refreshes `latest` and the GitHub release only when it remains the newest eligible tag on `main`.
@@ -30,6 +43,10 @@
 
 ## Verification
 
+- Run `docker compose -f docker/run/docker-compose.darkoffice.yml config` after
+  changing DarkOffice pull-mount deploy configuration.
+- Run the focused runtime-image test command from `workflows/ci.yml` after changing
+  DarkOffice CI, deploy, rollback, or compose behavior.
 - Run `pytest tests/test_docker_release_plan.py` after changing Docker publish planning or release workflow behavior.
 - Run targeted tests for any changed script that already has coverage.
 

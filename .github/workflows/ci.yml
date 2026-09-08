@@ -1,0 +1,82 @@
+name: DarkOffice CI
+
+on:
+  pull_request:
+    branches:
+      - develop
+  push:
+    branches:
+      - develop
+      - main
+      - "release/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: darkoffice-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DARKOFFICE_BASE_IMAGE: agent0ai/agent-zero:latest
+  DARKOFFICE_CONTAINER_NAME: darkoffice-ci-${{ github.run_id }}
+  DARKOFFICE_HTTP_PORT: "18080"
+  DARKOFFICE_SOURCE_DIR: ../..
+  DARKOFFICE_DATA_DIR: ../../tmp/docker-ci-usr
+  BRANCH: local
+  AUTH_LOGIN: ci
+  AUTH_PASSWORD: ci-password
+
+jobs:
+  verify:
+    name: Test And Docker Smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Pull runtime image
+        run: docker pull "$DARKOFFICE_BASE_IMAGE"
+
+      - name: Validate compose config
+        run: docker compose -f docker/run/docker-compose.darkoffice.yml config
+
+      - name: Run focused pytest suite in runtime image
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/a0" \
+            -w /a0 \
+            "$DARKOFFICE_BASE_IMAGE" \
+            bash -lc 'source /opt/venv-a0/bin/activate && python -m pip install pytest && python -m pytest tests/test_skills_runtime.py tests/test_docker_initialize_limits.py tests/test_run_ui_config.py -q'
+
+      - name: Compile core Python sources in runtime image
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/a0" \
+            -w /a0 \
+            "$DARKOFFICE_BASE_IMAGE" \
+            bash -lc 'source /opt/venv-a0/bin/activate && python -m compileall -q agent.py initialize.py models.py run_ui.py api helpers tools plugins skills'
+
+      - name: Start pull-mount container
+        run: |
+          mkdir -p tmp/docker-ci-usr
+          docker compose -f docker/run/docker-compose.darkoffice.yml up -d
+
+      - name: Smoke test WebUI health
+        run: |
+          for attempt in $(seq 1 60); do
+            if curl -fsS "http://127.0.0.1:${DARKOFFICE_HTTP_PORT}/api/health"; then
+              curl -fsS "http://127.0.0.1:${DARKOFFICE_HTTP_PORT}/login" >/dev/null
+              exit 0
+            fi
+            sleep 5
+          done
+
+          docker logs "$DARKOFFICE_CONTAINER_NAME" --tail=200
+          exit 1
+
+      - name: Stop pull-mount container
+        if: always()
+        run: docker compose -f docker/run/docker-compose.darkoffice.yml down --remove-orphans
