@@ -68,6 +68,8 @@ Do not rewrite shared history or force-push protected branches.
 - `Deploy DarkOffice Server` is manual. It checks out the selected ref, runs the
   same focused checks, uploads source to the server, switches the active release,
   restarts Docker Compose, and checks `/api/health`.
+- Server deploy prefers the Docker Compose plugin (`docker compose`) and falls
+  back to legacy `docker-compose` when the plugin is not installed.
 - `Rollback DarkOffice Server` is manual. It accepts a git tag, commit, or branch
   and redeploys that exact ref.
 

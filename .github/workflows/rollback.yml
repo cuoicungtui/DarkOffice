@@ -110,7 +110,14 @@ jobs:
             mkdir -p '${DARKOFFICE_SERVER_ROOT}/releases' '${DARKOFFICE_SERVER_ROOT}/usr'
             test -w '${DARKOFFICE_SERVER_ROOT}'
             command -v docker >/dev/null
-            docker compose version >/dev/null
+            if docker compose version >/dev/null 2>&1; then
+              :
+            elif command -v docker-compose >/dev/null 2>&1; then
+              docker-compose version >/dev/null
+            else
+              echo 'Docker Compose is required: install the Docker Compose plugin or docker-compose.' >&2
+              exit 1
+            fi
           "
 
       - name: Upload rollback release and compose file
@@ -180,9 +187,17 @@ jobs:
 
           ssh $SSH_OPTS "$SSH_TARGET" "
             set -eu
+            if docker compose version >/dev/null 2>&1; then
+              COMPOSE='docker compose'
+            elif command -v docker-compose >/dev/null 2>&1; then
+              COMPOSE='docker-compose'
+            else
+              echo 'Docker Compose is required: install the Docker Compose plugin or docker-compose.' >&2
+              exit 1
+            fi
             ln -sfn '${RELEASE_DIR}' '${DARKOFFICE_SERVER_ROOT}/current'
             docker pull '${DARKOFFICE_BASE_IMAGE}'
-            docker compose --env-file '${DARKOFFICE_SERVER_ROOT}/.env' -f '${DARKOFFICE_SERVER_ROOT}/docker-compose.yml' up -d --remove-orphans
+            \$COMPOSE --env-file '${DARKOFFICE_SERVER_ROOT}/.env' -f '${DARKOFFICE_SERVER_ROOT}/docker-compose.yml' up -d --remove-orphans
             ls -1dt '${DARKOFFICE_SERVER_ROOT}'/releases/* | tail -n +6 | xargs -r rm -rf
           "
 

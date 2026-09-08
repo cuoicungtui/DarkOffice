@@ -110,6 +110,7 @@ Design workflows around gates:
 - Push to `develop`, `release/*`, or `main`: run the same CI gate before any server action.
 - Manual server deploy: check out the selected git ref, run checks, upload source to `/opt/darkoffice/releases/<sha>`, switch `/opt/darkoffice/current`, and restart Docker Compose over SSH.
 - Manual rollback: accept a git tag, commit, or branch and redeploy without modifying source history.
+- Server workflows should prefer `docker compose` but support `docker-compose` when the plugin is not installed.
 
 Do not require `GHCR_USER` or `GHCR_TOKEN` while DarkOffice uses pull-mount deploy from `agent0ai/agent-zero:latest`.
 
