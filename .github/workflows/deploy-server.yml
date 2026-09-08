@@ -224,6 +224,12 @@ jobs:
             for attempt in \$(seq 1 60); do
               if curl -fsS 'http://127.0.0.1:${DEPLOY_HTTP_PORT}/api/health'; then
                 curl -fsS 'http://127.0.0.1:${DEPLOY_HTTP_PORT}/login' >/dev/null
+                splash=\$(curl -fsS 'http://127.0.0.1:${DEPLOY_HTTP_PORT}/')
+                printf '%s' "\$splash" | grep -q 'DarkOffice'
+                if printf '%s' "\$splash" | grep -qi 'Agent Zero'; then
+                  echo 'Deployed splash still contains the legacy Agent Zero branding.' >&2
+                  exit 1
+                fi
                 exit 0
               fi
               sleep 5
