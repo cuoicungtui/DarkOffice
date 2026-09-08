@@ -1,6 +1,6 @@
 ---
 name: scheduled-tasks
-description: Use for complex Agent Zero scheduler work, including creating, updating, deleting, running, waiting for, timezone-correcting, or auditing scheduled, planned, and adhoc tasks.
+description: Use for complex DarkOffice scheduler work, including creating, updating, deleting, running, waiting for, timezone-correcting, or auditing scheduled, planned, and adhoc tasks.
 ---
 
 # Scheduler Tasks

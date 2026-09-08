@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own Telegram bot integration for Agent Zero with polling, webhook, per-user sessions, and file exchange.
+- Own Telegram bot integration for DarkOffice with polling, webhook, per-user sessions, and file exchange.
 
 ## Ownership
 

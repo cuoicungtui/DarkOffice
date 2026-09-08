@@ -3,7 +3,7 @@
 ## Purpose
 
 - Own the `fasta2a_client.py` helper module.
-- This module connects Agent Zero to external A2A agents.
+- This module connects DarkOffice to external A2A agents.
 - Keep this file-level DOX profile synchronized with `fasta2a_client.py` because this directory is intentionally flat.
 
 ## Ownership

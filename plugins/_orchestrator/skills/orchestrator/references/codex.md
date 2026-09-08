@@ -1,6 +1,6 @@
 # Codex CLI
 
-Use Codex for autonomous coding tasks in a repository. Inside the Agent Zero Docker runtime, the Codex sandbox may fail, so the Docker-safe default uses `--dangerously-bypass-approvals-and-sandbox`.
+Use Codex for autonomous coding tasks in a repository. Inside the DarkOffice Docker runtime, the Codex sandbox may fail, so the Docker-safe default uses `--dangerously-bypass-approvals-and-sandbox`.
 
 ## Install And Probe
 

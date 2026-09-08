@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own bundled Agent Zero skills and their agent-facing instructions.
+- Own bundled DarkOffice skills and their agent-facing instructions.
 - Keep skill workflows accurate, composable, and safe for runtime loading.
 
 ## Ownership
@@ -36,13 +36,13 @@ Direct child DOX files:
 | Child | Scope |
 | --- | --- |
 | [a0-contribute-plugin/AGENTS.md](a0-contribute-plugin/AGENTS.md) | Publishing plugins to the community Plugin Index. |
-| [a0-create-agent/AGENTS.md](a0-create-agent/AGENTS.md) | Creating Agent Zero agent profiles. |
-| [a0-create-plugin/AGENTS.md](a0-create-plugin/AGENTS.md) | Creating or extending Agent Zero plugins. |
+| [a0-create-agent/AGENTS.md](a0-create-agent/AGENTS.md) | Creating DarkOffice agent profiles. |
+| [a0-create-plugin/AGENTS.md](a0-create-plugin/AGENTS.md) | Creating or extending DarkOffice plugins. |
 | [a0-debug-plugin/AGENTS.md](a0-debug-plugin/AGENTS.md) | Diagnosing plugin loading, API, frontend, and extension issues. |
-| [a0-development/AGENTS.md](a0-development/AGENTS.md) | Broad Agent Zero framework development guidance. |
+| [a0-development/AGENTS.md](a0-development/AGENTS.md) | Broad DarkOffice framework development guidance. |
 | [a0-manage-plugin/AGENTS.md](a0-manage-plugin/AGENTS.md) | Plugin install, update, scan, enable, disable, and removal workflows. |
 | [a0-plugin-router/AGENTS.md](a0-plugin-router/AGENTS.md) | Routing plugin-related user requests to specialist skills. |
 | [a0-review-plugin/AGENTS.md](a0-review-plugin/AGENTS.md) | Full plugin audit workflow and checklists. |
-| [build-skill/AGENTS.md](build-skill/AGENTS.md) | Building and improving Agent Zero skills. |
+| [build-skill/AGENTS.md](build-skill/AGENTS.md) | Building and improving DarkOffice skills. |
 | [darkoffice-gitflow/AGENTS.md](darkoffice-gitflow/AGENTS.md) | DarkOffice Gitflow, GitHub Actions, Docker deploy, and rollback workflow. |
 | [scheduled-tasks/AGENTS.md](scheduled-tasks/AGENTS.md) | Managing scheduled, planned, and adhoc tasks. |

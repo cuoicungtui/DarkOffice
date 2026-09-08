@@ -53,7 +53,7 @@ def _plugin_payload(plugin: object) -> dict[str, Any]:
     enabled = always_enabled or toggle_state == "enabled"
     protected_reason = _PROTECTED_PLUGIN_REASONS.get(name, "")
     if always_enabled and not protected_reason:
-        protected_reason = "Agent Zero marks this plugin as always enabled."
+        protected_reason = "DarkOffice marks this plugin as always enabled."
 
     return {
         "name": name,
@@ -105,7 +105,7 @@ def _parse_enabled(value: object) -> bool | None:
 
 
 class InstalledPlugins(connector_base.ProtectedConnectorApiHandler):
-    """List and toggle already-installed Agent Zero Core plugins only."""
+    """List and toggle already-installed DarkOffice Core plugins only."""
 
     async def process(self, input: dict, request: Request) -> dict | Response:
         del request

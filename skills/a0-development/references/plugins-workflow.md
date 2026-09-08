@@ -9,7 +9,7 @@
 
 ## Plugin-First Rule
 
-Plugins are the primary way to extend Agent Zero. A plugin can bundle:
+Plugins are the primary way to extend DarkOffice. A plugin can bundle:
 
 - `plugin.yaml`
 - `default_config.yaml`

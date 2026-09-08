@@ -21,7 +21,7 @@
 
 ## Work Guidance
 
-- Prefer adding provider metadata here only when it is broadly useful to shipped Agent Zero.
+- Prefer adding provider metadata here only when it is broadly useful to shipped DarkOffice.
 - Keep comments concise and operational.
 - Coordinate provider changes with model settings UI, plugin model overrides, and docs.
 

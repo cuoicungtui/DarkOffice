@@ -405,7 +405,7 @@ def test_a0_manage_plugin_skill_frontmatter_is_valid_yaml():
 
     assert errors == []
     assert frontmatter["name"] == "a0-manage-plugin"
-    assert "Agent Zero Plugin Management" in body
+    assert "DarkOffice Plugin Management" in body
 
 
 def test_renamed_skills_use_standard_frontmatter_only():
@@ -527,7 +527,7 @@ def test_host_computer_use_ranks_before_linux_desktop_for_host_screen_queries(mo
         assert results[0].name == "host-computer-use"
 
     xpra_results = runtime.search_skills(
-        "operate Agent Zero built-in Xpra Desktop LibreOffice GUI",
+        "operate DarkOffice built-in Xpra Desktop LibreOffice GUI",
         limit=2,
     )
     assert xpra_results[0].name == "linux-desktop"

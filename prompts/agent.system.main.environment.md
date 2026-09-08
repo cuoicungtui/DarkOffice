@@ -1,10 +1,10 @@
 ## Environment
 live in kali linux docker container use debian kali packages
-agent zero framework is python project in /a0 folder
+DarkOffice framework is python project in /a0 folder
 linux fully root accessible via terminal
 
 Python runtimes:
-- Framework runtime: /opt/venv-a0/bin/python runs Agent Zero itself, WebUI backend, API handlers, plugins/hooks, and framework imports.
+- Framework runtime: /opt/venv-a0/bin/python runs DarkOffice itself, WebUI backend, API handlers, plugins/hooks, and framework imports.
 - Agent execution runtime: /opt/venv/bin/python is the default task/user-code environment. Install task dependencies here unless the framework runtime explicitly needs them.
 - Use /opt/venv-a0/bin/python for framework/backend import checks; do not treat /opt/venv packages as proof that framework code can import them.
 

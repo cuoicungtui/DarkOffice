@@ -279,19 +279,19 @@ class GeminiApiOAuthProvider:
                     return LoginPollResult(
                         ok=False,
                         provider_id=GEMINI_API_PROVIDER_ID,
-                        error="OAuth state mismatch. Return to Agent Zero and start a new Google Gemini API connection.",
+                        error="OAuth state mismatch. Return to DarkOffice and start a new Google Gemini API connection.",
                     )
                 return LoginPollResult(
                     ok=False,
                     provider_id=GEMINI_API_PROVIDER_ID,
                     expired=True,
-                    error="OAuth sign-in expired. Return to Agent Zero and start a new Google Gemini API connection.",
+                    error="OAuth sign-in expired. Return to DarkOffice and start a new Google Gemini API connection.",
                 )
             if attempt.provider_id != GEMINI_API_PROVIDER_ID:
                 return LoginPollResult(
                     ok=False,
                     provider_id=GEMINI_API_PROVIDER_ID,
-                    error="OAuth state mismatch. Return to Agent Zero and start a new Google Gemini API connection.",
+                    error="OAuth state mismatch. Return to DarkOffice and start a new Google Gemini API connection.",
                 )
         elif allow_missing_state:
             attempt = latest_attempt(GEMINI_API_PROVIDER_ID)

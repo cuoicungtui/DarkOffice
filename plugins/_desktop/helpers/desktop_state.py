@@ -839,7 +839,7 @@ def iso_now() -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Observe the Agent Zero persistent Linux Desktop state.")
+    parser = argparse.ArgumentParser(description="Observe the DarkOffice persistent Linux Desktop state.")
     subparsers = parser.add_subparsers(dest="command")
 
     state_parser = subparsers.add_parser("state")

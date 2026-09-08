@@ -1,7 +1,7 @@
 # Agent Profiles and the Agent Editor
 
 Agent Profiles give a chat a repeatable role, set of instructions, model preset,
-and capability policy. Use one when you want Agent Zero to work consistently as
+and capability policy. Use one when you want DarkOffice to work consistently as
 a developer, researcher, reviewer, writer, or another specialist.
 
 The Agent Editor is deterministic: it does not call a model to interpret your
@@ -28,7 +28,7 @@ Open **Manage agents**, select **Create agent**, and complete the form:
 
 1. Choose **Global** to make the profile available everywhere, or choose a
    project to keep the profile and its overrides in that project.
-2. Enter the agent name. Agent Zero creates a stable profile ID from the name.
+2. Enter the agent name. DarkOffice creates a stable profile ID from the name.
 3. Optionally choose a color or image.
 4. Select a model preset, or keep the current preset.
 5. Write direct instructions: what the agent should do, how it should reason,
@@ -90,7 +90,7 @@ To stop a profile from being selected or delegated to in one project:
 2. Choose the project.
 3. Turn that profile's availability toggle off.
 
-The Global profile is not deleted or changed. Agent Zero keeps at least one
+The Global profile is not deleted or changed. DarkOffice keeps at least one
 profile available in every scope; if a chat uses a profile that becomes
 unavailable, it is reconciled to an available profile.
 
@@ -300,4 +300,4 @@ For small local models that narrate instead of calling tools, use the bundled
 [Local Model Tool Use](local-model-tool-use.md).
 
 For source-linked internals, use
-[DeepWiki for Agent Zero](https://deepwiki.com/agent0ai/agent-zero).
+[DeepWiki for DarkOffice](https://deepwiki.com/agent0ai/agent-zero).

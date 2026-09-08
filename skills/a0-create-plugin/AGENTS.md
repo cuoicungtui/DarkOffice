@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own the workflow for creating, extending, or modifying Agent Zero plugins.
+- Own the workflow for creating, extending, or modifying DarkOffice plugins.
 - Keep full-stack plugin conventions accurate for API, tools, extensions, settings UI, and WebUI integration.
 
 ## Ownership

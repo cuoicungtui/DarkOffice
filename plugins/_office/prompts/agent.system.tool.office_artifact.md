@@ -1,5 +1,5 @@
 ### office_artifact
-create/open/read/edit/export Office artifacts in Agent Zero
+create/open/read/edit/export Office artifacts in DarkOffice
 formats: odt ods odp docx xlsx pptx
 defaults: document->odt spreadsheet->ods presentation->odp
 actions: create open read edit inspect export version_history restore_version status

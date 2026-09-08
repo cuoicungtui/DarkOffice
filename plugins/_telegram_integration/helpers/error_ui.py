@@ -12,7 +12,7 @@ def friendly_error_message(exception: BaseException) -> str:
 
     if category == "auth":
         return (
-            "**Agent Zero hit a provider setup issue.**\n\n"
+            "**DarkOffice hit a provider setup issue.**\n\n"
             "The model provider rejected the request because an API key or credential is missing, invalid, or unauthorized.\n\n"
             f"Details: `{summary}`\n\n"
             "Please check the model/API key settings, then send the message again."
@@ -20,27 +20,27 @@ def friendly_error_message(exception: BaseException) -> str:
 
     if category == "rate_limit":
         return (
-            "**Agent Zero was rate limited by the model provider.**\n\n"
+            "**DarkOffice was rate limited by the model provider.**\n\n"
             "The provider is asking us to slow down before trying again.\n\n"
             f"Details: `{summary}`"
         )
 
     if category == "timeout":
         return (
-            "**Agent Zero did not get a response in time.**\n\n"
+            "**DarkOffice did not get a response in time.**\n\n"
             "The provider or tool call timed out before the agent could finish this request.\n\n"
             f"Details: `{summary}`"
         )
 
     if category == "provider":
         return (
-            "**Agent Zero could not complete the model request.**\n\n"
+            "**DarkOffice could not complete the model request.**\n\n"
             "The model provider returned an error before the agent could finish.\n\n"
             f"Details: `{summary}`"
         )
 
     return (
-        "**Agent Zero ran into an error while working on this.**\n\n"
+        "**DarkOffice ran into an error while working on this.**\n\n"
         f"Details: `{summary}`"
     )
 

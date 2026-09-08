@@ -1,9 +1,9 @@
 # Desktop Guide
 
-Agent Zero has its own Linux desktop inside the right-side Canvas.
+DarkOffice has its own Linux desktop inside the right-side Canvas.
 
 Open it by clicking the **Desktop** icon in the Canvas rail. The surface starts
-an XFCE desktop that Agent Zero can also control when a task needs a real GUI.
+an XFCE desktop that DarkOffice can also control when a task needs a real GUI.
 
 ![Desktop Canvas](../res/usage/webui/desktop-canvas.png)
 
@@ -11,19 +11,19 @@ Use the Desktop when the work is visual: opening Linux apps, inspecting files in
 a file manager, checking a document layout, or LibreOffice Cowork.
 
 For architecture and source-linked internals, use
-[DeepWiki for Agent Zero](https://deepwiki.com/agent0ai/agent-zero). This page
+[DeepWiki for DarkOffice](https://deepwiki.com/agent0ai/agent-zero). This page
 is the practical tour.
 
 ## What The Desktop Is For
 
-The Desktop is a live Linux workspace. You can use it yourself, and Agent Zero
+The Desktop is a live Linux workspace. You can use it yourself, and DarkOffice
 can use its Linux Desktop skill to observe the screen, act through the GUI, and
 verify what changed.
 
 Good uses:
 
 - open the graphical file manager for `Workdir`, `Projects`, `Skills`, `Agents`, or `Downloads`;
-- run Linux GUI apps that are available in the Agent Zero environment;
+- run Linux GUI apps that are available in the DarkOffice environment;
 - open a terminal when a visual terminal session is useful;
 - inspect or polish LibreOffice Writer, Calc, and Impress files;
 - Cowork with the agent in a document, spreadsheet, or presentation.
@@ -36,7 +36,7 @@ screenshots, history, annotations, and host-browser support.
 
 The Desktop lives next to the Browser surface in the Canvas.
 
-1. Open Agent Zero.
+1. Open DarkOffice.
 2. Click the **Desktop** icon on the right Canvas rail.
 3. Wait for the desktop to finish starting.
 4. Click **Open as window** if you want more room.
@@ -57,9 +57,9 @@ Use it to create:
 - **Spreadsheet** for LibreOffice Calc workbooks;
 - **Presentation** for LibreOffice Impress decks.
 
-Use **Open** when you already have a file in the Agent Zero workspace.
+Use **Open** when you already have a file in the DarkOffice workspace.
 
-Agent Zero usually creates document files through its document tools first, then
+DarkOffice usually creates document files through its document tools first, then
 lets you open them in the Desktop when you want to inspect or polish them. That
 keeps content changes reliable while still giving you the full GUI when it
 matters.
@@ -71,7 +71,7 @@ LibreOffice Writer, Calc, and Impress run inside the Desktop.
 ![Writer in Desktop](../res/usage/webui/desktop-writer.png)
 
 You can type directly in the app, save, rename, and close the file from the
-Canvas header. Agent Zero can also work with the same file: it can create the
+Canvas header. DarkOffice can also work with the same file: it can create the
 first draft, update cells, revise slides, or use the visible Desktop to check
 layout before reporting back.
 
@@ -97,9 +97,9 @@ For default formats, think:
 
 Ask for DOCX, XLSX, or PPTX only when you need Microsoft Office compatibility.
 
-## How Agent Zero Uses It
+## How DarkOffice Uses It
 
-When you ask for Desktop work, Agent Zero uses a careful loop:
+When you ask for Desktop work, DarkOffice uses a careful loop:
 
 1. create or edit the file in the most reliable way;
 2. open the Desktop only when the GUI is useful;
@@ -116,7 +116,7 @@ where the agent can do GUI work and you can take over at any time.
 - Save before closing if you edited by hand.
 - Use Markdown for quick notes and drafts unless you need a LibreOffice file.
 - Use Writer, Calc, or Impress when layout, formulas, charts, or slide polish matter.
-- If a GUI app feels stuck, ask Agent Zero to verify the Desktop state before continuing.
+- If a GUI app feels stuck, ask DarkOffice to verify the Desktop state before continuing.
 - Keep the Browser surface for websites and the Desktop surface for Linux apps.
 
 ## Related

@@ -179,7 +179,7 @@ class TextEditorRemote(Tool):
         if not sid:
             if not candidates:
                 error = (
-                    "text_editor_remote: no CLI client connected to Agent Zero. "
+                    "text_editor_remote: no CLI client connected to DarkOffice. "
                     "Make sure the CLI is connected to this instance."
                 )
             elif require_writes:

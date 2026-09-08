@@ -1,6 +1,6 @@
 # Skills
 
-Skills is a built-in Agent Zero plugin that manages current-chat skill loading
+Skills is a built-in DarkOffice plugin that manages current-chat skill loading
 and layered skill visibility, including profile-level policy from Agent Editor.
 
 ## What It Does
@@ -15,7 +15,7 @@ and layered skill visibility, including profile-level policy from Agent Editor.
 
 ## Why This Exists
 
-Agent Zero already supports loading skills dynamically with `skills_tool`, and already has great built-in skill management surfaces. What it did not have was a lightweight way to use that same history-backed skill loading from the Skills screen.
+DarkOffice already supports loading skills dynamically with `skills_tool`, and already has great built-in skill management surfaces. What it did not have was a lightweight way to use that same history-backed skill loading from the Skills screen.
 
 Skills fills that gap as a bundled built-in plugin.
 The shared skill discovery and loaded-skill ledger live in `helpers/skills.py`, and this plugin focuses on catalog UI, chat loading, and visibility.

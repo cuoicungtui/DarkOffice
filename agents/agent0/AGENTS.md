@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own the main user-facing Agent Zero profile metadata.
+- Own the main user-facing DarkOffice profile metadata.
 - Keep the primary assistant profile discoverable and distinct from subordinate specialist profiles.
 
 ## Ownership

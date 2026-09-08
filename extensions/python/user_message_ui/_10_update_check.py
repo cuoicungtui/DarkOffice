@@ -100,7 +100,7 @@ class UpdateCheck(Extension):
 
         message = notif.get(
             "message",
-            "A newer version of Agent Zero is available. Please update to the latest version.",
+            "A newer version of DarkOffice is available. Please update to the latest version.",
         )
         message = message.replace(
             '<a href="#" @click.prevent="$store.selfUpdateStore.openModal()">Open updater</a>.',

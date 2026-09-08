@@ -6,7 +6,7 @@ import plugins._a0_connector.api.v1.base as connector_base
 
 
 _PRIVACY_NOTICE = (
-    "For Browser model-use settings, visit Agent Zero WebUI > Browser settings to choose "
+    "For Browser model-use settings, visit DarkOffice WebUI > Browser settings to choose "
     "Local models only, Warn when using cloud, or Allow."
 )
 

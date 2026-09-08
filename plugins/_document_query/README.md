@@ -36,7 +36,7 @@ See default_config.yaml for all options. Key settings:
 | liteparse_ocr_auto_disable_pages | 30 | Disable OCR for PDFs at or above this effective page count |
 | thread_offload | true | Offload sync parsers to thread pool |
 
-LiteParse is installed into the Agent Zero framework runtime from hooks.py during
+LiteParse is installed into the DarkOffice framework runtime from hooks.py during
 plugin install/startup. If installation fails, the plugin logs the error and
 continues with the legacy parser fallbacks.
 

@@ -1,11 +1,11 @@
 ---
 name: linux-desktop
-description: Use only for Agent Zero's built-in Docker/Xpra Linux Desktop, XFCE apps, LibreOffice GUI apps, file manager, terminal, or visual workflows inside the Agent Zero runtime. Not for A0 CLI /computer-use or computer_use_remote host control.
+description: Use only for DarkOffice's built-in Docker/Xpra Linux Desktop, XFCE apps, LibreOffice GUI apps, file manager, terminal, or visual workflows inside the DarkOffice runtime. Not for A0 CLI /computer-use or computer_use_remote host control.
 version: "0.3.0"
-author: "Agent Zero Core Team"
+author: "DarkOffice Core Team"
 tags: ["linux", "desktop", "xfce", "libreoffice", "gui", "files", "terminal"]
 triggers:
-  - "Agent Zero Desktop"
+  - "DarkOffice Desktop"
   - "built-in Linux Desktop"
   - "Xpra Desktop"
   - "XFCE Desktop"
@@ -21,13 +21,13 @@ allowed_tools:
 
 ## Boundary With Host Computer Use
 
-This skill is only for the built-in Desktop surface running inside Agent Zero's Docker/runtime Xpra session. It does not control the user's host OS, real monitor, local Ubuntu/Wayland session, macOS desktop, or Windows desktop.
+This skill is only for the built-in Desktop surface running inside DarkOffice's Docker/runtime Xpra session. It does not control the user's host OS, real monitor, local Ubuntu/Wayland session, macOS desktop, or Windows desktop.
 
 If the user asks for `/computer-use`, "my computer", "host machine", "local desktop", screenshots of the user's screen, hiding/minimizing a window on their screen, or any connected A0 CLI Computer Use task, do not use this skill, `desktopctl.sh`, Xpra, `code_execution_tool`, or Docker shell commands. Load `host-computer-use` and use `computer_use_remote`; if unavailable, tell the user to enable `/computer-use on`.
 
-`desktopctl.sh` only targets the internal Agent Zero Xpra display. It cannot observe or control the user's connected host screen.
+`desktopctl.sh` only targets the internal DarkOffice Xpra display. It cannot observe or control the user's connected host screen.
 
-Use the Desktop as a full Linux GUI when the user explicitly needs a visual workflow, an installed desktop app, or manual layout polish that is awkward through structured file edits alone. Agent Zero may warm the persistent Desktop runtime during initial startup, but visible Desktop surface use remains opt-in. The Desktop is opt-in at the UI level: do not open a surface just because the user asks for a document. Use structured tools first for deterministic content changes, then use the Desktop for inspection, GUI-only actions, and final visual confirmation.
+Use the Desktop as a full Linux GUI when the user explicitly needs a visual workflow, an installed desktop app, or manual layout polish that is awkward through structured file edits alone. DarkOffice may warm the persistent Desktop runtime during initial startup, but visible Desktop surface use remains opt-in. The Desktop is opt-in at the UI level: do not open a surface just because the user asks for a document. Use structured tools first for deterministic content changes, then use the Desktop for inspection, GUI-only actions, and final visual confirmation.
 
 ## Operating Model
 
@@ -49,12 +49,12 @@ Keep these standing rules:
 3. Use the Desktop only when the user asks for the Desktop, a GUI app, binary Office visual work, or visual confirmation.
 4. Never open the Desktop surface automatically from a tool result if the user has not opened it. Offer an explicit Open in Desktop action instead.
 5. Launch common apps from the Desktop icons, the header buttons, or `/a0/plugins/_desktop/skills/linux-desktop/scripts/desktopctl.sh`.
-6. Use the external Agent Zero Browser for web browsing. Do not launch an operating-system browser in this version.
+6. Use the external DarkOffice Browser for web browsing. Do not launch an operating-system browser in this version.
 7. Verify GUI work by observing the desktop state, checking window titles, and saving the file before reporting success. If exact terminal text matters, load or inspect the screenshot path returned by the final observation, not a screenshot captured before the text appeared.
 
 ## Control Flow
 
-Use the helper script when the Desktop is already open and you need reliable app launches, clicks, keystrokes, or window checks from the agent shell. In the live Agent Zero runtime, prefer the absolute path so the command works from any current directory:
+Use the helper script when the Desktop is already open and you need reliable app launches, clicks, keystrokes, or window checks from the agent shell. In the live DarkOffice runtime, prefer the absolute path so the command works from any current directory:
 
 ```bash
 DESKTOP=/a0/plugins/_desktop/skills/linux-desktop/scripts/desktopctl.sh
@@ -174,7 +174,7 @@ $DESKTOP observe --json --screenshot
 
 The Desktop exposes stable folders for common user work:
 
-- `Workdir` -> configured Agent Zero workdir (default `/a0/usr/workdir`)
+- `Workdir` -> configured DarkOffice workdir (default `/a0/usr/workdir`)
 - `Projects` -> `/a0/usr/projects`
 - `Skills` -> `/a0/usr/skills`
 - `Agents` -> `/a0/usr/agents`
@@ -187,15 +187,15 @@ Use these folders when the user asks to inspect or manipulate project files, ski
 - `LibreOffice Writer`: ODT word processing and DOCX compatibility layout.
 - `LibreOffice Calc`: ODS spreadsheets, formulas, tables, charts, and XLSX compatibility.
 - `LibreOffice Impress`: ODP presentations, slide polish, and PPTX compatibility.
-- `Workdir`: graphical file management with Thunar at the configured Agent Zero workdir (default `/a0/usr/workdir`).
-- `Terminal`: shell work inside the Agent Zero runtime.
+- `Workdir`: graphical file management with Thunar at the configured DarkOffice workdir (default `/a0/usr/workdir`).
+- `Terminal`: shell work inside the DarkOffice runtime.
 - `Settings`: XFCE system settings.
 
 ## Practical Rules
 
 - Keep installs inside normal plugin hook or image install flows; do not install packages ad hoc just to complete one desktop action.
 - The persistent Desktop can be running in the background while the canvas stays closed; that is expected and still respects user ownership of the visible UI.
-- Do not treat closing a document tab as closing the whole Desktop. The Desktop is persistent while Agent Zero is running.
+- Do not treat closing a document tab as closing the whole Desktop. The Desktop is persistent while DarkOffice is running.
 - Save before sync or final verification when the GUI app has edited a file.
 - If a GUI action is flaky, switch to structured file editing for content and return to the Desktop only for visual confirmation.
 - For live Calc edits that the user should see immediately, prefer `desktopctl.sh calc-set-cell FILE SHEET CELL VALUE`.

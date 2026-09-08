@@ -326,7 +326,7 @@ def _tool_descriptions(agent: Any, tool_names: set[str]) -> dict[str, str]:
 def _canonical_from_path(path: str, name: str) -> tuple[str, str]:
     if plugin_id := plugins.get_plugin_name_from_path(path):
         return f"plugin:{plugin_id}:{name}", f"Plugin · {plugin_id}"
-    return f"local:{name}", "Agent Zero"
+    return f"local:{name}", "DarkOffice"
 
 
 def _normalize_ids(raw: Any) -> list[str]:

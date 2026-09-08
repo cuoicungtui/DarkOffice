@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own LLM-guided security scanning for third-party Agent Zero plugins.
+- Own LLM-guided security scanning for third-party DarkOffice plugins.
 
 ## Ownership
 

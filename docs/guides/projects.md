@@ -1,6 +1,6 @@
 # Projects
 
-Projects tell Agent Zero what world it is working in.
+Projects tell DarkOffice what world it is working in.
 
 Use a project when you want a chat to have its own purpose, instructions, files,
 memory, secrets, and model choices. A project can be a client, a codebase, a
@@ -10,12 +10,12 @@ research topic, a recurring workflow, or any other focused workspace.
 
 ## When To Use One
 
-Create a project when you want Agent Zero to remember context that should not
+Create a project when you want DarkOffice to remember context that should not
 leak into every other chat.
 
 Good project examples:
 
-- A Git repository you want Agent Zero to work on.
+- A Git repository you want DarkOffice to work on.
 - A client workspace with its own tone, files, and credentials.
 - A research topic with its own sources and notes.
 - A recurring report that always follows the same steps.
@@ -42,11 +42,11 @@ recognize later in the project picker.
 
 ![Create project](../res/usage/webui/project-create-filled.png)
 
-For a simple project, the title is enough. If you want Agent Zero to clone a
+For a simple project, the title is enough. If you want DarkOffice to clone a
 repository into the project, paste the Git URL in **Git Repository** before you
 continue.
 
-After creating the project, Agent Zero opens the edit screen.
+After creating the project, DarkOffice opens the edit screen.
 
 ## Write Helpful Instructions
 
@@ -54,11 +54,11 @@ The most important part of a project is the **Instructions** field.
 
 Description answers: "What is this project?"
 
-Instructions answer: "How should Agent Zero behave when this project is active?"
+Instructions answer: "How should DarkOffice behave when this project is active?"
 
 ![Project instructions](../res/usage/webui/project-instructions-filled.png)
 
-Good instructions are usually short and specific. Tell Agent Zero:
+Good instructions are usually short and specific. Tell DarkOffice:
 
 - what the project is for,
 - what style of answer you want,
@@ -96,7 +96,7 @@ Choose your project.
 ![Project active in chat](../res/usage/webui/project-active-chat.png)
 
 When the project name appears in the top bar, the chat is now using that
-project. Agent Zero will use the project instructions and work with the project
+project. DarkOffice will use the project instructions and work with the project
 workspace for that chat.
 
 Each chat can use a different project. This lets you keep a client chat, a code
@@ -108,7 +108,7 @@ profile remains unchanged. See [Agent Profiles](agent-profiles.md).
 
 ## What Changes After Activation
 
-When a project is active, Agent Zero can use:
+When a project is active, DarkOffice can use:
 
 - the project instructions,
 - files stored in the project workspace,
@@ -132,12 +132,12 @@ Use this project as the home for our weekly research notes.
 
 ## Git Projects
 
-If you paste a Git repository URL while creating the project, Agent Zero clones
+If you paste a Git repository URL while creating the project, DarkOffice clones
 that repository into the project workspace.
 
 ![Git project clone](../res/usage/projects/projects-gitprojects-clone.png)
 
-Use Git projects when you want Agent Zero to work on a real codebase with the
+Use Git projects when you want DarkOffice to work on a real codebase with the
 right local files, branch state, and project instructions.
 
 For private repositories, use a token when the UI asks for one. Do not paste
@@ -176,7 +176,7 @@ A good project stays useful because it stays focused.
 
 ## Common Problems
 
-**Agent Zero ignores the project.**
+**DarkOffice ignores the project.**
 Check the top-right project picker. The project name must be visible in the
 active chat.
 
@@ -198,4 +198,4 @@ Split it. Projects work best when each one has a clear job.
 - [Usage Guide](usage.md)
 - [Browser Guide](browser.md)
 - [A0 CLI Connector](a0-cli-connector.md)
-- [DeepWiki for Agent Zero](https://deepwiki.com/agent0ai/agent-zero)
+- [DeepWiki for DarkOffice](https://deepwiki.com/agent0ai/agent-zero)

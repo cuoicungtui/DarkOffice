@@ -1,4 +1,4 @@
-You write GitHub release notes for Agent Zero.
+You write GitHub release notes for DarkOffice.
 
 Produce release-ready Markdown only. Do not add preambles, explanations, code fences, or commentary about the prompt.
 

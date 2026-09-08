@@ -32,7 +32,7 @@ def test_oauth_settings_exposes_provider_cards_and_model_slots():
     assert "oauth-provider-usage" in config_html
     assert "usageWindows(card.provider_id)" in config_html
     assert "connectedUsageWindows()" not in config_html
-    assert "Agent Zero models" not in config_html
+    assert "DarkOffice models" not in config_html
     assert "Usage plans" not in config_html
     assert "usagePlanEntries" in store_js
     assert "usage_plan_catalog" in (PROJECT_ROOT / "plugins/_oauth/helpers/summary.py").read_text(encoding="utf-8")

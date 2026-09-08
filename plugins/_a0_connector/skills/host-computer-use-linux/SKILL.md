@@ -7,7 +7,7 @@ description: Backend-specific Linux guidance for `computer_use_remote`. Load aft
 
 Use this after `host-computer-use` when the connected A0 CLI reports the Linux/Wayland computer-use backend.
 
-Do not use this skill for macOS, Windows, Xpra, Docker, browser-only tasks, or the internal Agent Zero Desktop. If the backend is not Linux or does not advertise AT-SPI support, skip Linux structural actions and follow the generic host computer-use rules.
+Do not use this skill for macOS, Windows, Xpra, Docker, browser-only tasks, or the internal DarkOffice Desktop. If the backend is not Linux or does not advertise AT-SPI support, skip Linux structural actions and follow the generic host computer-use rules.
 
 ## Linux AT-SPI Targeting
 

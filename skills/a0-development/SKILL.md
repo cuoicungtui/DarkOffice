@@ -1,22 +1,22 @@
 ---
 name: a0-development
-description: Development guide for extending Agent Zero from current source and DOX. Use for framework architecture, tools, extensions, API/WebUI handlers, agent profiles, prompts, skills, projects, runtime boundaries, and contribution workflow. Load the focused reference files before giving implementation guidance.
+description: Development guide for extending DarkOffice from current source and DOX. Use for framework architecture, tools, extensions, API/WebUI handlers, agent profiles, prompts, skills, projects, runtime boundaries, and contribution workflow. Load the focused reference files before giving implementation guidance.
 version: 1.1.0
-author: Agent Zero Team
+author: DarkOffice Team
 tags: ["development", "framework", "agent-zero", "extending", "tools", "extensions", "skills", "api", "agents", "prompts", "dox"]
 trigger_patterns:
-  - "extend agent zero"
-  - "agent zero development"
-  - "build agent zero feature"
-  - "create agent zero tool"
+  - "extend DarkOffice"
+  - "DarkOffice development"
+  - "build DarkOffice feature"
+  - "create DarkOffice tool"
   - "add extension"
   - "framework development"
-  - "agent zero architecture"
-  - "how does agent zero work"
-  - "create agent zero extension"
+  - "DarkOffice architecture"
+  - "how does DarkOffice work"
+  - "create DarkOffice extension"
   - "add api endpoint"
   - "create agent profile"
-  - "agent zero internals"
+  - "DarkOffice internals"
   - "how does the agent loop work"
   - "extension hook points"
   - "prompt system"
@@ -24,9 +24,9 @@ trigger_patterns:
   - "dox"
 ---
 
-# Agent Zero Development
+# DarkOffice Development
 
-Use this skill as the entry point for Agent Zero framework development. It is intentionally lean: load only the reference files that match the task, then verify against the current repository before changing code.
+Use this skill as the entry point for DarkOffice framework development. It is intentionally lean: load only the reference files that match the task, then verify against the current repository before changing code.
 
 ## Reality Rules
 

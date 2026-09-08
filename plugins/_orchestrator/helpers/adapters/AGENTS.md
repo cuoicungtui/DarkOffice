@@ -23,12 +23,12 @@
 ## Work Guidance
 
 - A0 Headless:
-  - Host resolution is config `a0.host`, then `AGENT_ZERO_HOST`, then `http://localhost:80` inside the Agent Zero container.
+  - Host resolution is config `a0.host`, then `AGENT_ZERO_HOST`, then `http://localhost:80` inside the DarkOffice container.
   - The Docker fallback binary is `/opt/venv/bin/a0` when plain `a0` is unavailable.
   - Status means the host socket is reachable; login/target choice is handled by the skill.
 - Codex CLI:
   - Detect plugin-owned `data/codex/auth.json` before external `CODEX_HOME` or `~/.codex/auth.json`.
-  - Keep device-code OAuth compatible with the Agent Zero `_oauth` reference.
+  - Keep device-code OAuth compatible with the DarkOffice `_oauth` reference.
   - External disconnect may call `codex logout`; plugin-owned disconnect deletes only the plugin auth file.
 - Claude Code:
   - Treat `ANTHROPIC_API_KEY` as environment auth.

@@ -1,6 +1,6 @@
 # Memory Guide
 
-Agent Zero can remember useful facts, solutions, preferences, and imported
+DarkOffice can remember useful facts, solutions, preferences, and imported
 knowledge so future chats do not always start from zero.
 
 That power needs curation. Long-term AI memory is not a solved problem, even for
@@ -9,7 +9,7 @@ useful, but it can also preserve stale assumptions, wrong conclusions, old test
 data, or instructions that no longer fit. A sustainable memory system needs some
 human gardening.
 
-When Agent Zero does something unexpected, keeps repeating a bad habit, or seems
+When DarkOffice does something unexpected, keeps repeating a bad habit, or seems
 strangely confident about the wrong thing, Memory is one of the first places to
 look.
 
@@ -37,7 +37,7 @@ The most useful controls are:
 - **Limit:** control how many results are returned.
 - **Clear:** reset the filters.
 
-Start with ordinary words. If Agent Zero keeps using the wrong command, search
+Start with ordinary words. If DarkOffice keeps using the wrong command, search
 for the command. If it keeps assuming the wrong project rule, search for the
 rule, client name, repo name, or phrase it keeps repeating.
 
@@ -91,7 +91,7 @@ again.
 
 ## When Behavior Looks Wrong
 
-Check Memory early when Agent Zero:
+Check Memory early when DarkOffice:
 
 - keeps following an old instruction after you corrected it;
 - keeps using a tool, path, or workflow you no longer want;
@@ -115,7 +115,7 @@ Keep project-specific memories in the project where they belong. Client rules,
 repository conventions, local commands, and workflow preferences should not leak
 into unrelated work.
 
-If Agent Zero is mixing contexts, check whether the memory belongs in global
+If DarkOffice is mixing contexts, check whether the memory belongs in global
 memory or project memory. Moving from "global forever" to "this project only" is
 one of the simplest ways to keep the system sane.
 
@@ -136,7 +136,7 @@ right signal and removing the noise that makes the agent less trustworthy.
 
 ## Related
 
-- [Usage Guide](usage.md): where Memory fits in the everyday Agent Zero workflow.
+- [Usage Guide](usage.md): where Memory fits in the everyday DarkOffice workflow.
 - [Projects Guide](projects.md): how project memory keeps client, repo, and task context separated.
-- [Troubleshooting](troubleshooting.md): quick checks when Agent Zero behaves unexpectedly.
+- [Troubleshooting](troubleshooting.md): quick checks when DarkOffice behaves unexpectedly.
 - [Backup And Restore](usage.md#backup-and-restore): what to do before large memory cleanup.

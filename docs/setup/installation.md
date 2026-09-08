@@ -6,10 +6,10 @@
 
 ## Quick Start (Recommended)
 
-Agent Zero runs as a Docker container, and you now have two friendly ways to get
+DarkOffice runs as a Docker container, and you now have two friendly ways to get
 there:
 
-- **A0 Launcher** is the desktop app. It can download Agent Zero, create and
+- **A0 Launcher** is the desktop app. It can download DarkOffice, create and
   manage Instances, and help set up the local container runtime when needed.
 - **A0 Install** is the terminal installer. It is best for SSH sessions,
   servers, scripted setup, recovery shells, or users who prefer commands.
@@ -21,7 +21,7 @@ directly.
 
 Use **A0 Launcher** when you want the guided desktop path. Download the app for
 your platform, open it, and let it check Docker or set up a runtime before it
-downloads Agent Zero.
+downloads DarkOffice.
 
 #### Downloads
 
@@ -37,7 +37,7 @@ for release notes and updater metadata. See the
 ### A0 Install
 
 Use **A0 Install** when you want the command-line path. The installer creates a
-Dockerized Agent Zero instance, mounts user data to `/a0/usr`, and tries to
+Dockerized DarkOffice instance, mounts user data to `/a0/usr`, and tries to
 reuse an existing Docker-compatible runtime before setting one up.
 
 #### macOS / Linux
@@ -76,14 +76,14 @@ docker run -p 80:80 -v a0_usr:/a0/usr agent0ai/agent-zero
 
 Once the install completes, open the URL shown in your terminal or Launcher to
 access the Web UI. Complete onboarding, add your model provider or API key, then
-continue to [Step 3: Configure Agent Zero](#step-3-configure-agent-zero).
+continue to [Step 3: Configure DarkOffice](#step-3-configure-darkoffice).
 
 > [!TIP]
-> Need Agent Zero to reach host-machine files, shell, or a host browser? Install the optional [A0 CLI Connector](../guides/a0-cli-connector.md), then run `a0` to connect your terminal to this Agent Zero instance.
+> Need DarkOffice to reach host-machine files, shell, or a host browser? Install the optional [A0 CLI Connector](../guides/a0-cli-connector.md), then run `a0` to connect your terminal to this DarkOffice instance.
 
 ---
 
-## How to Update Agent Zero
+## How to Update DarkOffice
 
 ### Self Update (Recommended)
 
@@ -91,7 +91,7 @@ Use the built-in updater in the Web UI:
 
 1. Open **Settings UI -> Update** tab
 2. Open **Self Update**
-3. Wait for the update checker to see if you have the latest version or if there's an available update. 
+3. Wait for the update checker to see if you have the latest version or if there's an available update.
 
 You'll also be prompted through the UI when a new A0 version is released. Backups are automatically managed internally during this process.
 
@@ -99,7 +99,7 @@ For technical details of the updater, see [Self Update](../guides/self-update.md
 
 ### Updating from v1.20 to v2.0
 
-Agent Zero v2.0 starts a new major release line. If your instance is on v1.20,
+DarkOffice v2.0 starts a new major release line. If your instance is on v1.20,
 the in-app Self Update can show the newer v2.x line, but it will not apply that
 jump inside the existing v1 Docker image. The safe path is:
 
@@ -111,9 +111,9 @@ jump inside the existing v1 Docker image. The safe path is:
 
 ![Self Update warning for a newer major release line](../res/usage/updating/self-update-v1-to-v2-warning.png)
 
-#### Without Agent Zero Launcher
+#### Without DarkOffice Launcher
 
-Use this path if you manage Agent Zero directly from Docker Desktop or Docker
+Use this path if you manage DarkOffice directly from Docker Desktop or Docker
 CLI.
 
 1. Open your old v1.20 Web UI and create a backup from **Settings -> Check for Updates -> Backup & Restore -> Create Backup**. Keep the downloaded `.zip` file.
@@ -128,7 +128,7 @@ CLI.
 4. Open the new v2.0 instance, complete any first-run prompts, then restore the downloaded `.zip` from **Settings -> Check for Updates -> Backup & Restore -> Restore Backup**.
 5. Verify chats, projects, memory, settings, and custom plugins before removing the old v1.20 container.
 
-#### With Agent Zero Launcher
+#### With DarkOffice Launcher
 
 Launcher gives you the same backup/restore idea from the **Instances** page.
 
@@ -147,7 +147,7 @@ to compare them before cleanup.
 
 ### Updating from Pre-v0.9.8
 
-If you are upgrading from Agent Zero v0.9.8 or earlier to v1.1 or newer, use the migration path below. Older installs were laid out differently, so the in-app Self Update is not the right tool for that jump.
+If you are upgrading from DarkOffice v0.9.8 or earlier to v1.1 or newer, use the migration path below. Older installs were laid out differently, so the in-app Self Update is not the right tool for that jump.
 
 1. **Backup your existing `usr/` directory** (which contains your settings, projects, memory, and custom plugins).
 2. **Run the new install script** to set up the current Docker-based install:
@@ -183,7 +183,7 @@ Follow the steps below to install Docker and run the image by hand.
 
 ### Step 1: Install Docker Desktop
 
-Docker Desktop provides the runtime environment for Agent Zero, ensuring consistent behavior and security across platforms. The entire framework runs within a Docker container, providing isolation and easy deployment.
+Docker Desktop provides the runtime environment for DarkOffice, ensuring consistent behavior and security across platforms. The entire framework runs within a Docker container, providing isolation and easy deployment.
 
 **Choose your operating system:**
 
@@ -238,7 +238,7 @@ Once installed, launch Docker Desktop from your Start menu or desktop shortcut.
 
 **Docker is now installed.**
 
-Continue to [Step 2: Run Agent Zero](#step-2-run-agent-zero)
+Continue to [Step 2: Run DarkOffice](#step-2-run-darkoffice)
 
 ---
 
@@ -275,7 +275,7 @@ Open Docker Desktop from your Applications folder.
 
 **Docker is now installed.**
 
-Continue to [Step 2: Run Agent Zero](#step-2-run-agent-zero)
+Continue to [Step 2: Run DarkOffice](#step-2-run-darkoffice)
 
 ---
 
@@ -319,9 +319,9 @@ If you installed Docker Desktop, launch it from your applications menu.
 
 ---
 
-### Step 2: Run Agent Zero
+### Step 2: Run DarkOffice
 
-#### 2.1. Pull the Agent Zero Docker Image
+#### 2.1. Pull the DarkOffice Docker Image
 
 **Using Docker Desktop GUI:**
 
@@ -339,7 +339,7 @@ docker pull agent0ai/agent-zero
 
 #### 2.2. (Optional) Map Folders for Persistence
 
-Choose or create a folder on your computer where Agent Zero will save its data. 
+Choose or create a folder on your computer where DarkOffice will save its data.
 
 Setting up persistence is needed only if you want your data and files to remain available even after you delete the container.
 
@@ -354,7 +354,7 @@ You can map just the `/a0/usr` directory (recommended) or individual subfolders 
 > Do **not** map the entire `/a0` directory: it contains the application code and can break upgrades.
 
 > [!TIP]
-> Choose a location that's easy to access and backup. All your Agent Zero data will be directly accessible in this directory.
+> Choose a location that's easy to access and backup. All your DarkOffice data will be directly accessible in this directory.
 
 #### 2.3. Run the Container
 
@@ -379,7 +379,7 @@ The framework will take a few seconds to initialize. Find the mapped port in Doc
 
 ![docker logs](../res/setup/5-docker-click-to-open.png)
 
-Open `http://localhost:<PORT>` in your browser. The Web UI will open - Agent Zero is ready for configuration!
+Open `http://localhost:<PORT>` in your browser. The Web UI will open - DarkOffice is ready for configuration!
 
 ![docker ui](../res/setup/6-docker-a0-running-new.png)
 
@@ -387,7 +387,7 @@ Open `http://localhost:<PORT>` in your browser. The Web UI will open - Agent Zer
 > You can also access the Web UI by clicking the port link directly under the container ID in Docker Desktop.
 
 > [!NOTE]
-> After starting the container, you'll find all Agent Zero files in your chosen directory. You can access and edit these files directly on your machine, and the changes will be immediately reflected in the running container.
+> After starting the container, you'll find all DarkOffice files in your chosen directory. You can access and edit these files directly on your machine, and the changes will be immediately reflected in the running container.
 
 **Running A0 using Terminal?**
 
@@ -399,7 +399,7 @@ docker run -p 0:80 -v /path/to/your/work_dir:/a0/usr agent0ai/agent-zero
 
 ---
 
-## Step 3: Configure Agent Zero
+## Step 3: Configure DarkOffice
 
 The UI opens on the welcome screen. If model setup is missing, send a message
 or use the setup shortcuts to choose Cloud, AI account, or Local access, then
@@ -408,7 +408,7 @@ select your main and utility models. For the screenshot walkthrough, see the
 
 ### Settings Configuration
 
-Agent Zero provides a comprehensive settings interface to customize various aspects of its functionality. Access the settings by clicking the "Settings" button with a gear icon in the sidebar.
+DarkOffice provides a comprehensive settings interface to customize various aspects of its functionality. Access the settings by clicking the "Settings" button with a gear icon in the sidebar.
 
 ### Agent Configuration
 
@@ -464,11 +464,11 @@ Use `claude-sonnet-4-5` for Anthropic, but use `anthropic/claude-sonnet-4-5` for
 - **Model Name:** Select the specific embedding model (e.g., text-embedding-3-small)
 
 > [!NOTE]
-> Agent Zero uses a local embedding model by default (runs on CPU), but you can switch to OpenAI embeddings like `text-embedding-3-small` or `text-embedding-3-large` if preferred.
+> DarkOffice uses a local embedding model by default (runs on CPU), but you can switch to OpenAI embeddings like `text-embedding-3-small` or `text-embedding-3-large` if preferred.
 
 ### Built-in Voice Plugins
 
-- Agent Zero ships Whisper STT as the built-in `_whisper_stt` plugin and Kokoro TTS as the built-in `_kokoro_tts` plugin.
+- DarkOffice ships Whisper STT as the built-in `_whisper_stt` plugin and Kokoro TTS as the built-in `_kokoro_tts` plugin.
 - Docker/bootstrap remains responsible for installing the required speech dependencies such as `ffmpeg`, Kokoro, Whisper, and `soundfile`.
 - Both plugins can be enabled or disabled independently from the Agent Plugins section in the Web UI.
 - Whisper model size, language, message handling, and silence behavior are configured from the plugin settings screen.
@@ -479,13 +479,13 @@ Use `claude-sonnet-4-5` for Anthropic, but use `anthropic/claude-sonnet-4-5` for
 Configure API keys for various service providers directly within the Web UI. Click `Save` to confirm your settings.
 
 > [!NOTE]
-> **OpenAI API vs Plus subscription:** A ChatGPT Plus subscription does not include API credits. You must provide a separate API key for OpenAI usage in Agent Zero.
+> **OpenAI API vs Plus subscription:** A ChatGPT Plus subscription does not include API credits. You must provide a separate API key for OpenAI usage in DarkOffice.
 
 > [!TIP]
 > For OpenAI-compatible providers (e.g., custom gateways or Z.AI/GLM), add the API key under **External Services -> Other OpenAI-compatible API keys**, then select **OpenAI Compatible** as the provider in model settings.
 
 > [!CAUTION]
-> **GitHub Copilot Provider:** When using the GitHub Copilot provider, after selecting the model and entering your first prompt, the OAuth login procedure will begin. You'll find the authentication code and link in the output logs. Complete the authentication process by following the provided link and entering the code, then you may continue using Agent Zero.
+> **GitHub Copilot Provider:** When using the GitHub Copilot provider, after selecting the model and entering your first prompt, the OAuth login procedure will begin. You'll find the authentication code and link in the output logs. Complete the authentication process by following the provided link and entering the code, then you may continue using DarkOffice.
 
 ### Authentication
 
@@ -512,7 +512,7 @@ Learn more about Remote Function Calls in the [Development Setup guide](dev-setu
 
 ## Choosing Your LLMs
 
-The Settings page is the control center for selecting the Large Language Models (LLMs) that power Agent Zero. You can choose different LLMs for different roles:
+The Settings page is the control center for selecting the Large Language Models (LLMs) that power DarkOffice. You can choose different LLMs for different roles:
 
 | LLM Role | Description |
 | --- | --- |
@@ -549,7 +549,7 @@ Use the naming format required by your selected provider:
 
 #### Local Model Server Addresses From Docker
 
-When Agent Zero runs in Docker, `localhost` and `127.0.0.1` inside an API base URL mean the Agent Zero container, not your host machine. For a model server running on the host, use `http://host.docker.internal:<port>` when available, or the Docker host gateway address such as `http://172.17.0.1:<port>` on the default Linux bridge.
+When DarkOffice runs in Docker, `localhost` and `127.0.0.1` inside an API base URL mean the DarkOffice container, not your host machine. For a model server running on the host, use `http://host.docker.internal:<port>` when available, or the Docker host gateway address such as `http://172.17.0.1:<port>` on the default Linux bridge.
 
 If the model server only listens on host loopback, for example `127.0.0.1:<port>`, the container still cannot reach it through the gateway. Configure the local server to listen on a Docker-reachable address such as `0.0.0.0`, and keep that port limited to trusted clients.
 
@@ -601,22 +601,22 @@ To run a foreground server with oMLX's paged SSD cache enabled:
 omlx serve --model-dir ~/.omlx/models --paged-ssd-cache-dir ~/.omlx/cache
 ```
 
-### Configuring oMLX in Agent Zero
+### Configuring oMLX in DarkOffice
 
 1. Start oMLX and make sure at least one model is available in the oMLX dashboard or model directory.
-2. In Agent Zero Settings, choose **oMLX** as the Chat model, Utility model, or Embedding model provider.
+2. In DarkOffice Settings, choose **oMLX** as the Chat model, Utility model, or Embedding model provider.
 3. Use the model name shown by oMLX's model list or dashboard.
-4. Agent Zero includes Docker-friendly defaults for oMLX on the host at `http://host.docker.internal:8000/v1`. Override the API base URL only if your oMLX server runs somewhere else.
+4. DarkOffice includes Docker-friendly defaults for oMLX on the host at `http://host.docker.internal:8000/v1`. Override the API base URL only if your oMLX server runs somewhere else.
 5. Click `Save` to confirm your settings.
 
 > [!NOTE]
-> If Agent Zero runs in Docker and oMLX runs on the Mac host, ensure port **8000** is reachable from the container. The shipped Docker Compose file maps `host.docker.internal` to the host gateway for Linux Docker. Docker Desktop for macOS provides this hostname automatically.
+> If DarkOffice runs in Docker and oMLX runs on the Mac host, ensure port **8000** is reachable from the container. The shipped Docker Compose file maps `host.docker.internal` to the host gateway for Linux Docker. Docker Desktop for macOS provides this hostname automatically.
 
 ---
 
 ## Installing and Using llama.cpp (GGUF Local Models)
 
-llama.cpp provides `llama-server`, a lightweight OpenAI-compatible HTTP server for GGUF models. Agent Zero talks to it through the same `/v1` API used by OpenAI-compatible clients.
+llama.cpp provides `llama-server`, a lightweight OpenAI-compatible HTTP server for GGUF models. DarkOffice talks to it through the same `/v1` API used by OpenAI-compatible clients.
 
 ### macOS llama.cpp Installation
 
@@ -632,18 +632,18 @@ Start a server with a downloaded GGUF model:
 llama-server -m ~/models/model.gguf --port 8080 --alias local-gguf
 ```
 
-By default, Agent Zero expects llama.cpp at `http://host.docker.internal:8080/v1`. The model name can be the model path returned by `/v1/models`, but using `--alias` gives you a short stable name such as `local-gguf`.
+By default, DarkOffice expects llama.cpp at `http://host.docker.internal:8080/v1`. The model name can be the model path returned by `/v1/models`, but using `--alias` gives you a short stable name such as `local-gguf`.
 
-### Configuring llama.cpp in Agent Zero
+### Configuring llama.cpp in DarkOffice
 
 1. Start `llama-server` and confirm `http://localhost:8080/v1/models` returns your model.
-2. In Agent Zero Settings, choose **llama.cpp** as the Chat model, Utility model, or Embedding model provider.
+2. In DarkOffice Settings, choose **llama.cpp** as the Chat model, Utility model, or Embedding model provider.
 3. Use the model ID shown by `/v1/models`, or the alias you passed with `--alias`.
 4. Override the API base URL only if you started `llama-server` on another host or port.
 5. Click `Save` to confirm your settings.
 
 > [!NOTE]
-> If Agent Zero runs in Docker and cannot reach a host-side `llama-server`, start the server on an address Docker can reach, for example `--host 0.0.0.0`, and keep the port firewalled to trusted clients.
+> If DarkOffice runs in Docker and cannot reach a host-side `llama-server`, start the server on an address Docker can reach, for example `--host 0.0.0.0`, and keep the port firewalled to trusted clients.
 
 ---
 
@@ -664,12 +664,12 @@ Start a basic OpenAI-compatible server:
 vllm serve Qwen/Qwen2.5-1.5B-Instruct --host 0.0.0.0 --port 8000
 ```
 
-By default, Agent Zero expects vLLM at `http://host.docker.internal:8000/v1`, matching vLLM's default HTTP port. If another local provider already uses port 8000, start vLLM on another port and update Agent Zero's API base, for example `http://host.docker.internal:8001/v1`.
+By default, DarkOffice expects vLLM at `http://host.docker.internal:8000/v1`, matching vLLM's default HTTP port. If another local provider already uses port 8000, start vLLM on another port and update DarkOffice's API base, for example `http://host.docker.internal:8001/v1`.
 
-### Configuring vLLM in Agent Zero
+### Configuring vLLM in DarkOffice
 
 1. Start vLLM and confirm `http://localhost:8000/v1/models` returns the served model.
-2. In Agent Zero Settings, choose **vLLM** as the Chat model, Utility model, or Embedding model provider.
+2. In DarkOffice Settings, choose **vLLM** as the Chat model, Utility model, or Embedding model provider.
 3. Use the model ID returned by vLLM's model list endpoint.
 4. If you started vLLM with `--api-key`, enter the same key in the advanced provider settings or environment.
 5. Click `Save` to confirm your settings.
@@ -740,18 +740,18 @@ ollama pull <model-name>
 
 Replace `<model-name>` with the name of the model you want to use. For example: `ollama pull mistral-large`
 
-### Configuring Ollama in Agent Zero
+### Configuring Ollama in DarkOffice
 
 1. Once you've downloaded your model(s), select it in the Settings page of the GUI.
 2. Within the Chat model, Utility model, or Embedding model section, choose **Ollama** as provider.
 3. Write your model code as expected by Ollama, in the format `llama3.2` or `qwen2.5:7b`
-4. Agent Zero includes Docker-friendly defaults for Ollama on the host at `http://host.docker.internal:11434`. Override the API base URL only if your Ollama server runs somewhere else.
+4. DarkOffice includes Docker-friendly defaults for Ollama on the host at `http://host.docker.internal:11434`. Override the API base URL only if your Ollama server runs somewhere else.
 5. Click `Save` to confirm your settings.
 
 ![ollama](../res/setup/settings/4-local-models.png)
 
 > [!NOTE]
-> If Agent Zero runs in Docker and Ollama runs on the host, ensure port **11434** is reachable from the container. The shipped Docker Compose file maps `host.docker.internal` to the host gateway for Linux Docker. If both services are in the same Docker network, you can use `http://<container_name>:11434` instead of `host.docker.internal`.
+> If DarkOffice runs in Docker and Ollama runs on the host, ensure port **11434** is reachable from the container. The shipped Docker Compose file maps `host.docker.internal` to the host gateway for Linux Docker. If both services are in the same Docker network, you can use `http://<container_name>:11434` instead of `host.docker.internal`.
 
 ### Managing Downloaded Models
 
@@ -768,23 +768,23 @@ ollama rm <model-name>
 ```
 
 > [!TIP]
-> Experiment with different model combinations to find the balance of performance and cost that best suits your needs. E.g., faster and lower latency LLMs will help, and you can also use `faiss_gpu` instead of `faiss_cpu` for the memory. 
+> Experiment with different model combinations to find the balance of performance and cost that best suits your needs. E.g., faster and lower latency LLMs will help, and you can also use `faiss_gpu` instead of `faiss_cpu` for the memory.
 
 ---
 
-## Using Agent Zero on Your Mobile Device
+## Using DarkOffice on Your Mobile Device
 
-Agent Zero can be accessed from mobile devices and other computers using the built-in **Tunnel feature**.
+DarkOffice can be accessed from mobile devices and other computers using the built-in **Tunnel feature**.
 
 ### Recommended: Using Tunnel (Remote Access)
 
-The Tunnel feature allows secure access to your Agent Zero instance from anywhere:
+The Tunnel feature allows secure access to your DarkOffice instance from anywhere:
 
 1. Open Settings in the Web UI
 2. Navigate to the **External Services** tab
 3. Click on **Flare Tunnel** in the navigation menu
 4. Click **Create Tunnel** to generate a secure HTTPS URL
-5. Share this URL to access Agent Zero from any device
+5. Share this URL to access DarkOffice from any device
 
 > [!IMPORTANT]
 > **Security:** Always set a username and password in Settings -> Authentication before creating a tunnel to secure your instance on the internet.
@@ -802,13 +802,13 @@ If you prefer to keep access limited to your local network:
 > [!TIP]
 > Find your computer's IP address with `ipconfig` (Windows) or `ifconfig`/`ip addr` (macOS/Linux). It's usually in the format `192.168.x.x` or `10.0.x.x`.
 
-For developers or users who need to run Agent Zero directly on their system, see the [In-Depth Guide for Full Binaries Installation](dev-setup.md).
+For developers or users who need to run DarkOffice directly on their system, see the [In-Depth Guide for Full Binaries Installation](dev-setup.md).
 
 ---
 
 ## Advanced: Automated Configuration via Environment Variables
 
-Agent Zero settings can be automatically configured using environment variables with the `A0_SET_` prefix in your `.env` file. This enables automated deployments without manual configuration.
+DarkOffice settings can be automatically configured using environment variables with the `A0_SET_` prefix in your `.env` file. This enables automated deployments without manual configuration.
 
 **Usage:**
 
@@ -860,7 +860,7 @@ If you are migrating from older, non-Docker setups, A0 handles the migration of 
 
 ## Conclusion
 
-After following the instructions for your specific operating system, you should have Agent Zero successfully installed and running. You can now start exploring the framework's capabilities and experimenting with creating your own intelligent agents.
+After following the instructions for your specific operating system, you should have DarkOffice successfully installed and running. You can now start exploring the framework's capabilities and experimenting with creating your own intelligent agents.
 
 **Next Steps:**
 
@@ -868,4 +868,4 @@ After following the instructions for your specific operating system, you should 
 - For development setup and extensions, see the [Development Setup Guide](dev-setup.md)
 - For remote access via tunnel, see [Remote Access via Tunneling](../guides/usage.md#remote-access-via-tunneling)
 
-If you encounter any issues during the installation process, please consult the [Troubleshooting section](../guides/troubleshooting.md) of this documentation or refer to the Agent Zero [Skool](https://www.skool.com/agent-zero) or [Discord](https://discord.gg/B8KZKNsPpj) community for assistance.
+If you encounter any issues during the installation process, please consult the [Troubleshooting section](../guides/troubleshooting.md) of this documentation or refer to the DarkOffice [Skool](https://www.skool.com/agent-zero) or [Discord](https://discord.gg/B8KZKNsPpj) community for assistance.

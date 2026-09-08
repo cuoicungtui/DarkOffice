@@ -1,6 +1,6 @@
 ---
 name: a0-create-agent
-description: Create a new Agent Zero agent profile (subordinate). Covers where profiles live (user / plugin-distributed / project-scoped), the agent.yaml schema, the prompt inheritance & override model, and optional profile-specific tools and extensions. Use for any "create/add/new agent profile" request.
+description: Create a new DarkOffice agent profile (subordinate). Covers where profiles live (user / plugin-distributed / project-scoped), the agent.yaml schema, the prompt inheritance & override model, and optional profile-specific tools and extensions. Use for any "create/add/new agent profile" request.
 version: 1.0.0
 tags: ["agents", "profile", "create", "new", "subordinate"]
 trigger_patterns:
@@ -12,7 +12,7 @@ trigger_patterns:
   - "build agent profile"
 ---
 
-# Create an Agent Zero Agent Profile
+# Create an DarkOffice Agent Profile
 
 > [!IMPORTANT]
 > Do **not** create new profiles in `/a0/agents/` — that directory is reserved for core framework profiles (`default`, `agent0`, `developer`, `hacker`, `researcher`, `_example`). User profiles belong in `/a0/usr/agents/<profile_name>/`.
@@ -58,7 +58,7 @@ Default assumptions unless the user says otherwise:
 
 - Scope: user profile in `/a0/usr/agents/<name>`.
 - Models: inherit global/project `_model_config`.
-- Response contract: keep the standard Agent Zero JSON tool-call contract.
+- Response contract: keep the standard DarkOffice JSON tool-call contract.
 - Extras: no custom tools or lifecycle extensions.
 - Prompt strategy: `agent.yaml` plus `prompts/agent.system.main.specifics.md`.
 
@@ -232,7 +232,7 @@ A profile with only `agent.yaml` is valid — it inherits everything from `defau
 
 ## Step 4: Optional profile-specific model preset
 
-Agent Zero does **not** read model settings from `agent.yaml`. The `_model_config` plugin is always enabled and supports per-agent-profile preset selection. If the user wants this profile to use a specific existing global preset, create a companion config file:
+DarkOffice does **not** read model settings from `agent.yaml`. The `_model_config` plugin is always enabled and supports per-agent-profile preset selection. If the user wants this profile to use a specific existing global preset, create a companion config file:
 
 | Profile scope | Model config path |
 |---|---|
@@ -275,7 +275,7 @@ This is the designated extension slot for profile-specific role, identity, and b
 | `/a0/agents/developer/prompts/agent.system.main.specifics.md` | Full "Master Developer" role + process spec (most elaborate example) |
 | `/a0/agents/hacker/prompts/agent.system.main.specifics.md` | Concise red/blue team pentester identity |
 | `/a0/agents/researcher/prompts/agent.system.main.specifics.md` | Research methodology and deliverable expectations |
-| `/a0/agents/_example/prompts/agent.system.main.specifics.md` | Minimal demo override (fictional "Agent Zero" persona) |
+| `/a0/agents/_example/prompts/agent.system.main.specifics.md` | Minimal demo override (fictional "DarkOffice" persona) |
 
 Start by copying whichever existing profile's `specifics.md` is closest to your target, then rewrite.
 
@@ -309,7 +309,7 @@ The root `/a0/prompts` directory contains powerful defaults. A profile can overr
 | `agent.system.main.communication.md` | A different response contract, such as no `thoughts` array, a different JSON schema, plain Markdown answers, or a domain-specific output envelope. This is the main lever for output format changes. |
 | `agent.system.main.solving.md` | A different problem-solving loop, delegation policy, verification standard, or autonomy level. |
 | `agent.system.main.tips.md` | Different file-handling, skill-use, memory, or operational best-practice defaults. |
-| `agent.system.main.environment.md` | A different runtime/environment description than the default Kali/Docker Agent Zero environment. |
+| `agent.system.main.environment.md` | A different runtime/environment description than the default Kali/Docker DarkOffice environment. |
 | `agent.system.main.role.md` | A fundamentally different base identity. Rare; prefer `specifics.md` unless replacing the base role is intentional. |
 | `agent.system.tool.response.md` | Different final-response tool instructions, such as stricter final formatting or use of includes for long output. |
 | `fw.user_message.md` / `fw.ai_response.md` | Different framework message wrapping. Advanced and fragile; override only with a clear reason. |

@@ -289,19 +289,19 @@ class XaiGrokOAuthProvider:
                     return LoginPollResult(
                         ok=False,
                         provider_id=XAI_GROK_PROVIDER_ID,
-                        error="OAuth state mismatch. Return to Agent Zero and start a new xAI Grok connection.",
+                        error="OAuth state mismatch. Return to DarkOffice and start a new xAI Grok connection.",
                     )
                 return LoginPollResult(
                     ok=False,
                     provider_id=XAI_GROK_PROVIDER_ID,
                     expired=True,
-                    error="OAuth sign-in expired. Return to Agent Zero and start a new xAI Grok connection.",
+                    error="OAuth sign-in expired. Return to DarkOffice and start a new xAI Grok connection.",
                 )
             if attempt.provider_id != XAI_GROK_PROVIDER_ID:
                 return LoginPollResult(
                     ok=False,
                     provider_id=XAI_GROK_PROVIDER_ID,
-                    error="OAuth state mismatch. Return to Agent Zero and start a new xAI Grok connection.",
+                    error="OAuth state mismatch. Return to DarkOffice and start a new xAI Grok connection.",
                 )
         elif allow_missing_state:
             attempt = latest_attempt(XAI_GROK_PROVIDER_ID)

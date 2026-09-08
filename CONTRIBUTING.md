@@ -1,4 +1,4 @@
-# Contributing to Agent Zero
+# Contributing to DarkOffice
 
 This file is the GitHub-visible entry point for contributors.
 
@@ -20,9 +20,9 @@ For the full contribution workflow, start with:
 
 ## Choosing the right place to share work
 
-- **Core bugfix or docs for Agent Zero itself:** contribute back to `agent0ai/agent-zero` from a public fork.
+- **Core bugfix or docs for DarkOffice itself:** contribute back to `agent0ai/agent-zero` from a public fork.
 - **Community plugin:** publish the plugin in its own public repository, then submit it to `agent0ai/a0-plugins`.
-- **Reusable skill:** contribute it to Agent Zero's `skills/` tree or publish it in a dedicated public repository/collection.
+- **Reusable skill:** contribute it to DarkOffice's `skills/` tree or publish it in a dedicated public repository/collection.
 - **Private experiment, customer-specific code, local R&D, or sensitive material:** keep it out of public forks and upstream PRs.
 
 If you're unsure, use the decision guide in [`docs/developer/sharing-and-safety.md`](docs/developer/sharing-and-safety.md).

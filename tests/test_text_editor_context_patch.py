@@ -148,7 +148,7 @@ def test_context_patch_replaces_when_anchor_is_target_line(
     target.write_text(
         (
             "def main():\n"
-            "    print(greet(\"Agent Zero\"))\n"
+            "    print(greet(\"DarkOffice\"))\n"
             "\n"
             "\n"
             "if __name__ == \"__main__\":\n"
@@ -162,9 +162,9 @@ def test_context_patch_replaces_when_anchor_is_target_line(
         (
             "*** Begin Patch\n"
             "*** Update File: sample.py\n"
-            "@@     print(greet(\"Agent Zero\"))\n"
-            "-    print(greet(\"Agent Zero\"))\n"
-            "+    print(greet(\"Agent Zero\").upper())\n"
+            "@@     print(greet(\"DarkOffice\"))\n"
+            "-    print(greet(\"DarkOffice\"))\n"
+            "+    print(greet(\"DarkOffice\").upper())\n"
             "*** End Patch"
         ),
     )
@@ -172,7 +172,7 @@ def test_context_patch_replaces_when_anchor_is_target_line(
     assert result["line_from"] == 2
     assert target.read_text(encoding="utf-8") == (
         "def main():\n"
-        "    print(greet(\"Agent Zero\").upper())\n"
+        "    print(greet(\"DarkOffice\").upper())\n"
         "\n"
         "\n"
         "if __name__ == \"__main__\":\n"

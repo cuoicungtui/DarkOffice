@@ -3,7 +3,7 @@
 ## Purpose
 
 - Own the `fasta2a_server.py` helper module.
-- This module serves Agent Zero through a dynamic A2A proxy.
+- This module serves DarkOffice through a dynamic A2A proxy.
 - Keep this file-level DOX profile synchronized with `fasta2a_server.py` because this directory is intentionally flat.
 
 ## Ownership
@@ -31,7 +31,7 @@
 
 - Helper modules own reusable framework APIs and must preserve public callers unless all callers, tests, and docs are updated together.
 - Update this file whenever public functions, classes, persistence behavior, path/security assumptions, side effects, or cross-module contracts change.
-- Agent Zero wraps `FastA2A` with `AgentZeroFastA2A` so the generated agent card sets `capabilities.streaming` to `true` by default.
+- DarkOffice wraps `FastA2A` with `AgentZeroFastA2A` so the generated agent card sets `capabilities.streaming` to `true` by default.
 - Observed side-effect areas: filesystem writes, filesystem deletion, settings/state persistence, secret handling, scheduler state.
 - Imported dependency areas include: `agent`, `asyncio`, `atexit`, `contextlib`, `helpers`, `helpers.persist_chat`, `helpers.print_style`, `initialize`, `json`, `starlette.requests`, `starlette.responses`, `threading`, `typing`, `uuid`.
 

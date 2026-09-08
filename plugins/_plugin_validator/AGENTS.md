@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own structured validation of Agent Zero plugins against manifest, structure, code-pattern, and security conventions.
+- Own structured validation of DarkOffice plugins against manifest, structure, code-pattern, and security conventions.
 
 ## Ownership
 

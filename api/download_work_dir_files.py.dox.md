@@ -31,6 +31,7 @@
 - `DownloadFiles` defines `process(...)`.
 - The endpoint retains the default authenticated and CSRF-protected browser contract.
 - Selected paths use `/` as their root, matching the authenticated File Browser and editor filesystem scope.
+- Generated archives use the `darkoffice-selected-<count>-<timestamp>.zip` default name.
 - Observed side-effect areas: filesystem reads, filesystem writes, filesystem deletion.
 - Imported dependency areas include: `api.download_work_dir_file`, `base64`, `flask`, `helpers`, `helpers.api`, `helpers.localization`, `io`, `os`, `pathlib`, `tempfile`, `zipfile`.
 

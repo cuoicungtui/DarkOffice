@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own the workflow for browsing, scanning, installing, updating, enabling, disabling, and uninstalling Agent Zero plugins.
+- Own the workflow for browsing, scanning, installing, updating, enabling, disabling, and uninstalling DarkOffice plugins.
 
 ## Ownership
 

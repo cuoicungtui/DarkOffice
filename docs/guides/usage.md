@@ -1,26 +1,26 @@
 # Usage Guide
 
-This guide is the practical tour of Agent Zero after installation. It explains
+This guide is the practical tour of DarkOffice after installation. It explains
 what you can do in the Web UI, what to try first, and where to go when you want
 the deeper source-linked explanation.
 
 For architecture, backend flow, Web UI internals, plugin lifecycle, and API
-details, use [DeepWiki for Agent Zero](https://deepwiki.com/agent0ai/agent-zero).
+details, use [DeepWiki for DarkOffice](https://deepwiki.com/agent0ai/agent-zero).
 
-![Agent Zero first task](../res/usage/first-task.png)
+![DarkOffice first task](../res/usage/first-task.png)
 
 ## Basic Operations
 
-Agent Zero is built around a chat, a working Linux environment, and a Web UI that
+DarkOffice is built around a chat, a working Linux environment, and a Web UI that
 lets you watch and steer the work.
 
 Common places to start:
 
 - **New Chat:** start a clean conversation.
 - **Projects:** give a chat its own workspace, files, memory, secrets, and instructions.
-- **Memory:** review what Agent Zero has learned or imported.
+- **Memory:** review what DarkOffice has learned or imported.
 - **Tasks:** create scheduled, planned, or manual automations.
-- **Files:** open the Agent Zero file browser.
+- **Files:** open the DarkOffice file browser.
 - **Settings:** configure models, credentials, preferences, plugins, and backup.
 - **Browser:** open the live Browser surface when you want to watch browsing or annotate a page.
 - **Desktop:** open the live Linux desktop when you want GUI apps, a terminal window, or LibreOffice Cowork.
@@ -63,7 +63,7 @@ without opening the full Settings screen.
 
 ### Skills
 
-Skills are focused instructions Agent Zero can load when it needs them. You can
+Skills are focused instructions DarkOffice can load when it needs them. You can
 also pin a skill manually for the current chat.
 
 Click the **+** button in the chat input, then click **Skills**.
@@ -125,11 +125,11 @@ Move these files into a clean folder structure and explain what changed.
 ```
 
 Attached files are visible in the chat input before you send the message, so you
-can remove mistakes before Agent Zero starts working.
+can remove mistakes before DarkOffice starts working.
 
 ## Tool Usage
 
-You usually do not need to name tools. Say what you want done and Agent Zero will
+You usually do not need to name tools. Say what you want done and DarkOffice will
 choose whether it needs the browser, code execution, files, knowledge, plugins,
 or another available capability.
 
@@ -148,7 +148,7 @@ Inspect this repository and propose the safest first improvement before changing
 ```
 
 When you do want internals, use
-[DeepWiki for Agent Zero](https://deepwiki.com/agent0ai/agent-zero).
+[DeepWiki for DarkOffice](https://deepwiki.com/agent0ai/agent-zero).
 
 ### Browser Tool And Surface
 
@@ -178,7 +178,7 @@ External browser MCP tools are still useful for specialized setups. See
 
 ### Desktop Surface
 
-The Desktop surface opens Agent Zero's own Linux desktop in the Canvas.
+The Desktop surface opens DarkOffice's own Linux desktop in the Canvas.
 Use it when you want the agent to work visually with GUI apps, open a terminal,
 or cowork with you in LibreOffice.
 
@@ -186,23 +186,23 @@ or cowork with you in LibreOffice.
 
 The **New** menu can create Markdown, Writer, Spreadsheet, and Presentation
 files. Writer, Calc, and Impress run inside the Desktop, so you can edit by hand
-while Agent Zero creates, updates, saves, and verifies the same files.
+while DarkOffice creates, updates, saves, and verifies the same files.
 
 For the screenshot walkthrough and prompt examples, see the
 [Desktop Guide](desktop.md).
 
 ### Agent-To-Agent Communication
 
-Agent Zero instances can communicate through A2A when you want multiple
+DarkOffice instances can communicate through A2A when you want multiple
 instances to collaborate.
 
-Use A2A when you have a clear reason to split work across Agent Zero instances,
+Use A2A when you have a clear reason to split work across DarkOffice instances,
 such as a specialist server, a remote machine, or a project-specific agent. See
 [A2A Setup](a2a-setup.md).
 
 ### Multi-Agent Cooperation
 
-Inside a single Agent Zero instance, the main agent can create subordinate agents
+Inside a single DarkOffice instance, the main agent can create subordinate agents
 to investigate focused parts of a larger job.
 
 ![Multi-agent cooperation](../res/usage/multi-agent.png)
@@ -212,7 +212,7 @@ agent should gather information while another keeps the main plan moving.
 
 ## Projects
 
-Projects tell Agent Zero what world it is working in. Use one when a chat needs
+Projects tell DarkOffice what world it is working in. Use one when a chat needs
 its own files, instructions, memory, secrets, or model settings.
 
 ![Project active in chat](../res/usage/webui/project-active-chat.png)
@@ -229,7 +229,7 @@ The simple flow:
 
 ![Project instructions](../res/usage/webui/project-instructions-filled.png)
 
-Good project instructions tell Agent Zero what should be different in that
+Good project instructions tell DarkOffice what should be different in that
 workspace:
 
 ```markdown
@@ -247,7 +247,7 @@ See the [Projects guide](projects.md) for the full screenshot walkthrough.
 
 ## Tasks And Scheduling
 
-Tasks let Agent Zero run work later, repeatedly, or on demand.
+Tasks let DarkOffice run work later, repeatedly, or on demand.
 
 Use tasks for:
 
@@ -266,7 +266,7 @@ When creating a task, focus on four things:
 - **Name:** what you will recognize later.
 - **Type:** scheduled, planned, or ad-hoc.
 - **Project:** optional, but recommended when the task needs specific context or secrets.
-- **Prompt:** the actual work Agent Zero should perform.
+- **Prompt:** the actual work DarkOffice should perform.
 
 ![Edit task](../res/usage/tasks/edit-task.png)
 
@@ -302,7 +302,7 @@ of important secrets because backups may not include every secret.
 
 ## Remote Access Via Tunneling
 
-Tunnels let you reach your local Agent Zero instance from another device or
+Tunnels let you reach your local DarkOffice instance from another device or
 share it temporarily.
 
 Before creating a tunnel:
@@ -315,13 +315,13 @@ Open **Settings -> External Services -> Flare Tunnel** to create or stop a tunne
 
 ## Voice Interface
 
-Agent Zero supports text-to-speech and speech-to-text through built-in voice plugins:
+DarkOffice supports text-to-speech and speech-to-text through built-in voice plugins:
 
 - `_kokoro_tts` provides container-side Kokoro speech synthesis when enabled.
 - `_whisper_stt` provides local Whisper transcription and adds the microphone control when enabled.
 - Browser-native `speechSynthesis` remains the fallback output path when `_kokoro_tts` is disabled.
 
-Use the **Voice** section in Agent settings or the plugin settings in **Agent Plugins** to configure providers. Use the sidebar **Speech** preference when you want Agent Zero to read responses automatically.
+Use the **Voice** section in Agent settings or the plugin settings in **Agent Plugins** to configure providers. Use the sidebar **Speech** preference when you want DarkOffice to read responses automatically.
 
 Use speech when you want to listen while doing something else, dictate a prompt,
 or make the interface more accessible.
@@ -338,7 +338,7 @@ Speech-to-text settings live in the Whisper STT plugin card and include model si
 
 ## Mathematical Expressions
 
-Agent Zero can render mathematical notation with KaTeX.
+DarkOffice can render mathematical notation with KaTeX.
 
 ![KaTeX display](../res/usage/ui-katex-2.png)
 
@@ -350,7 +350,7 @@ Solve this step by step and show the final equations in KaTeX.
 
 ## File Browser
 
-The File Browser lets you inspect and manage files inside the Agent Zero
+The File Browser lets you inspect and manage files inside the DarkOffice
 environment.
 
 ![File Browser](../res/usage/file-browser.png)
@@ -369,7 +369,7 @@ important work only in temporary directories.
 
 ## Memory Management
 
-Memory is where Agent Zero keeps useful remembered information from conversations
+Memory is where DarkOffice keeps useful remembered information from conversations
 and imported knowledge. It is powerful, but it is not magic. Long-term AI memory
 still needs curation; this is not fully solved even by the largest AI labs and
 companies.
@@ -392,7 +392,7 @@ Use memory deliberately:
 - use project memory for project-specific context;
 - create a backup before large cleanup.
 
-If Agent Zero does something unexpected, repeats a wrong behavior, or seems to
+If DarkOffice does something unexpected, repeats a wrong behavior, or seems to
 remember the wrong thing, Memory is one of the first places to look. A stale or
 incorrect memory can poison the processing instead of helping it.
 
@@ -432,4 +432,4 @@ separate secure copy of credentials you depend on.
 - [Model Presets guide](model-presets.md)
 - [MCP Setup](mcp-setup.md)
 - [Troubleshooting](troubleshooting.md)
-- [DeepWiki for Agent Zero](https://deepwiki.com/agent0ai/agent-zero)
+- [DeepWiki for DarkOffice](https://deepwiki.com/agent0ai/agent-zero)

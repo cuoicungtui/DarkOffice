@@ -16,7 +16,7 @@ class MissingApiKeyCheck(Extension):
                 "id": "missing-api-key",
                 "type": "warning",
                 "priority": 100,
-                "title": "Welcome to Agent Zero!",
+                "title": "Welcome to DarkOffice!",
                 "html": f"""You're almost ready to chat. Please configure your models to continue.<br>
                          Insert your API key in the onboarding wizard.""",
                 "cta_text": self.ONBOARDING_CTA_TEXT,

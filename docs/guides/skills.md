@@ -1,9 +1,9 @@
 # Skills
 
-Skills are focused instructions Agent Zero can load when a task needs them.
+Skills are focused instructions DarkOffice can load when a task needs them.
 
 Most of the time, you do not need to think about skills. Ask for the work you
-want, and Agent Zero can load a matching skill on demand.
+want, and DarkOffice can load a matching skill on demand.
 
 You can also pin a skill yourself from the chat input when you want it to stay
 active for the current conversation.
@@ -30,11 +30,11 @@ To remove a skill, use the remove button in **Active skills** or uncheck it in
 the list.
 
 Active skills are added to the **Protocol** part of the prompt. That means
-Agent Zero sees them every turn while they are active.
+DarkOffice sees them every turn while they are active.
 
 > [!TIP]
 > Keep this list short. Pin the skills you really want present all the time, and
-> let Agent Zero load the rest only when it needs them.
+> let DarkOffice load the rest only when it needs them.
 
 ## When To Pin A Skill
 
@@ -60,7 +60,7 @@ usually easier for the agent to follow.
 | **Agent Profiles** | Changes the broader role and behavior of the chat. |
 | **Projects** | Adds workspace, files, memory, secrets, and project instructions. |
 
-If Agent Zero starts following an old procedure you no longer want, open the
+If DarkOffice starts following an old procedure you no longer want, open the
 Skills selector and remove any active skill that does not belong in the chat.
 
 The Agent Editor can also set a profile-wide Skills visibility policy. That

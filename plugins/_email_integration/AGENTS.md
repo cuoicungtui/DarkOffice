@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own communicating with Agent Zero through email inboxes and SMTP replies.
+- Own communicating with DarkOffice through email inboxes and SMTP replies.
 
 ## Ownership
 

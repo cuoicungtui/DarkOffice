@@ -1,15 +1,15 @@
 # MCP Setup
 
-MCP lets Agent Zero use tools from other apps and services.
+MCP lets DarkOffice use tools from other apps and services.
 
 Think of each MCP connection as a bridge. One bridge might connect Gmail,
 another might connect a database, and another might connect an automation app.
 
-Use MCP when you have a clear external tool you want Agent Zero to call. For
-normal browsing, start with Agent Zero's built-in Browser first.
+Use MCP when you have a clear external tool you want DarkOffice to call. For
+normal browsing, start with DarkOffice's built-in Browser first.
 
 > [!NOTE]
-> This page is about giving Agent Zero tools from other apps. For deeper MCP
+> This page is about giving DarkOffice tools from other apps. For deeper MCP
 > details, see the [advanced MCP reference](../developer/mcp-configuration.md).
 
 ## When To Use MCP
@@ -25,7 +25,7 @@ normal browsing, start with Agent Zero's built-in Browser first.
 
 - [ ] You know what app or service you want to connect.
 - [ ] You trust the package or URL.
-- [ ] You know where it will run: inside Agent Zero, on your computer, or online.
+- [ ] You know where it will run: inside DarkOffice, on your computer, or online.
 - [ ] You have any needed credentials ready.
 - [ ] You know whether the tool should be project-specific or global.
 
@@ -68,12 +68,12 @@ After applying the config, look for the status below the editor.
 
 | Signal | What it means |
 | --- | --- |
-| Name | The connection Agent Zero found. |
+| Name | The connection DarkOffice found. |
 | Tool count | How many tools are available. |
 | Green status | The connection is working. |
 | Error text | The command, URL, network, or credentials need attention. |
 
-After the connection works, Agent Zero discovers the MCP tools. The active
+After the connection works, DarkOffice discovers the MCP tools. The active
 Agent Profile's MCP policy still decides which discovered tools it may use. Use
 **Edit agent -> MCPs** to keep the category default or set an individual tool
 to **On** or **Off**. See [Agent Profiles](agent-profiles.md#choose-capability-access).
@@ -88,7 +88,7 @@ Use the connected Gmail tools to find the last message from Alice and summarize 
 
 ### Tool Started By A Command
 
-Use this pattern when Agent Zero should start the tool itself.
+Use this pattern when DarkOffice should start the tool itself.
 
 ```json
 {
@@ -124,22 +124,22 @@ Use this pattern when the tool is already running at a URL.
 
 ## Docker Networking
 
-If Agent Zero runs in Docker and the MCP tool runs somewhere else, the address
+If DarkOffice runs in Docker and the MCP tool runs somewhere else, the address
 matters.
 
-| Where the MCP tool runs | What to use from Agent Zero |
+| Where the MCP tool runs | What to use from DarkOffice |
 | --- | --- |
 | Host machine on macOS or Windows | `host.docker.internal` |
 | Another container | Same Docker network plus the container name |
 | Remote server | The reachable HTTPS URL |
-| Inside Agent Zero's container | Local command config |
+| Inside DarkOffice's container | Local command config |
 
 On Linux, `host.docker.internal` is not always available by default. Running the
 MCP tool in the same Docker network is usually cleaner.
 
 ## Browser MCP Or Built-In Browser?
 
-For most browsing tasks, use Agent Zero's built-in `_browser` plugin and direct
+For most browsing tasks, use DarkOffice's built-in `_browser` plugin and direct
 `browser` tool. It covers the Docker browser surface, screenshots, annotations,
 Chrome extensions, and optional A0 CLI host-browser mode.
 
@@ -161,7 +161,7 @@ See the [Browser Guide](browser.md) for the built-in workflow.
 ## Troubleshooting
 
 - **No tools appear:** confirm the JSON is valid and click **Apply now** again.
-- **Command not found:** install the command where Agent Zero can run it, or use a URL-based tool instead.
+- **Command not found:** install the command where DarkOffice can run it, or use a URL-based tool instead.
 - **Package launch is slow:** wait for the first package download to finish.
 - **Host service unreachable:** check Docker networking and try `host.docker.internal` on macOS or Windows.
 - **Credentials fail:** rotate or re-enter the credential, then restart or reapply the config.

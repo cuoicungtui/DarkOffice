@@ -1,15 +1,15 @@
 ---
 name: browser-extension-control
-description: Create, inspect, install, and safely maintain Chrome extensions for Agent Zero's built-in Browser plugin. Use when the user asks to build a browser extension, modify an existing extension, install a Chrome Web Store extension, or review extension permissions.
+description: Create, inspect, install, and safely maintain Chrome extensions for DarkOffice's built-in Browser plugin. Use when the user asks to build a browser extension, modify an existing extension, install a Chrome Web Store extension, or review extension permissions.
 ---
 
-# Agent Zero Browser Extensions
+# DarkOffice Browser Extensions
 
-Use this skill when the user wants to create a new Browser extension, modify an existing extension, or install a Chrome Web Store extension for Agent Zero's direct `_browser` plugin.
+Use this skill when the user wants to create a new Browser extension, modify an existing extension, or install a Chrome Web Store extension for DarkOffice's direct `_browser` plugin.
 
 ## Operating Model
 
-- Agent Zero loads Browser extensions from unpacked directories.
+- DarkOffice loads Browser extensions from unpacked directories.
 - Create user-owned extensions under `/a0/usr/browser-extensions/<extension-slug>/`.
 - Browser extension paths must be visible inside the Docker runtime. Prefer `/a0/usr/browser-extensions/...` paths over host-only paths.
 - The Browser puzzle menu can open "My Browser Extensions", seed a "+ Create New with A0" request, and install Chrome Web Store URLs.
@@ -45,9 +45,9 @@ Minimal Manifest V3 starter:
 ```json
 {
   "manifest_version": 3,
-  "name": "Agent Zero Example Extension",
+  "name": "DarkOffice Example Extension",
   "version": "0.1.0",
-  "description": "Small, auditable Browser extension created with Agent Zero.",
+  "description": "Small, auditable Browser extension created with DarkOffice.",
   "permissions": [],
   "host_permissions": [],
   "action": {
@@ -61,7 +61,7 @@ Content script starter:
 ```json
 {
   "manifest_version": 3,
-  "name": "Agent Zero Page Helper",
+  "name": "DarkOffice Page Helper",
   "version": "0.1.0",
   "description": "Adds a small page helper for specific sites.",
   "permissions": [],

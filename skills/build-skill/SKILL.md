@@ -1,11 +1,11 @@
 ---
 name: build-skill
-description: Build or improve Agent Zero skills following the official SKILL.md standard. Use when the user asks to create, rename, move, audit, test, or refactor a skill, or when a workflow should be packaged as reusable skill instructions.
+description: Build or improve DarkOffice skills following the official SKILL.md standard. Use when the user asks to create, rename, move, audit, test, or refactor a skill, or when a workflow should be packaged as reusable skill instructions.
 ---
 
 # Build Skill
 
-Skills are small folders that teach Agent Zero a repeatable workflow. Keep the always-visible metadata precise, keep `SKILL.md` lean, and move detailed material into scripts, references, or assets only when the task needs it.
+Skills are small folders that teach DarkOffice a repeatable workflow. Keep the always-visible metadata precise, keep `SKILL.md` lean, and move detailed material into scripts, references, or assets only when the task needs it.
 
 ## Standard Shape
 
@@ -46,7 +46,7 @@ Use lowercase letters, digits, and hyphens. Prefer short verb-led names such as 
 
 Use plugin-scoped skills when the skill exists to explain a plugin-owned tool or UI surface. Examples: Browser workflows belong under `_browser`; A0 CLI host tools belong under `_a0_connector`; Desktop canvas workflows belong under `_desktop`.
 
-Use root `skills/` for Agent Zero framework workflows that are not owned by one plugin, such as building skills, developing core features, or managing community plugins.
+Use root `skills/` for DarkOffice framework workflows that are not owned by one plugin, such as building skills, developing core features, or managing community plugins.
 
 ## Writing Rules
 

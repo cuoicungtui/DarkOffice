@@ -943,7 +943,7 @@ def launch_ui_process(repo_dir: Path, logger: AttemptLogger) -> subprocess.Popen
     else:
         logger.log("prepare.py not found, skipping prepare step")
 
-    logger.log("Starting Agent Zero UI")
+    logger.log("Starting DarkOffice UI")
     return subprocess.Popen(
         [
             sys.executable,
@@ -1174,7 +1174,7 @@ def execute_pending_update(
             refresh_codex_cli(logger)
             record_result(
                 status="success",
-                message=f"Updated Agent Zero to branch {branch}, {resolved_target['target_description']}.",
+                message=f"Updated DarkOffice to branch {branch}, {resolved_target['target_description']}.",
                 request_data=request_data,
                 source_info=source_info,
                 current_version=current_info["short_tag"],
@@ -1357,7 +1357,7 @@ def installed_target_matches_request(
 def trigger_update_command(args: list[str]) -> int:
     parser = argparse.ArgumentParser(
         prog="trigger_self_update.sh",
-        description="Queue an Agent Zero self-update for the next startup attempt.",
+        description="Queue an DarkOffice self-update for the next startup attempt.",
     )
     parser.add_argument(
         "branch",
@@ -1407,7 +1407,7 @@ def trigger_update_command(args: list[str]) -> int:
         print(f"Failed to queue self-update: {exc}", file=sys.stderr)
         return 1
 
-    print("Queued Agent Zero self-update for the next startup attempt.")
+    print("Queued DarkOffice self-update for the next startup attempt.")
     print(f"Branch: {payload['branch']}")
     print(f"Version: {payload['tag']}")
     if payload["backup_usr"]:
@@ -1418,7 +1418,7 @@ def trigger_update_command(args: list[str]) -> int:
         print("Backup: disabled")
     print(f"Trigger file: {TRIGGER_FILE}")
     print(f"Log file: {LOG_FILE}")
-    print("Restart the container or Agent Zero process to apply it.")
+    print("Restart the container or DarkOffice process to apply it.")
     return 0
 
 

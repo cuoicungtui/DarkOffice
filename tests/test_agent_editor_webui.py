@@ -464,7 +464,7 @@ loadHandler = null;
 if (!calls.some(call => call.endpoint === "openPresetEditor" && call.payload === "Codex")) throw new Error("Easy preset editor action did not reuse Model Configuration");
 store.draft.modelPreset = "";
 store.state.tools.catalog = [
-  { id: "local:shell", name: "shell", label: "Shell", origin: "Agent Zero", available: true },
+  { id: "local:shell", name: "shell", label: "Shell", origin: "DarkOffice", available: true },
   { id: "local:gone", name: "gone", label: "Gone", origin: "Unavailable", available: false },
   { id: "mcp:docs:read", name: "read", label: "Docs read", origin: "MCP", available: true },
 ];
@@ -576,7 +576,7 @@ if (store.draft.toolPolicy.mode !== "inherit" || store.isToolAllowed(store.state
 store.projectName = "";
 store.state.tools.effective_policy = { mode: "inherit", default: "allow", mcp_default: "allow", allowed: [], blocked: [] };
 store.state.skills.catalog = [
-  { name: "Research", path: "skills/research/SKILL.md", origin: "Agent Zero", description: "Research sources", available: true, tags: [], allowed_tools: [] },
+  { name: "Research", path: "skills/research/SKILL.md", origin: "DarkOffice", description: "Research sources", available: true, tags: [], allowed_tools: [] },
   { name: "Gone", path: "skills/gone/SKILL.md", origin: "Unavailable", description: "Missing skill", available: false, tags: [], allowed_tools: [] },
 ];
 store.draft.skillPolicy = { mode: "inherit", default: "allow", allowed: [], blocked: [] };
@@ -627,11 +627,11 @@ store.state = {
   model_preset: { has_override: false, effective: "Default" },
   model_presets: [],
   tools: { policy: { mode: "inherit" }, effective_policy: { mode: "inherit", default: "allow", mcp_default: "allow", allowed: [], blocked: [] }, has_override: false, catalog: [
-    { id: "local:shell", name: "shell", label: "Shell", origin: "Agent Zero", available: true },
+    { id: "local:shell", name: "shell", label: "Shell", origin: "DarkOffice", available: true },
     { id: "local:old", name: "old", label: "Old", origin: "Old scope", available: true },
   ] },
   skills: { policy: { mode: "inherit" }, effective_policy: { mode: "inherit", default: "allow", allowed: [], blocked: [] }, has_override: false, catalog: [
-    { name: "Research", path: "skills/research/SKILL.md", origin: "Agent Zero", description: "Research", available: true, tags: [], allowed_tools: [] },
+    { name: "Research", path: "skills/research/SKILL.md", origin: "DarkOffice", description: "Research", available: true, tags: [], allowed_tools: [] },
     { name: "Old skill", path: "skills/old/SKILL.md", origin: "Old scope", description: "Old", available: true, tags: [], allowed_tools: [] },
   ] },
 };
@@ -678,11 +678,11 @@ const projectState = {
   model_preset: { has_override: false, effective: "Default" },
   model_presets: [],
   tools: { policy: { mode: "inherit" }, effective_policy: { mode: "inherit", default: "allow", mcp_default: "allow", allowed: [], blocked: [] }, has_override: false, catalog: [
-    { id: "local:shell", name: "shell", label: "Shell", origin: "Agent Zero", available: true },
+    { id: "local:shell", name: "shell", label: "Shell", origin: "DarkOffice", available: true },
     { id: "local:new", name: "new", label: "New", origin: "Project", available: true },
   ] },
   skills: { policy: { mode: "inherit" }, effective_policy: { mode: "inherit", default: "allow", allowed: [], blocked: [] }, has_override: false, catalog: [
-    { name: "Research", path: "skills/research/SKILL.md", origin: "Agent Zero", description: "Research", available: true, tags: [], allowed_tools: [] },
+    { name: "Research", path: "skills/research/SKILL.md", origin: "DarkOffice", description: "Research", available: true, tags: [], allowed_tools: [] },
     { name: "New skill", path: "skills/new/SKILL.md", origin: "Project", description: "New", available: true, tags: [], allowed_tools: [] },
   ] },
 };

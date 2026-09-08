@@ -3,7 +3,7 @@
 ## Purpose
 
 - Own the `update_check.py` helper module.
-- This module checks available Agent Zero updates.
+- This module checks available DarkOffice updates.
 - Keep this file-level DOX profile synchronized with `update_check.py` because this directory is intentionally flat.
 
 ## Ownership

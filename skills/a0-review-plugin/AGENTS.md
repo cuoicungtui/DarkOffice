@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own the full audit workflow for Agent Zero plugins.
+- Own the full audit workflow for DarkOffice plugins.
 - Keep manifest, structure, code-pattern, security, and duplicate-detection checks current.
 
 ## Ownership

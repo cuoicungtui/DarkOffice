@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Commit a previously reviewed harness export into native Agent Zero storage.
+Commit a previously reviewed harness export into native DarkOffice storage.
 
 ## Contract
 

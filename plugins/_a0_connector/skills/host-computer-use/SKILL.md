@@ -21,7 +21,7 @@ This skill unlocks the beta `computer_use_remote` tool for connected local deskt
 
 ## When to Use
 
-Load this skill before using `computer_use_remote` for local desktop and native UI tasks on the connected machine. Use it for the user's real host screen, not the internal Agent Zero Desktop.
+Load this skill before using `computer_use_remote` for local desktop and native UI tasks on the connected machine. Use it for the user's real host screen, not the internal DarkOffice Desktop.
 
 If the task is browser-only and the user is flexible, prefer direct browser tooling because it is usually more reliable and token-efficient than screenshot-driven desktop control.
 
@@ -31,14 +31,14 @@ If the task needs shell execution on the CLI host, load `host-code-execution` se
 
 This skill controls the user's connected host/local computer through A0 CLI. It is not the built-in Linux Desktop/Xpra skill.
 
-Never switch to `linux-desktop`, the Agent Zero Desktop/Xpra surface, `desktopctl.sh`, `code_execution_tool`, or Docker/server shell commands as a fallback for host screen actions such as screenshots, clicking, typing, desktop state changes, or checking visible host UI. Those paths only see the internal Agent Zero runtime. If `computer_use_remote` is unavailable, disabled, or needs re-arming, stop and ask the user to run `/computer-use on` in the A0 Launcher chat when using Launcher Host access, or in A0 CLI otherwise, and approve the platform permission prompt.
+Never switch to `linux-desktop`, the DarkOffice Desktop/Xpra surface, `desktopctl.sh`, `code_execution_tool`, or Docker/server shell commands as a fallback for host screen actions such as screenshots, clicking, typing, desktop state changes, or checking visible host UI. Those paths only see the internal DarkOffice runtime. If `computer_use_remote` is unavailable, disabled, or needs re-arming, stop and ask the user to run `/computer-use on` in the A0 Launcher chat when using Launcher Host access, or in A0 CLI otherwise, and approve the platform permission prompt.
 
 ## Browser Boundary
 
 - If the user asks to use/open/control their host browser, local browser, Chrome, "my browser", or a URL in the host browser, use the `browser` tool. The Browser plugin chooses Docker or A0 CLI host-browser runtime from Browser settings and can surface Chrome remote-debugging setup.
 - Do not start `computer_use_remote` for web-page navigation just because the phrase "host browser" appears. Use this skill only for desktop/browser-chrome tasks that the `browser` tool cannot express.
 - If host-browser setup fails or mentions remote debugging, tell the user to open `chrome://inspect/#remote-debugging`, enable "Allow remote debugging for this browser instance", run `/browser host on`, and retry.
-- Do not fall back to `code_execution_remote`, `xdg-open`, `sensible-browser`, or Python `webbrowser.open` for host-browser control. Those can launch pages without giving Agent Zero browser control or setup diagnostics.
+- Do not fall back to `code_execution_remote`, `xdg-open`, `sensible-browser`, or Python `webbrowser.open` for host-browser control. Those can launch pages without giving DarkOffice browser control or setup diagnostics.
 
 ## Tool Contract
 

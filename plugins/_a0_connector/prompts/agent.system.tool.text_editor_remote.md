@@ -25,7 +25,7 @@ report that to the user instead of falling back to server-side file tools.
 - Prefer `patch_text` for context-anchored changes and `edits` only for fresh, surgical line ranges.
 - If freshness checks reject a line patch, reread the file and retry with updated ranges.
 - Relative paths are relative to the CLI host filesystem. Do not rewrite them to
-  `/a0/usr/workdir`; that path belongs to the Agent Zero server/Docker side.
+  `/a0/usr/workdir`; that path belongs to the DarkOffice server/Docker side.
 
 ## Usage
 ~~~json

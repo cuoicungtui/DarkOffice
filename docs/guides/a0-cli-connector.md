@@ -1,18 +1,18 @@
 # A0 CLI Connector
 
-A0 CLI connects your terminal to Agent Zero.
+A0 CLI connects your terminal to DarkOffice.
 
-It is not a second agent. Agent Zero is still the one thinking, remembering, and
-using tools. A0 CLI is the doorway that lets Agent Zero work on the computer
+It is not a second agent. DarkOffice is still the one thinking, remembering, and
+using tools. A0 CLI is the doorway that lets DarkOffice work on the computer
 where the CLI is running.
 
-Agent Zero lives in Docker because that is safer and easier to manage. A0 CLI is
-the intentional bridge for moments when you want Agent Zero to work with your
+DarkOffice lives in Docker because that is safer and easier to manage. A0 CLI is
+the intentional bridge for moments when you want DarkOffice to work with your
 real files, terminal, or browser on the host machine.
 
-Agent Zero stays in Docker. A0 CLI installs on the host machine.
+DarkOffice stays in Docker. A0 CLI installs on the host machine.
 
-The same connector can also let Agent Zero use a Chrome-family browser on your
+The same connector can also let DarkOffice use a Chrome-family browser on your
 computer.
 
 ## Quick Install
@@ -27,30 +27,30 @@ curl -LsSf https://cli.agent-zero.ai/install.sh | sh
 irm https://cli.agent-zero.ai/install.ps1 | iex
 ```
 
-Run these on the host machine, not inside the Agent Zero container.
+Run these on the host machine, not inside the DarkOffice container.
 
 The installer handles the small Python helper it needs.
 
 ## Open it and start working
 
-1. Make sure Agent Zero is already running.
+1. Make sure DarkOffice is already running.
 2. Launch A0 CLI on the host machine:
 
 ```bash
 a0
 ```
 
-3. If Agent Zero is running on the same machine, A0 CLI will usually find it.
-4. If Agent Zero is somewhere else, enter its web address.
-5. Open or create a chat and confirm you can talk to Agent Zero from the host machine.
+3. If DarkOffice is running on the same machine, A0 CLI will usually find it.
+4. If DarkOffice is somewhere else, enter its web address.
+5. Open or create a chat and confirm you can talk to DarkOffice from the host machine.
 
 > [!NOTE]
-> If A0 CLI says connector support is missing, update Agent Zero first.
+> If A0 CLI says connector support is missing, update DarkOffice first.
 
 ### Connection picker
 
-On launch, A0 CLI opens a host picker. If it finds Agent Zero on this machine,
-click **Connect**. If Agent Zero is somewhere else, click **Enter URL manually**
+On launch, A0 CLI opens a host picker. If it finds DarkOffice on this machine,
+click **Connect**. If DarkOffice is somewhere else, click **Enter URL manually**
 and paste the address.
 
 ![A0 CLI host picker](../res/usage/a0-cli/a0-cli-host-picker.png)
@@ -74,8 +74,8 @@ If **Remember this host** is enabled, the CLI saves that address for next time.
 
 ### The connected shell
 
-After connecting, the shell shows the Agent Zero address, current project, model,
-local folder, Agent Zero workspace, and the message box.
+After connecting, the shell shows the DarkOffice address, current project, model,
+local folder, DarkOffice workspace, and the message box.
 
 ![A0 CLI connected shell](../res/usage/a0-cli/a0-cli-start.png)
 
@@ -155,16 +155,16 @@ UI and file-format guide, see [Agent Profiles](agent-profiles.md).
 
 ## Host Browser
 
-Use this when you want Agent Zero to browse with a browser on your computer.
+Use this when you want DarkOffice to browse with a browser on your computer.
 This is useful when the page, login, or browser profile should stay on your
 machine.
 
 ### Setup Checklist
 
-- [ ] Keep A0 CLI connected to the Agent Zero chat.
-- [ ] In Agent Zero Web UI, open Browser plugin settings and choose **Bring Your
+- [ ] Keep A0 CLI connected to the DarkOffice chat.
+- [ ] In DarkOffice Web UI, open Browser plugin settings and choose **Bring Your
       Own Browser**.
-- [ ] If you want Agent Zero to use an already-open personal browser window,
+- [ ] If you want DarkOffice to use an already-open personal browser window,
       open that browser first.
 - [ ] In that browser, open its remote debugging page.
 - [ ] Enable **Allow remote debugging for this browser instance**.
@@ -178,23 +178,23 @@ Remote debugging pages:
 
 ![Chrome remote debugging setting](../res/usage/browser/host-browser-remote-debugging-setting.png)
 
-When Agent Zero performs its first Browser action against that host browser,
-the browser asks for confirmation. Click **Allow** if you trust this Agent Zero
+When DarkOffice performs its first Browser action against that host browser,
+the browser asks for confirmation. Click **Allow** if you trust this DarkOffice
 instance and A0 CLI connection.
 
 ![Chrome remote debugging allow prompt](../res/usage/browser/host-browser-remote-debugging-allow.png)
 
 A0 CLI does not take over the browser while it is only checking status. Browser
-control starts when Agent Zero actually needs to use the browser.
+control starts when DarkOffice actually needs to use the browser.
 
 > [!IMPORTANT]
 > Remote debugging gives the connected app full control of that browser session,
 > including access to saved data, cookies, site data, and navigation. Use it only
-> with trusted Agent Zero instances and browser windows you intend the agent to
+> with trusted DarkOffice instances and browser windows you intend the agent to
 > control.
 
 The **Host browser** list in Browser settings comes from the connected local A0
-CLI, not from the Agent Zero Web UI server. It shows Automatic, currently
+CLI, not from the DarkOffice Web UI server. It shows Automatic, currently
 advertised debug endpoints, and **Custom endpoint**. If a newly authorized
 browser does not appear, restart or reconnect A0 CLI.
 
@@ -227,11 +227,11 @@ there once.
 
 ### Choose Browser Mode
 
-In Agent Zero Web UI, open Browser plugin settings and choose one of:
+In DarkOffice Web UI, open Browser plugin settings and choose one of:
 
-- **Docker browser:** use Agent Zero's built-in Docker browser.
+- **Docker browser:** use DarkOffice's built-in Docker browser.
 - **Bring Your Own Browser:** use the browser on your computer through A0 CLI.
-  If A0 CLI is not connected, Agent Zero will tell you instead of quietly using
+  If A0 CLI is not connected, DarkOffice will tell you instead of quietly using
   a different browser.
 
 You can also find the Browser commands from the CLI command palette:
@@ -271,7 +271,7 @@ what it needs to connect to the browser you approve.
 
 ### Page Privacy
 
-Browser settings decide what Agent Zero may do with page text and screenshots
+Browser settings decide what DarkOffice may do with page text and screenshots
 from your own browser:
 
 - **Local models only:** use host-browser page content only with local models.
@@ -279,7 +279,7 @@ from your own browser:
 - **Allow:** allow without warning.
 
 > [!NOTE]
-> The live Browser surface shows the Docker browser. When Agent Zero uses your
+> The live Browser surface shows the Docker browser. When DarkOffice uses your
 > host browser, results and screenshots appear in the chat, but the live Canvas
 > is not a stream of your personal browser window.
 
@@ -288,15 +288,15 @@ from your own browser:
 If another agent is helping with setup, do not paste a whole checklist. Paste one line:
 
 ```text
-Set up the A0 CLI connector for Agent Zero on this machine using the setup-a0-cli Skill.
+Set up the A0 CLI connector for DarkOffice on this machine using the setup-a0-cli Skill.
 ```
 
 ## Troubleshooting
 
-- **Nothing appears locally:** Enter the Agent Zero web address manually or export `AGENT_ZERO_HOST`.
-- **You tried to install from inside Docker:** A0 CLI belongs on the host machine. Agent Zero stays in Docker.
+- **Nothing appears locally:** Enter the DarkOffice web address manually or export `AGENT_ZERO_HOST`.
+- **You tried to install from inside Docker:** A0 CLI belongs on the host machine. DarkOffice stays in Docker.
 - **Function keys do nothing:** Some terminals and IDEs capture function keys. Use `Ctrl+P`.
-- **A0 CLI says connector support is missing:** Update Agent Zero.
+- **A0 CLI says connector support is missing:** Update DarkOffice.
 - **Host browser says repair is needed:** Run `/browser repair`.
 - **Host browser waits for relaunch:** Close the selected Chrome, Edge, or Chromium profile and run `/browser relaunch`.
 

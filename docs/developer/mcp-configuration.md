@@ -4,7 +4,7 @@ Most users should start with [MCP Setup](../guides/mcp-setup.md).
 
 This page is for people who need to paste or review MCP JSON by hand. MCP
 architecture and source-linked internals live in
-[DeepWiki for Agent Zero](https://deepwiki.com/agent0ai/agent-zero).
+[DeepWiki for DarkOffice](https://deepwiki.com/agent0ai/agent-zero).
 
 ## Basic Shape
 
@@ -52,15 +52,15 @@ somewhere else.
 
 ## Docker Addresses
 
-If Agent Zero runs in Docker, remember that "localhost" means the container, not
+If DarkOffice runs in Docker, remember that "localhost" means the container, not
 always your host machine.
 
-| Where the MCP tool runs | Address to use from Agent Zero |
+| Where the MCP tool runs | Address to use from DarkOffice |
 | --- | --- |
 | Host machine on macOS or Windows | `host.docker.internal` |
 | Another container | The container name on the same Docker network |
 | Remote machine | Its reachable HTTPS URL |
-| Inside Agent Zero's container | A command-based config |
+| Inside DarkOffice's container | A command-based config |
 
 On Linux, `host.docker.internal` may need extra Docker setup. Running the MCP
 tool in the same Docker network is often simpler.
@@ -77,4 +77,4 @@ tool in the same Docker network is often simpler.
 - [MCP Setup](../guides/mcp-setup.md)
 - [Browser Guide](../guides/browser.md)
 - [A0 CLI Connector](../guides/a0-cli-connector.md)
-- [DeepWiki for Agent Zero](https://deepwiki.com/agent0ai/agent-zero)
+- [DeepWiki for DarkOffice](https://deepwiki.com/agent0ai/agent-zero)

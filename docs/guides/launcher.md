@@ -1,19 +1,19 @@
-# Agent Zero Launcher
+# DarkOffice Launcher
 
-Agent Zero Launcher is the desktop app for installing, running, switching, and
-opening Dockerized Agent Zero Instances without starting from Docker commands.
+DarkOffice Launcher is the desktop app for installing, running, switching, and
+opening Dockerized DarkOffice Instances without starting from Docker commands.
 
 Use it when you are setting up a new machine, when you want a quiet inventory of
-installed Agent Zero images, or when you want one place to open local and remote
+installed DarkOffice images, or when you want one place to open local and remote
 Instances.
 
 ## Start Fresh On A New Machine
 
-1. Download Agent Zero Launcher from the
+1. Download DarkOffice Launcher from the
    [A0 Launcher releases](https://github.com/agent0ai/a0-launcher/releases).
 2. Open the app.
 3. If the launcher cannot reach Docker yet, follow the setup dialog.
-4. If Agent Zero is already hosted on another computer or VPS, click
+4. If DarkOffice is already hosted on another computer or VPS, click
    **Add remote Instance** instead of setting up local Docker.
 
 ![Launcher runtime setup dialog](../res/usage/launcher/launcher-runtime-setup.png)
@@ -22,19 +22,19 @@ The first setup dialog keeps the choice simple:
 
 - **Continue** starts the local runtime setup or refreshes the runtime state.
 - **Refresh** checks again after you start Docker yourself.
-- **Add remote Instance** saves an existing Agent Zero URL and lets you use the
+- **Add remote Instance** saves an existing DarkOffice URL and lets you use the
   Launcher without local Docker.
 
 ## Installs
 
 When Docker is ready, Launcher opens to **Installs**. This page shows official
-Agent Zero release lines and local images.
+DarkOffice release lines and local images.
 
 ![Launcher Installs view](../res/usage/launcher/launcher-installs.png)
 
 Cards usually mean:
 
-- **latest** tracks the newest published Agent Zero release image.
+- **latest** tracks the newest published DarkOffice release image.
 - **ready** tracks the development-ready image when you intentionally work from
   that branch.
 - Version cards such as **1.20**, **1.19**, or **1.18** are pinned release
@@ -44,7 +44,7 @@ Cards usually mean:
 
 ## Instances
 
-Open **Instances** after you run Agent Zero. This is where local containers and
+Open **Instances** after you run DarkOffice. This is where local containers and
 saved remote Instances live.
 
 Use the Instance card to:
@@ -53,7 +53,7 @@ Use the Instance card to:
 - start, stop, rename, or delete the container;
 - open logs;
 - use **Backup `/a0/usr`** to download the same user-data backup you can create
-  from Agent Zero Core;
+  from DarkOffice Core;
 - use **Restore `/a0/usr`** to restore that backup zip into the selected
   Instance;
 - open A0 CLI when the host connector is installed.
@@ -63,7 +63,7 @@ container is not the same as deleting a saved remote URL or a workspace backup.
 
 ## Updating With Launcher
 
-For same-major Agent Zero updates, the Web UI **Self Update** is still the
+For same-major DarkOffice updates, the Web UI **Self Update** is still the
 normal path.
 
 For a major image jump such as v1.20 -> v2.0, use Launcher or Docker to start a
@@ -156,7 +156,7 @@ await page.evaluate(async () => {
       state: "not_provisioned",
       action: "install",
       canProvision: true,
-      setupActionLabel: "Setup Agent Zero",
+      setupActionLabel: "Setup DarkOffice",
       detail: "No local container runtime was found.",
     },
     versions: [{ id: "latest", availability: "available" }],

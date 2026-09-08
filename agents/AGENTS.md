@@ -37,7 +37,7 @@ Direct child DOX files:
 | Child | Scope |
 | --- | --- |
 | [_example/AGENTS.md](_example/AGENTS.md) | Reference profile demonstrating profile-local prompts, tools, and extensions. |
-| [agent0/AGENTS.md](agent0/AGENTS.md) | Main user-facing Agent Zero profile metadata. |
+| [agent0/AGENTS.md](agent0/AGENTS.md) | Main user-facing DarkOffice profile metadata. |
 | [default/AGENTS.md](default/AGENTS.md) | Base profile metadata and inherited prompt specifics. |
 | [developer/AGENTS.md](developer/AGENTS.md) | Software development specialist profile. |
 | [hacker/AGENTS.md](hacker/AGENTS.md) | Cyber security and penetration testing specialist profile. |

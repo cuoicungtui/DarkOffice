@@ -28,8 +28,8 @@ Prefer the user's own host-machine CLI when that is what they mean. Container-in
 
 ## Rules
 
-- For Codex, Claude Code, Cursor CLI, Gemini CLI, Grok Build, Hermes Agent, and OpenCode, first decide the execution place: the user's local machine through A0 CLI, or the Agent Zero Docker/container shell.
-- If the user did not specify local/host versus container, check memory for this coding agent's execution-place preference. If no current preference is known, ask: "Do you want me to use your own local <agent> through A0 CLI, or the <agent> installed inside the Agent Zero container?"
+- For Codex, Claude Code, Cursor CLI, Gemini CLI, Grok Build, Hermes Agent, and OpenCode, first decide the execution place: the user's local machine through A0 CLI, or the DarkOffice Docker/container shell.
+- If the user did not specify local/host versus container, check memory for this coding agent's execution-place preference. If no current preference is known, ask: "Do you want me to use your own local <agent> through A0 CLI, or the <agent> installed inside the DarkOffice container?"
 - After the user chooses, save a stable per-agent preference with `memory_save`, for example: "For orchestrator, the user prefers Claude Code to run on the host machine through A0 CLI by default." If memory tools are unavailable, continue without saving.
 - Never use Computer Use to drive coding-agent terminals, menus, or TUIs. Use headless CLI commands through `code_execution_remote` or `code_execution_tool`; if that is not possible, stop and ask.
 - ACP may be available as a community plugin, but do not assume it is installed. Mention it only if the user explicitly asks for ACP or the direct CLI path is unsuitable.
@@ -38,7 +38,7 @@ Prefer the user's own host-machine CLI when that is what they mean. Container-in
 - Never start a full-screen CLI/TUI as a login fallback. If you accidentally opened one and see welcome, theme, provider, or unreadable menu output, reset the terminal session instead of sending keys into it.
 - If login/setup shows a menu or provider choices, show those choices to the user in chat and ask which one to select. Keep the terminal session open, then send the user's selected number/key back to that session.
 - Never ask the user to paste secrets into chat unless there is no safer path. Prefer browser/device login, the CLI's own prompt, or an environment variable set outside chat.
-- Always choose an explicit working directory for repository work. Prefer the user's project path over Agent Zero's default workdir.
+- Always choose an explicit working directory for repository work. Prefer the user's project path over DarkOffice's default workdir.
 - Optional command defaults may be stored in `/a0/usr/plugins/_orchestrator/config.json`. Read only the adapter block you need, and never print secrets.
 - For long-running commands, start the CLI in a shell session and poll that session's output. Do not add your own timeout wrapper around the terminal agent.
 - Pass a self-contained task brief: goal, target files or repo path, constraints, verification commands, and expected output.
@@ -63,7 +63,7 @@ irm https://cli.agent-zero.ai/install.ps1 | iex
 If A0 CLI is already installed but not running, open a terminal and run:
 a0
 
-Connect it to this Agent Zero instance. Select the chat/session, or type the Agent Zero URL manually if this is a remote/VPS instance. In A0 CLI, press F4 to allow Remote Code Execution. Press F3 too if the task needs host file writes. Then ask me again to use your local <agent>.
+Connect it to this DarkOffice instance. Select the chat/session, or type the DarkOffice URL manually if this is a remote/VPS instance. In A0 CLI, press F4 to allow Remote Code Execution. Press F3 too if the task needs host file writes. Then ask me again to use your local <agent>.
 ```
 
 3. Once remote execution is available, optionally load `host-code-execution` for host-shell safety rules.
@@ -72,9 +72,9 @@ Connect it to this Agent Zero instance. Select the chat/session, or type the Age
 
 ## Container Pal Flow
 
-Use this when the user chooses the Agent Zero container or explicitly wants a pal agent inside Docker.
+Use this when the user chooses the DarkOffice container or explicitly wants a pal agent inside Docker.
 
-For Agent Zero Headless, read `references/a0.md` and follow its target-selection flow instead of the non-A0 setup loop.
+For DarkOffice Headless, read `references/a0.md` and follow its target-selection flow instead of the non-A0 setup loop.
 
 For every non-A0 container adapter:
 
@@ -95,7 +95,7 @@ You can consult both host and container agents in one workflow. Keep their shell
 
 ## Reference Files
 
-- Agent Zero Headless: `references/a0.md`
+- DarkOffice Headless: `references/a0.md`
 - Codex CLI: `references/codex.md`
 - Claude Code: `references/claude.md`
 - Cursor CLI: `references/cursor.md`

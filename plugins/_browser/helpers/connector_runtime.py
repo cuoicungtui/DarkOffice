@@ -89,7 +89,7 @@ _HOST_BROWSER_REMOTE_DEBUGGING_HELP = (
     "and retry."
 )
 _DOCKER_BROWSER_RECOVERY_HELP = (
-    "To use Agent Zero's internal Docker browser instead, open Browser settings and set "
+    "To use DarkOffice's internal Docker browser instead, open Browser settings and set "
     "Browser location to Internal Docker browser, or run `/browser container` from A0 CLI."
 )
 _REMOTE_DEBUGGING_ERROR_TOKENS = (

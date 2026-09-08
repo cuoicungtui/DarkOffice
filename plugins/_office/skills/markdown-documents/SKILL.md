@@ -2,7 +2,7 @@
 name: markdown-documents
 description: Use when creating or editing Markdown documents, notes, reports, briefs, drafts, or other editable writing where Markdown should be the primary artifact format.
 version: "1.0.0"
-author: "Agent Zero Core Team"
+author: "DarkOffice Core Team"
 tags: ["markdown", "md", "documents", "writing", "notes", "reports", "briefs", "editor"]
 triggers:
   - "markdown"

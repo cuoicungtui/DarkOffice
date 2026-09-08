@@ -108,7 +108,7 @@ def extract_skills_zip(
     prefix: str = "import",
 ) -> tuple[Path, Path]:
     """
-    Extract a zip into a temp folder inside Agent Zero's tmp directory.
+    Extract a zip into a temp folder inside DarkOffice's tmp directory.
     Returns (source_root, cleanup_root).
     """
     base_tmp = Path(files.get_abs_path("tmp", tmp_subdir))
@@ -132,7 +132,7 @@ def extract_skills_zip(
 
 def _unzip_to_temp_dir(zip_path: Path) -> Path:
     """
-    Extract a zip into a temp folder under tmp/skill_imports (inside Agent Zero base dir).
+    Extract a zip into a temp folder under tmp/skill_imports (inside DarkOffice base dir).
     Returns the extraction root folder.
     """
     source_root, _cleanup_root = extract_skills_zip(zip_path)

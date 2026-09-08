@@ -159,7 +159,7 @@ def _agent_recorder(context_id: str = "ctx-mcp"):
     updates: list[dict] = []
     warnings: list[dict] = []
     agent = SimpleNamespace(
-        agent_name="Agent Zero",
+        agent_name="DarkOffice",
         context=SimpleNamespace(
             id=context_id,
             log=SimpleNamespace(log=lambda **kwargs: warnings.append(kwargs)),

@@ -3,7 +3,7 @@
 ## Purpose
 
 - Own the `skills.py` helper module.
-- This module discovers, parses, filters, and resolves Agent Zero skills.
+- This module discovers, parses, filters, and resolves DarkOffice skills.
 - Keep this file-level DOX profile synchronized with `skills.py` because this directory is intentionally flat.
 
 ## Ownership

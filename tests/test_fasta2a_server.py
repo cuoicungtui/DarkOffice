@@ -77,7 +77,7 @@ def test_a2a_agent_card_streaming_capability_is_enabled_by_default(monkeypatch):
     module = _load_fasta2a_server(monkeypatch)
 
     updated = module._enable_streaming_capability(
-        b'{"name":"Agent Zero","capabilities":{"streaming":false,"pushNotifications":false}}'
+        b'{"name":"DarkOffice","capabilities":{"streaming":false,"pushNotifications":false}}'
     )
 
     agent_card = json.loads(updated)
@@ -88,7 +88,7 @@ def test_a2a_agent_card_streaming_capability_is_enabled_by_default(monkeypatch):
 def test_a2a_agent_card_streaming_capability_creates_missing_block(monkeypatch):
     module = _load_fasta2a_server(monkeypatch)
 
-    updated = module._enable_streaming_capability(b'{"name":"Agent Zero"}')
+    updated = module._enable_streaming_capability(b'{"name":"DarkOffice"}')
 
     assert json.loads(updated)["capabilities"] == {"streaming": True}
 

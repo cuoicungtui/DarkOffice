@@ -20,7 +20,7 @@
 ## Work Guidance
 
 - Keep each file operational and short. The agent should be able to copy the command block safely.
-- Redact or avoid secrets; use environment variables and Agent Zero secret paths without printing values.
+- Redact or avoid secrets; use environment variables and DarkOffice secret paths without printing values.
 
 ## Verification
 

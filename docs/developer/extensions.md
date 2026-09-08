@@ -1,12 +1,12 @@
 # Extensions
 
-Extensions are an advanced way to change how Agent Zero behaves.
+Extensions are an advanced way to change how DarkOffice behaves.
 
 If you are new, start with plugins instead. Plugins are easier to create, test,
 disable, and remove.
 
 Architecture details, extension points, and source-linked explanations now live
-in [DeepWiki for Agent Zero](https://deepwiki.com/agent0ai/agent-zero). This
+in [DeepWiki for DarkOffice](https://deepwiki.com/agent0ai/agent-zero). This
 local page stays short on purpose.
 
 ## Start Here
@@ -43,4 +43,4 @@ DeepWiki page instead of copying the architecture into this repository.
 
 - [Create a Small Plugin](../guides/create-plugin.md)
 - [Agent Profiles](../guides/agent-profiles.md)
-- [DeepWiki for Agent Zero](https://deepwiki.com/agent0ai/agent-zero)
+- [DeepWiki for DarkOffice](https://deepwiki.com/agent0ai/agent-zero)

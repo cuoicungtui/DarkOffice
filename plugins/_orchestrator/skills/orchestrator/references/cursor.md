@@ -1,6 +1,6 @@
 # Cursor CLI
 
-Use Cursor CLI for headless Cursor Agent tasks. The official binary is `agent`; running it without `-p` starts the interactive terminal UI, so use `agent -p` for Agent Zero delegation.
+Use Cursor CLI for headless Cursor Agent tasks. The official binary is `agent`; running it without `-p` starts the interactive terminal UI, so use `agent -p` for DarkOffice delegation.
 
 ## Install And Probe
 
@@ -27,7 +27,7 @@ export CURSOR_API_KEY="..."
 
 Do not ask the user to paste the key into chat. Ask them to set `CURSOR_API_KEY` in the runtime environment, or to add it through Settings > External Services > Secrets Management when that maps into `/a0/usr/.env`.
 
-When using Agent Zero secrets, source `/a0/usr/.env` without printing it. If the key is stored as `API_KEY_CURSOR`, map it to the CLI variable before running Cursor CLI:
+When using DarkOffice secrets, source `/a0/usr/.env` without printing it. If the key is stored as `API_KEY_CURSOR`, map it to the CLI variable before running Cursor CLI:
 
 ```bash
 set -a

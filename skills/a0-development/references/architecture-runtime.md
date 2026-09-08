@@ -12,7 +12,7 @@
 
 ## Runtime Split
 
-Agent Zero has two Docker Python runtimes:
+DarkOffice has two Docker Python runtimes:
 
 | Runtime | Python | Purpose |
 |---|---|---|

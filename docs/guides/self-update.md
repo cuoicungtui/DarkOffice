@@ -16,18 +16,18 @@ The UI will tell you when a new A0 update is available for download. Backups are
 
 ## Technical reference
 
-Agent Zero includes a Docker-oriented self-update flow for switching to a specific repository version tag on `main`, `testing`, or `development`.
+DarkOffice includes a Docker-oriented self-update flow for switching to a specific repository version tag on `main`, `testing`, or `development`.
 
 ## How it works
 
 1. The Web UI writes a YAML request file outside `/a0` so the request survives upgrades and downgrades.
-2. Agent Zero restarts.
+2. DarkOffice restarts.
 3. The durable updater in `/exe` reads the YAML request before starting the UI.
 4. It cleans the root `uv` cache when `uv` is available.
 5. If requested, it creates a zip backup of `/a0/usr`.
-6. It fetches the requested branch and update target from the official Agent Zero repository.
+6. It fetches the requested branch and update target from the official DarkOffice repository.
 7. It updates `/a0` while preserving gitignored paths such as `/a0/usr`.
-8. It starts Agent Zero again and waits for `/api/health` to become healthy.
+8. It starts DarkOffice again and waits for `/api/health` to become healthy.
 9. If the UI does not become healthy within the allowed time, it restores the previous checkout and starts that version again.
 
 ## Durable files
@@ -56,7 +56,7 @@ The selector also includes `latest` when the selected branch is still on the cur
 - On `main`, `latest` resolves to the newest reachable release tag on `main`. It is displayed as `latest (vX.Y)`.
 - On `testing` and `development`, `latest` resolves to the current branch head. It is displayed as `latest (vX.Y+N)` when the branch head is `N` commits past the newest reachable tag, or `latest (vX.Y)` when it is exactly on a tag.
 
-Agent Zero version tags follow this format:
+DarkOffice version tags follow this format:
 
 `v{major}.{minor}`
 
@@ -85,7 +85,7 @@ The important part is moving a backup zip into a fresh v2.0 container:
 
 1. In the old v1.20 Web UI, create a backup from **Settings -> Check for Updates -> Backup & Restore -> Create Backup**.
 2. Pull `agent0ai/agent-zero:latest` in Docker Desktop or Docker CLI. For the v2.0 release, `latest` is the v2.0 image.
-3. Start a new container from that image, or use the **latest** card in **Agent Zero Launcher**.
+3. Start a new container from that image, or use the **latest** card in **DarkOffice Launcher**.
 4. Restore the downloaded backup zip into the new v2.0 Instance.
 5. Verify the new Instance before deleting the old v1.20 container.
 

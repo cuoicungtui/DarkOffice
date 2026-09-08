@@ -1,6 +1,6 @@
 # Browser Guide
 
-Agent Zero has a built-in Browser for real web pages.
+DarkOffice has a built-in Browser for real web pages.
 
 Use it for research, forms, screenshots, UI review, downloads, extensions, and
 anything else that works best in a browser.
@@ -45,7 +45,7 @@ The agent can:
 - upload files;
 - take screenshots.
 
-When a page is read, Agent Zero gets simple references such as `[link 1]`,
+When a page is read, DarkOffice gets simple references such as `[link 1]`,
 `[button 2]`, or `[input text 3]`. It can use those references to act on the
 right part of the page.
 
@@ -83,7 +83,7 @@ close_all
 
 ## Screenshots And History
 
-When Agent Zero takes a Browser screenshot, the image is saved and shown in the
+When DarkOffice takes a Browser screenshot, the image is saved and shown in the
 chat history.
 
 Many Browser steps also keep a small history screenshot. That means an older
@@ -111,7 +111,7 @@ Open Browser settings from the Browser toolbar or from the Browser plugin settin
 The toolbar menu includes:
 
 - **Browser LLM Preset:** Optional model choice for Browser helper work.
-- **Chrome Extensions:** Install a Chrome Web Store URL, create a new extension with Agent Zero, or scan an extension with Agent Zero.
+- **Chrome Extensions:** Install a Chrome Web Store URL, create a new extension with DarkOffice, or scan an extension with DarkOffice.
 - **Settings:** Opens the full Browser plugin settings.
 
 ![Browser plugin settings](../res/usage/browser/browser-plugin-settings.png)
@@ -127,14 +127,14 @@ The full settings include:
 
 ## Docker Browser
 
-The Docker browser is the default. It is a separate browser inside Agent Zero's
+The Docker browser is the default. It is a separate browser inside DarkOffice's
 Docker environment, and it is the browser shown in the live Browser surface.
 
-Use Docker browser mode when you want a clean, separate browser that Agent Zero
+Use Docker browser mode when you want a clean, separate browser that DarkOffice
 can show in the Canvas.
 
 In normal Docker installs, the needed browser is already included. In local
-development, Agent Zero can install it the first time it is needed.
+development, DarkOffice can install it the first time it is needed.
 
 To use a proxy, enter its server in Browser settings, for example
 `http://proxy.example:3128` or `socks5://proxy.example:1080`. Add an optional
@@ -143,14 +143,14 @@ them. Saving proxy changes restarts active Docker Browser sessions.
 
 ## Bring Your Own Browser
 
-Bring Your Own Browser lets Agent Zero use Chrome, Edge, Brave, Opera, Vivaldi,
+Bring Your Own Browser lets DarkOffice use Chrome, Edge, Brave, Opera, Vivaldi,
 or Chromium on your own computer through A0 CLI.
 
 Use it when the page, login, or browser profile should stay on your machine.
 
 Requirements:
 
-- [ ] Keep A0 CLI connected to the Agent Zero chat.
+- [ ] Keep A0 CLI connected to the DarkOffice chat.
 - [ ] Choose **Bring Your Own Browser** in Browser settings.
 - [ ] Use a Chromium-family browser on the host: Chrome, Edge, Brave, Opera, Vivaldi, or Chromium.
 - [ ] For an already-open browser, open its remote debugging page and enable **Allow remote debugging for this browser instance**.
@@ -164,7 +164,7 @@ Remote debugging pages:
 
 The **Host browser** list shows Automatic, currently advertised debug endpoints,
 and **Custom endpoint**. If a browser does not appear after enabling remote
-debugging, restart or reconnect the local A0 CLI. Restarting only the Agent Zero
+debugging, restart or reconnect the local A0 CLI. Restarting only the DarkOffice
 Web UI server does not refresh the browser inventory; the list comes from the
 connected CLI.
 
@@ -185,8 +185,8 @@ export A0_HOST_BROWSER_REMOTE_DEBUGGING_ENDPOINTS="http://localhost:9222"
 
 ![Host browser remote debugging setting](../res/usage/browser/host-browser-remote-debugging-setting.png)
 
-The first time Agent Zero tries to operate that browser, Chrome shows an **Allow
-remote debugging?** prompt. Click **Allow** if you trust the connected Agent Zero
+The first time DarkOffice tries to operate that browser, Chrome shows an **Allow
+remote debugging?** prompt. Click **Allow** if you trust the connected DarkOffice
 instance and A0 CLI session.
 
 ![Host browser remote debugging allow prompt](../res/usage/browser/host-browser-remote-debugging-allow.png)
@@ -194,9 +194,9 @@ instance and A0 CLI session.
 > [!IMPORTANT]
 > Remote debugging grants full control of that browser session, including access
 > to saved data, cookies, site data, and navigation. Enable it only for browser
-> instances you intend Agent Zero to control.
+> instances you intend DarkOffice to control.
 
-Browser settings decide what Agent Zero may do with page text and screenshots
+Browser settings decide what DarkOffice may do with page text and screenshots
 from your own browser:
 
 - **Local models only:** Block host-browser content and screenshots unless the active chat model is local.
@@ -204,7 +204,7 @@ from your own browser:
 - **Allow:** Allow without warning.
 
 > [!NOTE]
-> The live Browser surface shows the Docker browser. When Agent Zero uses your
+> The live Browser surface shows the Docker browser. When DarkOffice uses your
 > host browser, page results and screenshots appear in the chat, but the live
 > Canvas is not a stream of your personal browser window.
 
@@ -219,7 +219,7 @@ can still change what happens in that browser.
 
 ## MCP Alternatives
 
-Start with Agent Zero's built-in Browser.
+Start with DarkOffice's built-in Browser.
 
 Use an MCP browser option only when you specifically need another browser tool
 or an external automation service.
@@ -234,7 +234,7 @@ See [MCP Setup](mcp-setup.md) for MCP setup.
 
 ## Troubleshooting
 
-- **Browser says Chromium is missing:** Docker installs already include the browser. In local development, let Agent Zero install it on first use or preinstall it with `PLAYWRIGHT_BROWSERS_PATH=tmp/playwright patchright install chromium --no-shell`.
+- **Browser says Chromium is missing:** Docker installs already include the browser. In local development, let DarkOffice install it on first use or preinstall it with `PLAYWRIGHT_BROWSERS_PATH=tmp/playwright patchright install chromium --no-shell`.
 - **The Browser surface does not open automatically:** That is expected. Open the Browser surface manually or ask the agent to show it.
 - **The Canvas does not follow the agent:** Enable **Autofocus active page** in Browser settings.
 - **Bring Your Own Browser cannot start:** Keep A0 CLI connected, verify Browser location is **Bring Your Own Browser**, and check `/browser status` in A0 CLI.

@@ -1,14 +1,14 @@
 # Quick Start
 
 This guide gets you from install to a first useful chat. Keep it simple: start
-Agent Zero, add a model or API key, open the Web UI, and give it a concrete job.
+DarkOffice, add a model or API key, open the Web UI, and give it a concrete job.
 
 ## Installation (recommended)
 
 Choose the path that matches your machine:
 
 - Use [A0 Launcher](guides/launcher.md) if you want a desktop app on a fresh
-  machine. It can set up the local runtime, download Agent Zero, open
+  machine. It can set up the local runtime, download DarkOffice, open
   Instances, or save a remote Instance URL.
 - Use A0 Install if you want the terminal path. The script handles Docker
   detection, image pull, and container setup.
@@ -26,16 +26,16 @@ irm https://ps.agent-zero.ai | iex
 Follow the CLI prompts for port and authentication, complete onboarding, then open the Web UI URL from the terminal.
 
 > [!TIP]
-> To update later, open **Settings UI -> Update tab -> Open Self Update** (see [How to Update](setup/installation.md#how-to-update-agent-zero)). Backups are automatically managed internally.
+> To update later, open **Settings UI -> Update tab -> Open Self Update** (see [How to Update](setup/installation.md#how-to-update-darkoffice)). Backups are automatically managed internally.
 
 > [!NOTE]
 > For Launcher downloads, headless installer flags, direct Docker, manual Docker Desktop setup, volume mapping, and platform-specific detail, see the [Installation Guide](setup/installation.md).
 
-## Use Agent Zero on your real local files
+## Use DarkOffice on your real local files
 
-If you want Agent Zero to work on the actual files on your computer, this is the important part.
+If you want DarkOffice to work on the actual files on your computer, this is the important part.
 
-Agent Zero stays in Docker for safety. The A0 CLI installs and runs on your host machine. It is not another CLI agent; it is the connector that lets your running Agent Zero instance work on the real files on your real computer.
+DarkOffice stays in Docker for safety. The A0 CLI installs and runs on your host machine. It is not another CLI agent; it is the connector that lets your running DarkOffice instance work on the real files on your real computer.
 
 **macOS / Linux:**
 ```bash
@@ -47,7 +47,7 @@ curl -LsSf https://cli.agent-zero.ai/install.sh | sh
 irm https://cli.agent-zero.ai/install.ps1 | iex
 ```
 
-Run those on the host machine, not inside the Agent Zero container.
+Run those on the host machine, not inside the DarkOffice container.
 
 Then launch:
 
@@ -55,7 +55,7 @@ Then launch:
 a0
 ```
 
-Once `a0` connects, open or create a chat there. The reasoning still belongs to Agent Zero; the CLI is the host bridge that lets it work on real local files on your machine.
+Once `a0` connects, open or create a chat there. The reasoning still belongs to DarkOffice; the CLI is the host bridge that lets it work on real local files on your machine.
 
 For the full setup flow, host picker screenshots, command palette guidance, Browser mode commands, manual fallback install paths, remote-host tips, and a copy-ready brief for another agent, see the [A0 CLI Connector guide](guides/a0-cli-connector.md).
 
@@ -66,21 +66,21 @@ open on the welcome screen. If models still need setup, send a message or use
 the setup shortcuts to choose Cloud, AI account, or Local access, then select
 your main and utility models.
 
-![Agent Zero Web UI](res/setup/6-docker-a0-running-new.png)
+![DarkOffice Web UI](res/setup/6-docker-a0-running-new.png)
 
 For a screenshot walkthrough using OpenRouter, see the
 [First-Run Onboarding guide](guides/onboarding.md).
 
 > [!NOTE]
-> Agent Zero supports hosted providers, account-backed providers, and local
+> DarkOffice supports hosted providers, account-backed providers, and local
 > models. Choose a strong main model for chat and a fast utility model for
 > internal tasks.
 
 ### Start your first chat
 
-Once configured, you will see the Agent Zero dashboard.
+Once configured, you will see the DarkOffice dashboard.
 
-![Agent Zero dashboard](res/usage/webui/dashboard.png)
+![DarkOffice dashboard](res/usage/webui/dashboard.png)
 
 Click **New Chat** and start with a specific request.
 
@@ -107,7 +107,7 @@ Help me create a project for this repository and write good instructions for it.
 
 ## Example Interaction
 
-Try a small request first so you can see how Agent Zero thinks, uses tools, and
+Try a small request first so you can see how DarkOffice thinks, uses tools, and
 reports progress.
 
 1. Type a concrete request in the chat input and press Enter.
@@ -120,13 +120,13 @@ Here's an example of what you might see in the Web UI at step 3:
 ![1](res/quickstart/image-24.png)
 
 ## Next Steps
-Now that you've run a simple task, you can experiment with more complex requests. Try asking Agent Zero to:
+Now that you've run a simple task, you can experiment with more complex requests. Try asking DarkOffice to:
 
 - Create a project for a focused workspace.
 - Use the built-in Browser to research, screenshot, or annotate a page.
 - Open the Desktop when you want Linux GUI apps or LibreOffice Cowork.
-- Review Memory when Agent Zero seems to keep the wrong assumption.
-- Connect A0 CLI when Agent Zero should work on host-machine files.
+- Review Memory when DarkOffice seems to keep the wrong assumption.
+- Connect A0 CLI when DarkOffice should work on host-machine files.
 - Use **+ -> Skills** when you want to pin or remove a skill in the current chat.
 - Switch Agent Profiles from the menu near the chat input when you want a different working style.
 - Use the first model dropdown when you want to choose or edit Model Presets.

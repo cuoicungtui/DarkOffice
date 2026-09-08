@@ -178,7 +178,7 @@ class ComputerUseRemote(Tool):
             tokens=token_estimate,
         )
 
-        agent_name = str(getattr(self.agent, "agent_name", "Agent Zero") or "Agent Zero")
+        agent_name = str(getattr(self.agent, "agent_name", "DarkOffice") or "DarkOffice")
         PrintStyle(
             font_color="#1B4F72",
             background_color="white",

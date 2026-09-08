@@ -2,7 +2,7 @@
 codex:
   enabled: true
 
-  # Empty stores credentials in Agent Zero's private OAuth directory.
+  # Empty stores credentials in DarkOffice's private OAuth directory.
   # Never share a rotating refresh-token file with Codex CLI or another client.
   auth_file_path: ""
 

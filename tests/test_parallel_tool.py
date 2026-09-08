@@ -202,7 +202,7 @@ async def test_parallel_jobs_extras_lists_running_and_ready_jobs() -> None:
         parent_context_id="ctx",
         index=0,
         tool_name="search_engine",
-        tool_args={"query": "Agent Zero"},
+        tool_args={"query": "DarkOffice"},
         kind="tool",
         state="running",
         started_at=time.time() - 2,

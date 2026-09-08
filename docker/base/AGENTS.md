@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own the Agent Zero base image build context.
+- Own the DarkOffice base image build context.
 - Build the operating system, package, Python, SearXNG, SSH, and bootstrap layers reused by runnable images.
 
 ## Ownership
@@ -21,7 +21,7 @@
 
 ## Work Guidance
 
-- Keep base dependencies here only when they are common to runnable Agent Zero images.
+- Keep base dependencies here only when they are common to runnable DarkOffice images.
 - Coordinate Python runtime changes with root Docker documentation and runnable image setup.
 
 ## Verification

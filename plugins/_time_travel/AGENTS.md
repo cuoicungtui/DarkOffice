@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own Agent Zero workspace history, diff inspection, travel, snapshots, and revert for selectable Agent Zero workdir/project workspaces under `/a0/usr`.
+- Own DarkOffice workspace history, diff inspection, travel, snapshots, and revert for selectable DarkOffice workdir/project workspaces under `/a0/usr`.
 
 ## Ownership
 
@@ -13,7 +13,7 @@
 
 ## Local Contracts
 
-- Keep history operations scoped to Agent Zero-owned workdir/project workspaces.
+- Keep history operations scoped to DarkOffice-owned workdir/project workspaces.
 - Revert and travel operations must avoid unintended writes outside managed workspace paths.
 - Preserve enough metadata for clear preview and diff inspection before destructive actions.
 

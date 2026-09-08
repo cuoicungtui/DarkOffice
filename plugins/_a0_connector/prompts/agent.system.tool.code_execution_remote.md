@@ -38,10 +38,10 @@ Runtime-specific fields:
 - Execution and output polling timeouts follow the normal `_code_execution`
   plugin settings. For builds, installs, servers, tests, training, and other
   long work, redirect logs and poll with `runtime=output`.
-- Paths and shell syntax are evaluated on the CLI host, not inside Agent Zero.
+- Paths and shell syntax are evaluated on the CLI host, not inside DarkOffice.
 - When the user gives a relative path like `tmp/file.txt`, keep it relative to
   the CLI host terminal. Do not prepend or `cd` to `/a0/usr/workdir`; that is the
-  Agent Zero server/Docker workdir, not the connected local terminal folder.
+  DarkOffice server/Docker workdir, not the connected local terminal folder.
 - If the current terminal folder matters, run `pwd` first or include `pwd` in
   the same command without changing directories.
 

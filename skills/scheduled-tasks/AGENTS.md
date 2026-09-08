@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own the workflow for managing Agent Zero scheduled, planned, and adhoc tasks.
+- Own the workflow for managing DarkOffice scheduled, planned, and adhoc tasks.
 - Keep scheduler tool usage and date/time guidance accurate.
 
 ## Ownership

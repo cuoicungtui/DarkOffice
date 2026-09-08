@@ -1,7 +1,7 @@
 # Architecture
 
-Agent Zero architecture is now documented in
-[DeepWiki for Agent Zero](https://deepwiki.com/agent0ai/agent-zero).
+DarkOffice architecture is now documented in
+[DeepWiki for DarkOffice](https://deepwiki.com/agent0ai/agent-zero).
 
 Use DeepWiki when you want source-linked explanations of:
 
@@ -19,7 +19,7 @@ second, stale architecture manual.
 
 | Goal | Start here |
 | --- | --- |
-| Install or update Agent Zero | [Installation Guide](../setup/installation.md) |
+| Install or update DarkOffice | [Installation Guide](../setup/installation.md) |
 | Learn the Web UI | [Usage Guide](../guides/usage.md) |
 | Create a focused workspace | [Projects Guide](../guides/projects.md) |
 | Use the Browser | [Browser Guide](../guides/browser.md) |

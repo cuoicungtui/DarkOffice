@@ -66,7 +66,7 @@ def normalize_paths(paths) -> list[str]:
 
 def selected_archive_name(count: int) -> str:
     stamp = Localization.get().now().strftime("%Y%m%d-%H%M%S")
-    return f"agent-zero-selected-{count}-{stamp}.zip"
+    return f"darkoffice-selected-{count}-{stamp}.zip"
 
 
 def create_selected_zip(paths: list[str], current_path: str = "") -> str:

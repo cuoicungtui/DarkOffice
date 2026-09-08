@@ -9,24 +9,24 @@ from urllib.parse import urlparse
 
 from plugins._orchestrator.helpers.adapters.base import TerminalAgentAdapter
 
-# Inside the Agent Zero container, the local WebUI listens on port 80,
+# Inside the DarkOffice container, the local WebUI listens on port 80,
 # so the default target is the instance running this very plugin.
 DEFAULT_HOST = "http://localhost:80"
 DEFAULT_DOCKER_A0_BINARY = "/opt/venv/bin/a0"
 
 
 class AgentZeroAdapter(TerminalAgentAdapter):
-    """Delegate tasks to an Agent Zero instance via `a0 headless` one-shot mode.
+    """Delegate tasks to an DarkOffice instance via `a0 headless` one-shot mode.
 
     Host resolution: adapter config `host` > AGENT_ZERO_HOST env > local
     instance (http://localhost:80 inside the container).
     """
 
     id = "a0"
-    title = "Agent Zero (headless)"
+    title = "DarkOffice (headless)"
     binary = "a0"
     install_hint = "pip install git+https://github.com/agent0ai/a0-connector.git@development"
-    description = "Delegate to this or another Agent Zero instance through a0 headless."
+    description = "Delegate to this or another DarkOffice instance through a0 headless."
 
     # --- connection ----------------------------------------------------------
 

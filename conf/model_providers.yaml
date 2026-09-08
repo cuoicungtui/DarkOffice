@@ -1,4 +1,4 @@
-# Supported model providers for Agent Zero
+# Supported model providers for DarkOffice
 # ---------------------------------------
 #
 # Each provider type ("chat", "embedding") contains a mapping of provider IDs
@@ -27,7 +27,7 @@
 
 chat:
   a0_venice:
-    name: Agent Zero API
+    name: DarkOffice API
     litellm_provider: openai
     models_list:
       endpoint_url: "https://api.venice.ai/api/v1/models"
@@ -206,7 +206,7 @@ chat:
       a0_api_mode: chat
       extra_headers:
         "HTTP-Referer": "https://agent-zero.ai/"
-        "X-Title": "Agent Zero"
+        "X-Title": "DarkOffice"
         "X-OpenRouter-Categories": "personal-agent,cloud-agent"
   sambanova:
     name: Sambanova
@@ -319,10 +319,10 @@ embedding:
       api_base: https://openrouter.ai/api/v1
       extra_headers:
         "HTTP-Referer": "https://agent-zero.ai/"
-        "X-Title": "Agent Zero"
+        "X-Title": "DarkOffice"
         "X-OpenRouter-Categories": "personal-agent,cloud-agent"
   a0_venice:
-    name: Agent Zero API
+    name: DarkOffice API
     litellm_provider: openai
     models_list:
       endpoint_url: "https://api.venice.ai/api/v1/models"

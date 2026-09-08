@@ -137,7 +137,7 @@ class MicrosoftDevTunnel(FlaredanticTunnelHelper):
                 raise
             tunnel_id = default_microsoft_tunnel_id()
             raise RuntimeError(
-                "Microsoft Dev Tunnels did not return a URL. Agent Zero uses "
+                "Microsoft Dev Tunnels did not return a URL. DarkOffice uses "
                 f"the tunnel id `{tunnel_id}` to avoid flaredantic's global "
                 "`flaredantic` tunnel-id collision. If this still fails, set "
                 "`A0_MICROSOFT_DEV_TUNNEL_ID` to a fresh unique value and try again."

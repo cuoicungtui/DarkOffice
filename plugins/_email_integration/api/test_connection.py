@@ -111,8 +111,8 @@ class TestConnection(ApiHandler):
             error = await send_reply(
                 config=self._smtp_config(handler),
                 to=handler.get("username", ""),
-                subject="Agent Zero - Connection Test",
-                body="This is a test email from Agent Zero email integration.",
+                subject="DarkOffice - Connection Test",
+                body="This is a test email from DarkOffice email integration.",
             )
             if error:
                 results.append({

@@ -3,7 +3,7 @@
 ## Purpose
 
 - Own the `call_subordinate.py` agent tool.
-- This module delegates work to a subordinate Agent Zero profile and returns its result.
+- This module delegates work to a subordinate DarkOffice profile and returns its result.
 - Keep this file-level DOX profile synchronized with `call_subordinate.py` because this directory is intentionally flat.
 
 ## Ownership

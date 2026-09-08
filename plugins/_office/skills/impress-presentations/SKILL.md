@@ -2,7 +2,7 @@
 name: impress-presentations
 description: Use when creating, opening, or editing LibreOffice Impress ODP presentations, or PPTX decks only when PowerPoint compatibility is explicitly required.
 version: "1.1.0"
-author: "Agent Zero Core Team"
+author: "DarkOffice Core Team"
 tags: ["presentation", "odp", "opendocument", "pptx", "powerpoint", "slides", "deck", "impress"]
 triggers:
   - "Impress"

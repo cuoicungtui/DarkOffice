@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own the broad Agent Zero development guide used by agents extending the framework.
+- Own the broad DarkOffice development guide used by agents extending the framework.
 - Keep architecture, tools, extensions, API, agents, prompts, projects, plugins, runtime, and skills guidance in sync with the repository.
 
 ## Ownership

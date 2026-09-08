@@ -93,7 +93,7 @@ class ImageGet(ApiHandler):
 
 
 def _resolve_allowed_image_path(path: str) -> str:
-    """Resolve a requested image path and keep it inside Agent Zero's base dir."""
+    """Resolve a requested image path and keep it inside DarkOffice's base dir."""
 
     if runtime.is_development():
         candidate = Path(files.fix_dev_path(path))

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own the workflow for creating, improving, auditing, and refactoring Agent Zero skills.
+- Own the workflow for creating, improving, auditing, and refactoring DarkOffice skills.
 - Keep skill format guidance aligned with runtime discovery and loading.
 
 ## Ownership

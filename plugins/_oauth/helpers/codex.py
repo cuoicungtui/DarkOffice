@@ -1252,7 +1252,7 @@ def _lock_file(handle: BinaryIO) -> None:
                     raise
                 time.sleep(WINDOWS_LOCK_RETRY_SECONDS)
                 handle.seek(0)
-    raise RuntimeError("This platform does not support locking the Agent Zero OAuth auth file.")
+    raise RuntimeError("This platform does not support locking the DarkOffice OAuth auth file.")
 
 
 def _unlock_file(handle: BinaryIO) -> None:
@@ -1333,7 +1333,7 @@ def _validate_private_auth_path(path: Path) -> Path:
 
 def _private_auth_path_error() -> RuntimeError:
     return RuntimeError(
-        "Agent Zero OAuth credentials must use an Agent Zero-owned auth file. "
+        "DarkOffice OAuth credentials must use an DarkOffice-owned auth file. "
         "Choose a private auth_file_path or leave it empty for the default private store."
     )
 

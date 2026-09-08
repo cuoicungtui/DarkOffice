@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own core agent tool implementations available to Agent Zero agents.
+- Own core agent tool implementations available to DarkOffice agents.
 - Keep tool execution contracts, progress logging, intervention handling, and tool-result formatting stable.
 
 ## Ownership

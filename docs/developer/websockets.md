@@ -1,7 +1,7 @@
 # WebSockets
 
-Agent Zero WebSocket architecture is documented in
-[DeepWiki for Agent Zero](https://deepwiki.com/agent0ai/agent-zero).
+DarkOffice WebSocket architecture is documented in
+[DeepWiki for DarkOffice](https://deepwiki.com/agent0ai/agent-zero).
 
 This local page is only a handoff. Keeping the full protocol guide here would
 duplicate source-linked documentation and become stale.
@@ -28,4 +28,4 @@ Start with the source and DeepWiki:
 ## Related
 
 - [Architecture](architecture.md)
-- [DeepWiki for Agent Zero](https://deepwiki.com/agent0ai/agent-zero)
+- [DeepWiki for DarkOffice](https://deepwiki.com/agent0ai/agent-zero)

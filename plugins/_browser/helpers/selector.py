@@ -8,7 +8,7 @@ from plugins._browser.helpers.runtime import get_runtime as get_container_runtim
 
 
 DOCKER_BROWSER_RECOVERY_HELP = (
-    "To use Agent Zero's internal Docker browser instead, open Browser settings and "
+    "To use DarkOffice's internal Docker browser instead, open Browser settings and "
     "set Browser location to Internal Docker browser, or run `/browser container` "
     "from A0 CLI."
 )
@@ -66,7 +66,7 @@ def _host_browser_status_detail(context_id: str) -> str:
         return ""
     statuses = host_browser_metadata_for_context(context_id)
     if not statuses:
-        return "open A0 CLI and connect it to this Agent Zero chat."
+        return "open A0 CLI and connect it to this DarkOffice chat."
     parts = []
     for status in statuses:
         parts.append(

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own the built-in version-gated "What's New" modal for showcasing Agent Zero features after updates, dormant when no cards are configured.
+- Own the built-in version-gated "What's New" modal for showcasing DarkOffice features after updates, dormant when no cards are configured.
 
 ## Ownership
 
@@ -21,7 +21,7 @@
 - The permanent opt-out is stored in browser-local state under `a0_whats_new_never_show`.
 - Honor the legacy `a0_whats_new_seen_version` browser-local marker as the last seen version.
 - Keep the modal copy concise, left-aligned, and paired with feature media.
-- Keep modal actions in the pinned footer using the shared Agent Zero button classes.
+- Keep modal actions in the pinned footer using the shared DarkOffice button classes.
 - Store seen-version and opt-out markers in browser-local state only; do not persist this under `usr/`.
 
 ## Work Guidance

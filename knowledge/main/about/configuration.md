@@ -1,4 +1,4 @@
-# Agent Zero Configuration
+# DarkOffice Configuration
 
 Main configuration lives in `usr/settings.json` and the Settings Web UI.
 

@@ -5,7 +5,7 @@ Shown when a connected A0 CLI or Launcher host gateway advertises enabled Comput
 
 Use this for native host desktop UI inspection, screenshots, background-safe window/element actions when supported, clicking, scrolling, typing, key presses, and status checks. Do not use it for ordinary web-page navigation or host-browser control; use the browser tool for web pages unless browser automation cannot express the task. For complex desktop workflows, load and follow skill `host-computer-use` before proceeding.
 
-This is the only desktop-control path for the user's connected host/local computer. Do not substitute the `linux-desktop` skill, the Agent Zero Desktop/Xpra surface, `desktopctl.sh`, `code_execution_tool`, or Docker/server shell commands for host screen actions; those target the internal Agent Zero runtime and cannot see or control the user's host screen.
+This is the only desktop-control path for the user's connected host/local computer. Do not substitute the `linux-desktop` skill, the DarkOffice Desktop/Xpra surface, `desktopctl.sh`, `code_execution_tool`, or Docker/server shell commands for host screen actions; those target the internal DarkOffice runtime and cannot see or control the user's host screen.
 
 If the tool reports no CLI/Launcher host bridge, disabled computer use, or `COMPUTER_USE_REARM_REQUIRED`, stop and tell the user to run `/computer-use on` in the A0 Launcher chat when using Launcher Host access, or in A0 CLI otherwise, and approve any host permission prompt.
 

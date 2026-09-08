@@ -1,6 +1,6 @@
 # Model Configuration
 
-Manage the reusable model presets used for Agent Zero's main, utility, and embedding models.
+Manage the reusable model presets used for DarkOffice's main, utility, and embedding models.
 
 ## Model Presets
 

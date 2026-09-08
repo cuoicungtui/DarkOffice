@@ -99,7 +99,7 @@ def _is_streaming_http_type(server_type: str) -> bool:
 
 
 def _split_qualified_tool_name(tool_name: str) -> tuple[str, str]:
-    """Split Agent Zero's server.tool MCP name while preserving dots in MCP tool names."""
+    """Split DarkOffice's server.tool MCP name while preserving dots in MCP tool names."""
     if "." not in tool_name:
         raise ValueError(f"Tool {tool_name} not found")
     server_name_part, tool_name_part = tool_name.split(".", 1)
@@ -1306,7 +1306,7 @@ class MCPClientBase(ABC):
             message = (
                 f"MCPClientBase ({self.server.name} - {operation_name}): "
                 f"operation did not finish within {timeout_seconds:.1f}s; "
-                "abandoning the isolated worker so Agent Zero can continue."
+                "abandoning the isolated worker so DarkOffice can continue."
             )
             PrintStyle.warning(message)
             with self.__lock:

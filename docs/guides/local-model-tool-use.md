@@ -1,6 +1,6 @@
 # Local Model Tool Use
 
-Small local models can struggle with Agent Zero's full default communication shape. The safest first fix is prompt/profile/plugin-only: use a smaller behavior contract while leaving Agent Zero's core parser and execution code unchanged.
+Small local models can struggle with DarkOffice's full default communication shape. The safest first fix is prompt/profile/plugin-only: use a smaller behavior contract while leaving DarkOffice's core parser and execution code unchanged.
 
 Use this guide for Ollama, LM Studio, Qwen, and similar local chat models when the model explains commands instead of calling tools.
 
@@ -14,7 +14,7 @@ The bundled profile lives at:
 agents/tiny-local/
 ```
 
-Tiny Local keeps the normal Agent Zero tool-call shape, but removes visible reasoning fields from the communication prompt. It tells the model to emit one executable JSON object with `tool_name` and `tool_args`.
+Tiny Local keeps the normal DarkOffice tool-call shape, but removes visible reasoning fields from the communication prompt. It tells the model to emit one executable JSON object with `tool_name` and `tool_args`.
 
 ## Use A Project Prompt Include
 
@@ -29,7 +29,7 @@ Put this content in that file:
 ```markdown
 ## Local model tool-use discipline
 
-You are Agent Zero. Act on the user's behalf.
+You are DarkOffice. Act on the user's behalf.
 
 When the user asks you to do something, do it directly. Do not explain how the user could do it themselves.
 

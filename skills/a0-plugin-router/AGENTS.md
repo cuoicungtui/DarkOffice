@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own routing for Agent Zero plugin-related user requests.
+- Own routing for DarkOffice plugin-related user requests.
 - Keep handoffs to plugin creation, review, contribution, management, and debugging skills accurate.
 
 ## Ownership

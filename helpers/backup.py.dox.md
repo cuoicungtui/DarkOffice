@@ -3,7 +3,7 @@
 ## Purpose
 
 - Own the `backup.py` helper module.
-- This module builds, inspects, previews, tests, and restores Agent Zero backup archives.
+- This module builds, inspects, previews, tests, and restores DarkOffice backup archives.
 - Keep this file-level DOX profile synchronized with `backup.py` because this directory is intentionally flat.
 
 ## Ownership

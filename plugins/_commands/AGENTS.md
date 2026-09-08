@@ -42,7 +42,7 @@
   owns its separate Textual permissions screen for the same command name.
 - Built-in `/computer-use on|off` emits a bounded `computer_use` effect. WebUI
   only directs the user to Host access in A0 Launcher or the same command in A0
-  CLI; it never changes a Launcher gateway lease from Agent Zero page content.
+  CLI; it never changes a Launcher gateway lease from DarkOffice page content.
 
 ## Work Guidance
 

@@ -7,9 +7,9 @@ description: Guide safe use of text_editor_remote for reading, writing, and patc
 
 ## Boundary
 
-Use `text_editor_remote` only for file work on the machine where A0 CLI is running. These paths and files belong to the CLI host, not the Agent Zero server or Docker container.
+Use `text_editor_remote` only for file work on the machine where A0 CLI is running. These paths and files belong to the CLI host, not the DarkOffice server or Docker container.
 
-If the task belongs inside Agent Zero's own runtime, use the normal server-side file tools instead.
+If the task belongs inside DarkOffice's own runtime, use the normal server-side file tools instead.
 
 ## Access Modes
 
@@ -37,6 +37,6 @@ If the task belongs inside Agent Zero's own runtime, use the normal server-side 
 
 ## Failure Handling
 
-- If no CLI is connected, ask the user to connect A0 CLI to this Agent Zero instance.
+- If no CLI is connected, ask the user to connect A0 CLI to this DarkOffice instance.
 - If writes are blocked, tell the user to switch local file access to Read&Write with F3.
 - If a request times out or the CLI disconnects, summarize the failure and wait for reconnection.

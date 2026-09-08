@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Repair malformed Agent Zero tool-call JSON and preserve raw output as compact thoughts JSON when repair cannot produce a tool call.
+- Repair malformed DarkOffice tool-call JSON and preserve raw output as compact thoughts JSON when repair cannot produce a tool call.
 
 ## Ownership
 

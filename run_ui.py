@@ -15,7 +15,7 @@ def run():
     PrintStyle().print("Preparing web server runtime...")
     server_runtime, host, port = prepare_web_runtime()
 
-    PrintStyle().print("Initializing Agent Zero components...")
+    PrintStyle().print("Initializing DarkOffice components...")
     init_a0()
 
     PrintStyle().print("Starting UI/API server...")

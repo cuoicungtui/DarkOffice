@@ -1,6 +1,6 @@
 {
-  "name": "Agent Zero",
-  "short_name": "Agent Zero",
+  "name": "DarkOffice",
+  "short_name": "DarkOffice",
   "description": "Autonomous AI agent",
   "start_url": "/",
   "display": "standalone",

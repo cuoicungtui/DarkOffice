@@ -2,7 +2,7 @@
 
 ![Migrate Agents plugin thumbnail](webui/thumbnail.webp)
 
-Migrate Agents is a bundled Agent Zero plugin for bringing retained work
+Migrate Agents is a bundled DarkOffice plugin for bringing retained work
 home from the five most-used open agent harnesses:
 
 - OpenClaw
@@ -12,7 +12,7 @@ home from the five most-used open agent harnesses:
 - Codex
 
 The plugin checks an export before importing it. You choose which chats,
-projects, memories, instructions, and skills to bring into Agent Zero.
+projects, memories, instructions, and skills to bring into DarkOffice.
 Credentials, authentication files, and hidden reasoning are excluded.
 
 ## Enable
@@ -35,7 +35,7 @@ confirm it.
 
 ## What maps cleanly
 
-| Source material | Agent Zero destination | Notes |
+| Source material | DarkOffice destination | Notes |
 | --- | --- | --- |
 | User and assistant messages | Native chats | Source ID, timestamps, and workspace metadata are retained when available. |
 | Retained workspace paths | Native projects | Chats from the same retained workspace are attached to the same imported project. Project files are not reconstructed from transcript metadata alone. |

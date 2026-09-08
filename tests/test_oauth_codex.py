@@ -706,7 +706,7 @@ def test_explicit_codex_cli_auth_path_is_rejected(tmp_path, monkeypatch):
     monkeypatch.setenv("CODEX_HOME", str(codex_home))
     monkeypatch.setattr(codex, "codex_config", lambda: {"auth_file_path": str(codex_home / "auth.json")})
 
-    with pytest.raises(RuntimeError, match="Agent Zero-owned auth file"):
+    with pytest.raises(RuntimeError, match="DarkOffice-owned auth file"):
         codex.resolve_auth_write_path()
 
 
@@ -719,7 +719,7 @@ def test_explicit_codex_cli_auth_hard_link_is_rejected(tmp_path, monkeypatch):
     monkeypatch.setenv("HOME", str(tmp_path))
     monkeypatch.setattr(codex, "codex_config", lambda: {"auth_file_path": str(alias)})
 
-    with pytest.raises(RuntimeError, match="Agent Zero-owned auth file"):
+    with pytest.raises(RuntimeError, match="DarkOffice-owned auth file"):
         codex.resolve_auth_write_path()
 
 
@@ -730,7 +730,7 @@ def test_explicit_private_auth_hard_link_is_rejected(tmp_path, monkeypatch):
     alias.hardlink_to(private_auth)
     monkeypatch.setattr(codex, "codex_config", lambda: {"auth_file_path": str(alias)})
 
-    with pytest.raises(RuntimeError, match="Agent Zero-owned auth file"):
+    with pytest.raises(RuntimeError, match="DarkOffice-owned auth file"):
         codex.resolve_auth_write_path()
 
 

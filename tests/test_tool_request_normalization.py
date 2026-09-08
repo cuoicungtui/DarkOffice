@@ -77,13 +77,13 @@ def test_normalize_tool_request_accepts_native_function_format() -> None:
     request = {
         "type": "function",
         "name": "search_engine",
-        "parameters": {"query": "latest Agent Zero release"},
+        "parameters": {"query": "latest DarkOffice release"},
     }
 
     assert json_parse_dirty(str(request)) == request
     assert normalize_tool_request(request) == (
         "search_engine",
-        {"query": "latest Agent Zero release"},
+        {"query": "latest DarkOffice release"},
     )
 
 

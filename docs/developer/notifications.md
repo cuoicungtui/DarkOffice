@@ -1,6 +1,6 @@
-# Agent Zero Notifications
+# DarkOffice Notifications
 
-Quick guide for using the notification system in Agent Zero.
+Quick guide for using the notification system in DarkOffice.
 
 > [!TIP]
 > Notifications pair well with scheduled tasks. See [Tasks & Scheduling](../guides/usage.md#tasks-and-scheduling) for automation patterns.

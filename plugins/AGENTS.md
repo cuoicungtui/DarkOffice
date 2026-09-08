@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own bundled system plugins shipped with Agent Zero.
+- Own bundled system plugins shipped with DarkOffice.
 - Provide the tracked plugin architecture contract for both bundled plugins and custom plugins developed under ignored `usr/plugins/`.
 - Keep plugin behavior discoverable, reversible, and compatible across bundled and custom roots without creating DOX files inside `usr/`.
 
@@ -31,7 +31,7 @@
 - `hooks.py` runs in the framework runtime. Explicitly target another runtime if a plugin must prepare the agent execution environment.
 - `execute.py` is manual user-triggered setup, maintenance, repair, migration, or refresh work; automatic framework behavior belongs in hooks or lifecycle extensions.
 - Plugin routes are `GET /plugins/<name>/<path>`, `POST /api/plugins/<name>/<handler>`, and `POST /api/plugins` for management actions.
-- `_a0_connector` WebSocket history replay must stay bounded: emit large chat history as paged `connector_context_snapshot` payloads, keep `last_sequence` as the Agent Zero log-output cursor, and avoid sending an entire long transcript in one frame.
+- `_a0_connector` WebSocket history replay must stay bounded: emit large chat history as paged `connector_context_snapshot` payloads, keep `last_sequence` as the DarkOffice log-output cursor, and avoid sending an entire long transcript in one frame.
 - Frontend plugin HTML extensions live under `extensions/webui/<point>/`, include a root Alpine scope, and use `x-move-*` directives when targeting static breakpoints.
 - Frontend plugin JS extensions live under `extensions/webui/<point>/` and export a default function.
 - Plugin UI must use the A0 notification system for errors, warnings, success, and info instead of inline success/error boxes.

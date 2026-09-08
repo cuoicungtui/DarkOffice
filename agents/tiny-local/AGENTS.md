@@ -16,7 +16,7 @@
 
 ## Local Contracts
 
-- Preserve the normal Agent Zero tool-call shape: `tool_name` plus `tool_args`.
+- Preserve the normal DarkOffice tool-call shape: `tool_name` plus `tool_args`.
 - Do not add parser repair, duplicate suppression runtime, model transport, or text-editor runtime behavior here.
 - Duplicate-message handling may be tightened through profile prompts only.
 - Keep prompt text short enough for small local models to follow.

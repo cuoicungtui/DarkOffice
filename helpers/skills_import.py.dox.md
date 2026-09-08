@@ -18,8 +18,8 @@
 - `_derive_namespace(source: Path) -> str`
 - `_candidate_skill_roots(source_dir: Path) -> List[Path]`: Heuristics to find likely skill roots inside a repo/pack:
 - `_safe_extract_zip(zip_path: Path, target: Path) -> None`
-- `extract_skills_zip(zip_path: Path, tmp_subdir: str=..., prefix: str=...) -> tuple[Path, Path]`: Extract a zip into a temp folder inside Agent Zero's tmp directory and return the scan/import root plus cleanup root.
-- `_unzip_to_temp_dir(zip_path: Path) -> Path`: Extract a zip into a temp folder under tmp/skill_imports (inside Agent Zero base dir).
+- `extract_skills_zip(zip_path: Path, tmp_subdir: str=..., prefix: str=...) -> tuple[Path, Path]`: Extract a zip into a temp folder inside DarkOffice's tmp directory and return the scan/import root plus cleanup root.
+- `_unzip_to_temp_dir(zip_path: Path) -> Path`: Extract a zip into a temp folder under tmp/skill_imports (inside DarkOffice base dir).
 - `build_import_plan(source: Path, dest_root: Path, namespace: Optional[str]=...) -> Tuple[List[ImportPlanItem], Path]`: Build a copy plan for importing skills from a source folder.
 - `_resolve_conflict(dest: Path, policy: ConflictPolicy) -> Tuple[Path, bool]`: Returns (final_dest_path, should_copy).
 - `get_project_skills_folder(project_name: str) -> Path`: Get the skills folder path for a project.

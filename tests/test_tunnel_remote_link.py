@@ -636,7 +636,7 @@ def test_tailscale_preflight_emits_login_url_from_tailscale_up(
         "event": "info",
         "message": (
             "Open the Tailscale login link and approve this container. "
-            "Agent Zero will continue when Tailscale finishes setup."
+            "DarkOffice will continue when Tailscale finishes setup."
         ),
         "data": {
             "provider": "tailscale",
@@ -794,7 +794,7 @@ def test_tailscale_funnel_command_surfaces_approval_url(
         "event": "info",
         "message": (
             "Open the Tailscale approval link to finish sign-in or enable Funnel. "
-            "Agent Zero will continue when Tailscale reports the public URL."
+            "DarkOffice will continue when Tailscale reports the public URL."
         ),
         "data": {
             "provider": "tailscale",

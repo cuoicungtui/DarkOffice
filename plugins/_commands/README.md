@@ -1,6 +1,6 @@
 # Commands
 
-YAML-configured slash commands for Agent Zero.
+YAML-configured slash commands for DarkOffice.
 
 This plugin lets you define reusable `/commands` as `.command.yaml` files with either:
 
@@ -145,4 +145,4 @@ When the built-in `_commands` plugin starts, it migrates files from the older co
 
 ## Agent Skill
 
-The plugin ships with `commands-create-slash-command`, a plugin-scoped skill that helps Agent Zero create or update command files.
+The plugin ships with `commands-create-slash-command`, a plugin-scoped skill that helps DarkOffice create or update command files.

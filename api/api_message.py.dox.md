@@ -3,7 +3,7 @@
 ## Purpose
 
 - Own the `api_message.py` API endpoint.
-- This module accepts external API messages and dispatches them into Agent Zero chat processing.
+- This module accepts external API messages and dispatches them into DarkOffice chat processing.
 - Keep this file-level DOX profile synchronized with `api_message.py` because this directory is intentionally flat.
 
 ## Ownership

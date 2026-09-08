@@ -33,9 +33,9 @@ gemini -p "Respond exactly: TERMINAL_AGENT_SMOKE_OK" --output-format json --appr
 
 ## Login
 
-Headless mode uses existing cached Google credentials, a Gemini API key, or Vertex AI credentials. Do not start bare `gemini` through Agent Zero for login; it opens a TUI. For local browser sign-in, ask the user to run `gemini` in their own terminal, select **Sign in with Google**, finish in the browser, and then retry the smoke prompt.
+Headless mode uses existing cached Google credentials, a Gemini API key, or Vertex AI credentials. Do not start bare `gemini` through DarkOffice for login; it opens a TUI. For local browser sign-in, ask the user to run `gemini` in their own terminal, select **Sign in with Google**, finish in the browser, and then retry the smoke prompt.
 
-For container automation, prefer `GEMINI_API_KEY`. Ask the user to add it through **Settings > External Services > Secrets Management**. If `GEMINI_API_KEY` is listed in Agent Zero's available secrets, do not source `/a0/usr/.env`; pass the exact secret alias only to the Gemini process:
+For container automation, prefer `GEMINI_API_KEY`. Ask the user to add it through **Settings > External Services > Secrets Management**. If `GEMINI_API_KEY` is listed in DarkOffice's available secrets, do not source `/a0/usr/.env`; pass the exact secret alias only to the Gemini process:
 
 ```bash
 GEMINI_API_KEY='§§secret(GEMINI_API_KEY)' gemini -p "Respond exactly: TERMINAL_AGENT_SMOKE_OK" --output-format json --approval-mode=yolo --skip-trust

@@ -59,7 +59,7 @@
 ## Verification
 
 - Run targeted tests for normalization, recursion guard, prompt extras, and tool result formatting.
-- Run a live Agent Zero chat when changing parallel execution, child chat metadata, or subordinate task behavior.
+- Run a live DarkOffice chat when changing parallel execution, child chat metadata, or subordinate task behavior.
 
 ## Child DOX Index
 

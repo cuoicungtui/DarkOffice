@@ -47,7 +47,7 @@ DISPLAY_START_TIMEOUT_SECONDS = 30.0
 PORT_START_TIMEOUT_SECONDS = 30.0
 STARTUP_GRACE_SECONDS = 45
 RUNTIME_INSTALL_MESSAGE = (
-    "Installing Agent Zero Desktop runtime dependencies. "
+    "Installing DarkOffice Desktop runtime dependencies. "
     "This can take a few minutes after an update."
 )
 HIDDEN_XPRA_DESKTOP_ENTRIES = (
@@ -1184,7 +1184,7 @@ class DesktopSessionManager:
         )
         _write_desktop_launcher(
             applications_dir / URL_HANDLER_DESKTOP_ID,
-            name="Agent Zero Browser",
+            name="DarkOffice Browser",
             exec_line=_desktop_exec(browser_bridge, "%U"),
             icon="web-browser",
             categories="Network;WebBrowser;",
@@ -1194,7 +1194,7 @@ class DesktopSessionManager:
         )
         _write_desktop_launcher(
             applications_dir / EDITOR_HANDLER_DESKTOP_ID,
-            name="Agent Zero Editor",
+            name="DarkOffice Editor",
             exec_line=_desktop_exec(editor_bridge, "%F"),
             icon="accessories-text-editor",
             categories="Utility;TextEditor;",
@@ -1353,7 +1353,7 @@ fi
                 [
                     "[Desktop Entry]",
                     "Type=Application",
-                    "Name=Agent Zero desktop profile",
+                    "Name=DarkOffice desktop profile",
                     f"Exec={script}",
                     "Terminal=false",
                     "OnlyShowIn=XFCE;",
@@ -1729,11 +1729,11 @@ def collect_desktop_status() -> dict[str, Any]:
         "binaries": binaries,
         "xpra_html_root": str(desktop.get("xpra_html_root") or ""),
         "message": (
-            "Agent Zero Desktop sessions are available."
+            "DarkOffice Desktop sessions are available."
             if healthy
             else RUNTIME_INSTALL_MESSAGE
             if installing
-            else f"Agent Zero Desktop sessions need: {', '.join(missing)}."
+            else f"DarkOffice Desktop sessions need: {', '.join(missing)}."
         ),
     }
 
@@ -2114,7 +2114,7 @@ def main():
             "source": "tray",
         }}
         write_json_atomic(REQUEST_PATH, payload)
-        notify("Shutting down Agent Zero Desktop.", 2)
+        notify("Shutting down DarkOffice Desktop.", 2)
 
 
 if __name__ == "__main__":
@@ -2231,7 +2231,7 @@ def _editor_text_handler_mime_types() -> tuple[str, ...]:
 def _write_mimeapps_defaults(path: Path, url_desktop_id: str, editor_desktop_id: str) -> None:
     url_associations = ";".join([url_desktop_id, ""])
     # LibreOffice Writer stays the default so double-clicks keep the user (and
-    # agents) inside the Desktop; the Agent Zero Editor remains an "Open With"
+    # agents) inside the Desktop; the DarkOffice Editor remains an "Open With"
     # option. When Writer's desktop entry is missing, xdg falls back through
     # the added associations to the editor.
     text_associations = ";".join([WRITER_HANDLER_DESKTOP_ID, editor_desktop_id, ""])
@@ -2264,7 +2264,7 @@ def _write_xfce_browser_helper(path: Path, bridge_script: Path) -> None:
                 f"X-XFCE-Commands={command}",
                 f"X-XFCE-CommandsWithParameter={command_with_parameter}",
                 "Icon=web-browser",
-                "Name=Agent Zero Browser",
+                "Name=DarkOffice Browser",
                 "",
             ],
         ),

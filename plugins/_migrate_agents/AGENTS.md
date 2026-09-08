@@ -14,7 +14,7 @@
 ## Local Contracts
 
 - The bundled folder, manifest name, Python imports, and HTTP routes use `_migrate_agents`.
-- Preview must not write Agent Zero state. Import starts only after explicit category selection and review consent.
+- Preview must not write DarkOffice state. Import starts only after explicit category selection and review consent.
 - Credentials, authentication state, hidden reasoning, schedules, live services, and replayable tool execution stay excluded.
 - Imported knowledge and skills remain namespaced below `usr/knowledge/_migrate_agents/` and `usr/skills/_migrate_agents/`.
 - Preserve source provenance and do not claim transcript metadata can reconstruct unavailable project files.
@@ -28,7 +28,7 @@
 ## Verification
 
 - Run `conda run -n a0 python -m pytest plugins/_migrate_agents/tests -q`.
-- For WebUI changes, verify the mounted modal and upload flow against the named live Agent Zero runtime.
+- For WebUI changes, verify the mounted modal and upload flow against the named live DarkOffice runtime.
 
 ## Child DOX Index
 

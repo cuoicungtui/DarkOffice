@@ -1,5 +1,5 @@
 # Enabled unpacked Chromium extension directories.
-# Paths must be readable from the Agent Zero runtime itself.
+# Paths must be readable from the DarkOffice runtime itself.
 extension_paths: []
 
 # Page opened by new Browser sessions when no URL is provided.
@@ -19,7 +19,7 @@ browser_tab_scope: "per_context"
 max_open_tabs: 32
 
 # Runtime used by the agent-facing browser tool:
-# - container: use Agent Zero's Docker/server Playwright browser.
+# - container: use DarkOffice's Docker/server Playwright browser.
 # - host_required: Bring Your Own Browser through A0 CLI and prepare it on first browser use when possible.
 runtime_backend: "container"
 

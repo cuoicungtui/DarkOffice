@@ -1,6 +1,6 @@
 # OAuth Connections
 
-Generic local OAuth bridge for Agent Zero.
+Generic local OAuth bridge for DarkOffice.
 
 Tokens in `auth.json` are password-equivalent credentials. Keep this plugin on trusted local machines only. Do not configure `auth_file_path` to share a rotating refresh-token file with Codex CLI or another client.
 
@@ -8,14 +8,14 @@ The settings UI groups providers as account-backed connections. More than one ac
 
 Each model slot has its own provider selector. The selector lists connected OAuth accounts only, so Main and Utility can use different account-backed providers when more than one account is connected.
 
-OAuth-backed model providers do not require users to enter API keys. Agent Zero supplies a local dummy key only at runtime after the selected account provider is connected, so unconnected providers stay blank in API-key surfaces.
+OAuth-backed model providers do not require users to enter API keys. DarkOffice supplies a local dummy key only at runtime after the selected account provider is connected, so unconnected providers stay blank in API-key surfaces.
 
 ## Providers
 
 ### Codex/ChatGPT (`codex_oauth`)
 
 - Uses the existing Codex device-code flow.
-- Writes Codex-compatible credentials to an Agent Zero-owned `auth.json` file.
+- Writes Codex-compatible credentials to an DarkOffice-owned `auth.json` file.
 - Refreshes local tokens when needed.
 - Exposes the local OpenAI-compatible wrapper at `/oauth/codex/v1`.
 - Lets users choose default reasoning effort, visible reasoning summaries, and answer verbosity while preserving explicit per-request settings.
@@ -48,7 +48,7 @@ The same status response also includes `oauth_accounts`, a compact summary used 
 
 ## Remote xAI Callback
 
-When Agent Zero is running on a remote host, the browser may complete the xAI authorization step somewhere other than the machine serving the local callback route. In that case, paste the callback value into the xAI card.
+When DarkOffice is running on a remote host, the browser may complete the xAI authorization step somewhere other than the machine serving the local callback route. In that case, paste the callback value into the xAI card.
 
 The xAI card accepts any of these formats:
 

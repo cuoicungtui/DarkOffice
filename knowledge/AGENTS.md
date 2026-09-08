@@ -7,7 +7,7 @@
 
 ## Ownership
 
-- `main/about/` contains built-in Agent Zero self-knowledge.
+- `main/about/` contains built-in DarkOffice self-knowledge.
 - `fragments/`, `instruments/`, and `solutions/` are reserved knowledge roots.
 - User-local knowledge belongs under `usr/knowledge/`.
 

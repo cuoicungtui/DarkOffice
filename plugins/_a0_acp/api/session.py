@@ -52,7 +52,7 @@ def _timestamp(value: object) -> str:
 def _session_payload(context) -> dict[str, Any]:
     return {
         "session_id": context.id,
-        "title": context.name or "Agent Zero ACP",
+        "title": context.name or "DarkOffice ACP",
         "cwd": str(context.get_data(CTX_CWD) or ""),
         "additional_directories": _paths(context.get_data(CTX_ADDITIONAL_DIRECTORIES)),
         "updated_at": _timestamp(context.last_message or context.created_at),
@@ -124,7 +124,7 @@ class Session(ProtectedConnectorApiHandler):
 
         config = _config()
         if not bool(config.get("enabled", True)):
-            return Response(status=403, response="ACP is disabled in Agent Zero settings")
+            return Response(status=403, response="ACP is disabled in DarkOffice settings")
         context, error = self._context(input)
         if error:
             return error
@@ -146,7 +146,7 @@ class Session(ProtectedConnectorApiHandler):
             if container_workspace:
                 context.set_data(CTX_WORKDIR, container_workspace)
         if not context.name:
-            context.name = Path(cwd).name or "Agent Zero ACP"
+            context.name = Path(cwd).name or "DarkOffice ACP"
         persist_chat.save_tmp_chat(context)
         _mark_dirty(context.id, "a0_acp.configure")
         return {"ok": True, "session": _session_payload(context), "config": config}
@@ -168,7 +168,7 @@ class Session(ProtectedConnectorApiHandler):
         if fork is None:
             return Response(status=500, response="Forked ACP session could not be loaded")
 
-        fork.name = f"{context.name or 'Agent Zero ACP'} (fork)"
+        fork.name = f"{context.name or 'DarkOffice ACP'} (fork)"
         fork.set_data(CTX_IS_ACP, True)
         fork.set_data(CTX_CWD, str(input.get("cwd") or context.get_data(CTX_CWD) or ""))
         fork.set_data(

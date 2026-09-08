@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own the workflow for publishing an Agent Zero plugin to the community Plugin Index.
+- Own the workflow for publishing an DarkOffice plugin to the community Plugin Index.
 - Keep contribution guidance aligned with current Plugin Hub and `a0-plugins` repository requirements.
 
 ## Ownership

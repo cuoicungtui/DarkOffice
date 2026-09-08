@@ -2,7 +2,7 @@
 name: document-query
 description: Use when reading, extracting, summarizing, comparing, or answering questions over local or remote documents, code files, PDFs, Office files, HTML/text files, large text-heavy files, and fallback OCR for document images or scans when vision tools are unavailable or insufficient.
 version: 1.0.0
-author: Agent Zero Team
+author: DarkOffice Team
 tags: ["documents", "ocr", "qa", "pdf", "code", "analysis"]
 trigger_patterns:
   - document query

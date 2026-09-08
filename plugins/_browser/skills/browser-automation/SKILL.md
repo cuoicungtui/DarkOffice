@@ -1,6 +1,6 @@
 ---
 name: browser-automation
-description: Use for complex Agent Zero browser automation, including multi-tab browsing, screenshots, forms, uploads, raw pointer/keyboard actions, host-vs-container browser mode, and visual verification workflows.
+description: Use for complex DarkOffice browser automation, including multi-tab browsing, screenshots, forms, uploads, raw pointer/keyboard actions, host-vs-container browser mode, and visual verification workflows.
 triggers:
   - "browser automation"
   - "web automation"
@@ -39,7 +39,7 @@ For fragile forms, load `browser-form-workflows` with `skills_tool:load` before 
 
 The same tool may run in Docker container mode or A0 CLI host-browser mode, depending on project/plugin settings.
 
-- Container mode: browser and upload paths resolve inside the Agent Zero container.
+- Container mode: browser and upload paths resolve inside the DarkOffice container.
 - Host mode: browser and upload paths resolve on the connected A0 CLI host machine.
 
 In host mode, page content and screenshots may be blocked by host-content policy when remote models are active.

@@ -1,4 +1,4 @@
-# Agent Zero Architecture
+# DarkOffice Architecture
 
 The agent loop builds a system prompt, appends conversation history, asks the model for one JSON tool request, executes that tool, records the result, and repeats until `response` ends the task.
 

@@ -61,7 +61,7 @@ class SkillsScan(ApiHandler):
         return {
             "success": True,
             "target_type": "installed",
-            "target_label": "Installed Agent Zero skills",
+            "target_label": "Installed DarkOffice skills",
             "targets": targets,
             "paths": [item["path"] for item in targets],
             "skill_count": total_skills,

@@ -2,7 +2,7 @@
 name: office-artifacts
 description: Use when creating, opening, reading, or editing Office artifacts such as LibreOffice-native ODT/ODS/ODP files and compatibility DOCX/XLSX/PPTX files with the office_artifact tool.
 version: "1.4.0"
-author: "Agent Zero Core Team"
+author: "DarkOffice Core Team"
 tags: ["office", "documents", "odt", "ods", "odp", "docx", "xlsx", "pptx", "spreadsheets", "presentations", "libreoffice", "opendocument"]
 triggers:
   - "office artifact"
@@ -160,7 +160,7 @@ Arguments:
 - Do not create an artifact for tiny one-shot edits or answers the agent can finish cleanly in chat or by directly editing the file.
 - For document-style writing requests with no requested binary format, use `text_editor` to create or edit Markdown and let the Editor surface be the primary interactive editor.
 - For spreadsheet or presentation file requests with no OOXML compatibility requirement, create ODS or ODP.
-- The Desktop runtime may be warmed during Agent Zero startup, but visible Desktop surface use remains opt-in. Treat LibreOffice GUI work as appropriate for explicit GUI requests, binary Office visual polish, or final layout inspection.
+- The Desktop runtime may be warmed during DarkOffice startup, but visible Desktop surface use remains opt-in. Treat LibreOffice GUI work as appropriate for explicit GUI requests, binary Office visual polish, or final layout inspection.
 - Never open Editor or Desktop automatically from a tool result. If the user has not asked to open it, leave the saved artifact available through the normal UI affordance.
 - Use native `create_chart` for embedded spreadsheet charts. Reach for Python/code execution only when the requested chart behavior is not supported by the tool.
 - Use `edit` for precise saved Office changes; use Editor for Markdown polish and Desktop for binary Office visual polish.

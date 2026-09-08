@@ -145,7 +145,7 @@ class CodeExecutionRemote(Tool):
                     else "code_execution_remote: no connected CLI currently has "
                     "remote execution enabled. Connect the CLI and press F4 to switch exec on."
                     if candidates
-                    else "code_execution_remote: no CLI client connected to Agent Zero. "
+                    else "code_execution_remote: no CLI client connected to DarkOffice. "
                     "Make sure the CLI is connected to this instance."
                 ),
                 break_loop=False,

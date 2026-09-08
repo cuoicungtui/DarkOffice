@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own the Agent Zero Linux desktop runtime, Xpra/Xfce session integration, and live desktop surface.
+- Own the DarkOffice Linux desktop runtime, Xpra/Xfce session integration, and live desktop surface.
 
 ## Ownership
 
@@ -18,7 +18,7 @@
 - Keep desktop state injected into prompts accurate and bounded.
 - Do not expose desktop routes without the expected auth protections.
 - Keep Desktop host visibility tied to an attached modal or canvas host; modal cleanup may preserve the iframe in keepalive, but must not leave stale modal mode behind.
-- Keep LibreOffice Writer as the default handler for Markdown and plain text files; keep Agent Zero Editor available as a secondary Open With target through the desktop intent bridge.
+- Keep LibreOffice Writer as the default handler for Markdown and plain text files; keep DarkOffice Editor available as a secondary Open With target through the desktop intent bridge.
 
 ## Work Guidance
 

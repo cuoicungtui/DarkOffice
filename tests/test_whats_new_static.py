@@ -12,7 +12,7 @@ def test_whats_new_modal_handles_empty_showcase_state():
         encoding="utf-8"
     )
 
-    assert "What's New in Agent Zero" in html
+    assert "What's New in DarkOffice" in html
     assert "data-modal-footer" in html
     assert "btn btn-ok" in html
     assert "btn btn-field" in html
@@ -39,7 +39,7 @@ def test_whats_new_legacy_modal_path_redirects_to_main_screen():
 
     assert "/plugins/_whats_new/webui/main.html" in html
     assert "openModal(mainPath)" in html
-    assert "What's New in Agent Zero" in html
+    assert "What's New in DarkOffice" in html
 
 
 def test_whats_new_startup_trigger_is_version_gated_with_opt_out():

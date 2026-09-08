@@ -21,17 +21,17 @@ provider prefix.
 
 The selected preset affects the current chat. Choose **Use scoped preset** to
 return the chat to the default selected for its project and agent profile. If no
-more specific choice exists, Agent Zero uses the global preset.
+more specific choice exists, DarkOffice uses the global preset.
 
 The **Default** preset is always available. You can edit its models, but you
 cannot rename or delete it.
 
 ## Initial Presets
 
-When no saved preset collection exists at startup, Agent Zero downloads the
+When no saved preset collection exists at startup, DarkOffice downloads the
 curated **Default**, **Efficiency**, and **Power** presets from the public
 [`agent0ai/a0-presets`](https://github.com/agent0ai/a0-presets) repository. If
-GitHub is unavailable or the file is invalid, Agent Zero saves its bundled
+GitHub is unavailable or the file is invalid, DarkOffice saves its bundled
 plugin fallback instead. Existing saved presets short-circuit this check and
 are never replaced.
 

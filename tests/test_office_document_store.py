@@ -729,7 +729,7 @@ def test_desktop_status_reports_installing_during_runtime_preparation(monkeypatc
     assert status["healthy"] is False
     assert status["installing"] is True
     assert status["state"] == "installing"
-    assert status["message"].startswith("Installing Agent Zero Desktop runtime dependencies")
+    assert status["message"].startswith("Installing DarkOffice Desktop runtime dependencies")
     assert "soffice" in status["missing"]
 
 

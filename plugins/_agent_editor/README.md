@@ -1,7 +1,7 @@
 # Agent Editor
 
 Agent Editor provides the deterministic Easy modal and Advanced workspace for
-Agent Zero profiles. It reads the existing layered profile architecture and
+DarkOffice profiles. It reads the existing layered profile architecture and
 writes only sparse overrides in the selected Global or project profile layer.
 
 The editor never invokes a model. Tool and skill controls are backed by the

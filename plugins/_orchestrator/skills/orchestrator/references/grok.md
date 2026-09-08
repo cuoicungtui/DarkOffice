@@ -1,6 +1,6 @@
 # Grok Build
 
-Use Grok Build for headless xAI coding-agent tasks. Running `grok` with no arguments starts the interactive TUI, so use `-p` for Agent Zero delegation.
+Use Grok Build for headless xAI coding-agent tasks. Running `grok` with no arguments starts the interactive TUI, so use `-p` for DarkOffice delegation.
 
 ## Install And Probe
 
@@ -31,7 +31,7 @@ export XAI_API_KEY="xai-..."
 
 Do not ask the user to paste the key into chat. Ask them to set `XAI_API_KEY` in the runtime environment, or to add it through Settings > External Services > Secrets Management when that maps into `/a0/usr/.env`.
 
-When using Agent Zero secrets, source `/a0/usr/.env` without printing it. Some Agent Zero installs store the xAI key as `API_KEY_XAI`; map it to the CLI variable before running Grok Build:
+When using DarkOffice secrets, source `/a0/usr/.env` without printing it. Some DarkOffice installs store the xAI key as `API_KEY_XAI`; map it to the CLI variable before running Grok Build:
 
 ```bash
 set -a

@@ -4,7 +4,7 @@ Most people should start with the practical guide:
 [Create a Small Plugin](../guides/create-plugin.md).
 
 Plugin architecture and source-linked internals live in
-[DeepWiki for Agent Zero](https://deepwiki.com/agent0ai/agent-zero). This page
+[DeepWiki for DarkOffice](https://deepwiki.com/agent0ai/agent-zero). This page
 stays intentionally small so the repository does not maintain a second plugin
 manual.
 
@@ -37,7 +37,7 @@ description: A short sentence that explains what it does.
 version: 1.0.0
 ```
 
-Ask Agent Zero to keep the first version small. A tiny plugin that does one
+Ask DarkOffice to keep the first version small. A tiny plugin that does one
 visible thing is easier to test, review, and share.
 
 ## Sharing A Plugin
@@ -57,4 +57,4 @@ For Plugin Index submission, use the current instructions in the
 
 - [Create a Small Plugin](../guides/create-plugin.md)
 - [Sharing and Safety](sharing-and-safety.md)
-- [DeepWiki for Agent Zero](https://deepwiki.com/agent0ai/agent-zero)
+- [DeepWiki for DarkOffice](https://deepwiki.com/agent0ai/agent-zero)

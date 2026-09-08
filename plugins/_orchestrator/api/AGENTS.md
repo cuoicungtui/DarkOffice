@@ -32,7 +32,7 @@
   ```bash
   docker exec 8dc967046cda bash -lc 'cd /a0 && /opt/venv-a0/bin/python plugins/_orchestrator/tests/test_status_adapters.py'
   ```
-- For import-only API changes, use the Agent Zero framework runtime:
+- For import-only API changes, use the DarkOffice framework runtime:
   ```bash
   docker exec 8dc967046cda bash -lc 'cd /a0 && /opt/venv-a0/bin/python -m py_compile plugins/_orchestrator/api/*.py'
   ```

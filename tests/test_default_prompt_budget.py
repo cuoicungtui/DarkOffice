@@ -138,7 +138,7 @@ async def test_tiny_local_profile_prompt_is_action_first_json_contract():
         PROJECT_ROOT / "agents" / "tiny-local" / "prompts" / "agent.system.main.solving.md"
     ).read_text(encoding="utf-8")
 
-    assert "You are Agent Zero. Act on the user's behalf." in system_text
+    assert "You are DarkOffice. Act on the user's behalf." in system_text
     assert "Your visible assistant message must be exactly one valid JSON object." in system_text
     assert 'Use exactly these top-level fields: `"tool_name"` and `"tool_args"`.' in system_text
     assert 'For a final user-facing answer, use the `response` tool.' in system_text

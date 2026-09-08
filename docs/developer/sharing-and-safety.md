@@ -4,7 +4,7 @@ This guide helps contributors decide **what to share**, **where to share it**, a
 
 ## Start with the decision tree
 
-### 1. Is this change meant for the Agent Zero core repository?
+### 1. Is this change meant for the DarkOffice core repository?
 
 Use the main `agent-zero` contribution flow when the change directly improves the framework itself, for example:
 
@@ -50,14 +50,14 @@ Use the **skills workflow** when the work is mainly procedural knowledge in `SKI
 Typical signals:
 
 - it teaches the agent how to perform a task
-- it is portable across Agent Zero, Cursor, Claude Code, or Copilot-style ecosystems
+- it is portable across DarkOffice, Cursor, Claude Code, or Copilot-style ecosystems
 - it lives naturally under `usr/skills/` during development
 
 If yes:
 
 1. Develop it locally in `usr/skills/`.
 2. Validate the structure and examples.
-3. Move it into `skills/` for an Agent Zero contribution, or publish it in a dedicated public repository/collection.
+3. Move it into `skills/` for an DarkOffice contribution, or publish it in a dedicated public repository/collection.
 
 See [`contributing-skills.md`](contributing-skills.md) for the authoring standard.
 

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own the workflow for creating Agent Zero agent profiles.
+- Own the workflow for creating DarkOffice agent profiles.
 - Keep guidance for user, plugin-distributed, and project-scoped profiles accurate.
 
 ## Ownership

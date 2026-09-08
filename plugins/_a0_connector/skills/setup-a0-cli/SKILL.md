@@ -1,11 +1,11 @@
 ---
 name: setup-a0-cli
-description: Briefly guide installing, connecting, or troubleshooting the A0 CLI on the user's host so Dockerized Agent Zero can work with real local files. Use for install A0, enable the host connector, connect local files, remote tools, host-vs-container confusion, or A0 CLI setup problems.
+description: Briefly guide installing, connecting, or troubleshooting the A0 CLI on the user's host so Dockerized DarkOffice can work with real local files. Use for install A0, enable the host connector, connect local files, remote tools, host-vs-container confusion, or A0 CLI setup problems.
 ---
 
 # A0 CLI Host Setup
 
-`a0` runs on the user's host machine; Agent Zero stays in Docker or its sandbox.
+`a0` runs on the user's host machine; DarkOffice stays in Docker or its sandbox.
 
 ## Keep The Conversation Short
 
@@ -44,7 +44,7 @@ Running `a0` opens a host picker and discovers local Docker instances when possi
 
 If manual entry is needed:
 
-- Use the exact URL the user currently uses to open Agent Zero, including its actual port.
+- Use the exact URL the user currently uses to open DarkOffice, including its actual port.
 - Never guess, prescribe, or describe any port as common or default. Do not turn a documentation example into the user's address.
 - If the URL is unknown, ask the user to copy it from their browser or Docker's published-port mapping.
 - A tunnel URL is pasted exactly as shown and does not need a port appended.
@@ -60,8 +60,8 @@ Mention `AGENT_ZERO_HOST` only if the user asks to prefill the picker. Use their
   uv tool install --upgrade git+https://github.com/agent0ai/a0-connector
   ```
 
-- A connector `404` usually means the running Agent Zero build lacks the bundled `_a0_connector`; tell the user to update Agent Zero.
-- If discovery fails, ask for the exact Agent Zero URL or suggest a Flare Tunnel only then. The Flare Tunnel flow is `Settings > External Services > Flare Tunnel` → `Create Tunnel` → paste the shown HTTPS URL into `a0`.
+- A connector `404` usually means the running DarkOffice build lacks the bundled `_a0_connector`; tell the user to update DarkOffice.
+- If discovery fails, ask for the exact DarkOffice URL or suggest a Flare Tunnel only then. The Flare Tunnel flow is `Settings > External Services > Flare Tunnel` → `Create Tunnel` → paste the shown HTTPS URL into `a0`.
 
 ## Response Examples
 
@@ -71,7 +71,7 @@ User: "How to enable host connector"
 
 User: "Linux"
 
-> Run this in your normal Linux terminal, then run `a0` and select the Agent Zero instance it finds.
+> Run this in your normal Linux terminal, then run `a0` and select the DarkOffice instance it finds.
 >
 > ```bash
 > curl -LsSf https://raw.githubusercontent.com/agent0ai/a0-connector/main/install.sh | sh
@@ -79,4 +79,4 @@ User: "Linux"
 
 User: "It asks for a custom URL"
 
-> Paste the exact URL you currently use to open Agent Zero in your browser, including its port.
+> Paste the exact URL you currently use to open DarkOffice in your browser, including its port.

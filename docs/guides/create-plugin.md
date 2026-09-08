@@ -1,6 +1,6 @@
 # Create A Small Plugin
 
-The fastest way to understand Agent Zero plugins is to make one small enough to
+The fastest way to understand DarkOffice plugins is to make one small enough to
 hold in your head.
 
 This guide walks through a real example: a local plugin named `unread_dot` that
@@ -10,7 +10,7 @@ are looking somewhere else.
 ![Unread dot in the chat list](../res/usage/webui/unread-dot-chat-list.png)
 
 For architecture and source-linked internals, use
-[DeepWiki for Agent Zero](https://deepwiki.com/agent0ai/agent-zero). This page
+[DeepWiki for DarkOffice](https://deepwiki.com/agent0ai/agent-zero). This page
 stays practical: what to ask, where files appear, what to check, and how to know
 the plugin actually works.
 
@@ -27,9 +27,9 @@ the plugin actually works.
 That makes it a good first plugin. You can see the whole shape without learning
 every plugin feature at once.
 
-## Ask Agent Zero To Build It
+## Ask DarkOffice To Build It
 
-Open a new chat and give Agent Zero a very specific plugin task:
+Open a new chat and give DarkOffice a very specific plugin task:
 
 ```text
 Use the a0-create-plugin skill.
@@ -55,7 +55,7 @@ Zero the plugin name, the location, the visible behavior, and the boundaries.
 ## Where The Files Go
 
 Local plugins live under `/a0/usr/plugins/<plugin_name>/` inside the running
-Agent Zero instance. For this example, the final plugin shape is:
+DarkOffice instance. For this example, the final plugin shape is:
 
 ```text
 /a0/usr/plugins/unread_dot/
@@ -94,7 +94,7 @@ The store keeps the unread state. The CSS draws the dot.
 
 ## Try It For Real
 
-After creating or changing a plugin, restart Agent Zero so the Web UI extension
+After creating or changing a plugin, restart DarkOffice so the Web UI extension
 list is rebuilt.
 
 Then test the behavior:
@@ -107,7 +107,7 @@ Then test the behavior:
    ```
 
 3. Immediately switch to another chat.
-4. Wait for Agent Zero to keep working in the first chat.
+4. Wait for DarkOffice to keep working in the first chat.
 5. Look at the chat list.
 
 If the first chat receives new activity while it is not selected, the dot appears.
@@ -132,7 +132,7 @@ For this example, the review result is:
 | --- | --- | --- |
 | Manifest | PASS | `plugin.yaml` is valid, named correctly, and uses simple local settings. |
 | Structure | PASS with WARN | The layout is standard. `LICENSE` is absent, which is fine locally but blocks Plugin Index submission. |
-| Code patterns | PASS with WARN | The store uses Agent Zero's `createStore` pattern. The unread signal is chat activity, not a parsed message-author check. |
+| Code patterns | PASS with WARN | The store uses DarkOffice's `createStore` pattern. The unread signal is chat activity, not a parsed message-author check. |
 | Security and index | PASS with WARN | No secrets, subprocesses, dependencies, or outbound calls. The community index already has a related `Chat Status Marklet` plugin, so treat this as a learning example unless you make it clearly different. |
 
 Status: ready as a local demo plugin. Not ready as a new community submission
@@ -154,5 +154,5 @@ standing inside the engine.
 ## Related
 
 - [Usage Guide](usage.md#plugins-and-plugin-hub): where plugins appear in the Web UI.
-- [DeepWiki for Agent Zero](https://deepwiki.com/agent0ai/agent-zero): source-linked architecture when you need it.
+- [DeepWiki for DarkOffice](https://deepwiki.com/agent0ai/agent-zero): source-linked architecture when you need it.
 - [Contributing Guide](contribution.md): expectations before sharing changes upstream.

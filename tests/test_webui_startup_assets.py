@@ -147,6 +147,10 @@ def test_startup_splash_is_handed_to_the_index_and_fades_when_ready() -> None:
     assert "pendingHtmlImports" not in extensions_js
     assert "data-extension-loaded" not in extensions_js
     assert '<svg xmlns="http://www.w3.org/2000/svg"' in splash_html
+    assert 'aria-label="DarkOffice"' in splash_html
+    assert ">DARKOFFICE</text>" in splash_html
+    assert "Agent Zero" not in splash_html
+    assert "Agent-Zero" not in splash_html
     assert '<main id="startup-transition"' in splash_html
     assert 'localStorage.getItem("darkMode") === "false"' in splash_html
     assert ' src="' not in splash_html

@@ -1,10 +1,10 @@
 # Telegram Integration
 
-Communicate with Agent Zero via Telegram. Supports polling and webhook modes with per-user chat sessions, group mentions, inline keyboards, and file exchange.
+Communicate with DarkOffice via Telegram. Supports polling and webhook modes with per-user chat sessions, group mentions, inline keyboards, and file exchange.
 
 ## What It Does
 
-This plugin connects one or more Telegram bots to Agent Zero. Each bot runs independently with its own token, mode (polling or webhook), access control list, and project binding. Users message the bot on Telegram, and Agent Zero processes the conversation just like a WebUI chat — including tool use, sub-agents, and file attachments.
+This plugin connects one or more Telegram bots to DarkOffice. Each bot runs independently with its own token, mode (polling or webhook), access control list, and project binding. Users message the bot on Telegram, and DarkOffice processes the conversation just like a WebUI chat — including tool use, sub-agents, and file attachments.
 
 ## Main Behavior
 
@@ -52,7 +52,7 @@ This plugin connects one or more Telegram bots to Agent Zero. Each bot runs inde
 - **Access control**
   - Per-bot allow-list by Telegram user ID or @username. Empty list = open to all.
 - **Project binding**
-  - Map individual Telegram users to specific Agent Zero projects; supports a default-project fallback.
+  - Map individual Telegram users to specific DarkOffice projects; supports a default-project fallback.
   - Inherits model overrides from sibling contexts in the same project.
 
 ## Key Files
@@ -93,4 +93,4 @@ This plugin connects one or more Telegram bots to Agent Zero. Each bot runs inde
 
 - **Name**: `_telegram_integration`
 - **Title**: `Telegram Integration`
-- **Description**: Communicate with Agent Zero via Telegram. Supports polling and webhook modes with per-user chat sessions.
+- **Description**: Communicate with DarkOffice via Telegram. Supports polling and webhook modes with per-user chat sessions.

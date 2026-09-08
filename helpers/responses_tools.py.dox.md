@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own conversion of Agent Zero tool prompt files and MCP tool metadata into OpenAI Responses API function tool definitions.
+- Own conversion of DarkOffice tool prompt files and MCP tool metadata into OpenAI Responses API function tool definitions.
 - Keep native Responses function availability synchronized with the text tool prompt surface.
 
 ## Ownership
@@ -22,7 +22,7 @@
 - Native local-tool descriptions reuse the tool catalog's compact prompt
   description; Responses retains native-name mapping, schema derivation, and
   provider description limits.
-- Preserve original Agent Zero tool names through the native Responses name map.
+- Preserve original DarkOffice tool names through the native Responses name map.
 - Keep MCP tool schemas merged after local prompt-derived tools.
 - Apply `helpers.tool_policy` before emitting local or MCP schemas; a blocked
   capability is absent from provider-native tool definitions. Vision routing

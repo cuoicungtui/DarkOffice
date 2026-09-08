@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own account-backed OAuth model-provider connections for Agent Zero.
+- Own account-backed OAuth model-provider connections for DarkOffice.
 - Provide local OpenAI-compatible proxy endpoints for connectable account providers.
 - Keep provider-specific OAuth behavior inside this plugin, not in core model code.
 - Preserve Codex/ChatGPT compatibility while allowing additional providers through the provider registry.

@@ -309,7 +309,7 @@ def test_desktop_plugin_owns_routes_runtime_surface_and_state_paths():
     assert "canvas.height = normalizedHeight" in desktop_store
     assert "canvas?.clientWidth || canvas?.width" in desktop_store
     assert "overflow: auto !important;" in desktop_store
-    assert "Installing Agent Zero Desktop runtime dependencies" in desktop_session
+    assert "Installing DarkOffice Desktop runtime dependencies" in desktop_session
     assert "normalize_desktop_display_size" in desktop_session
     assert "__a0XpraOffsetWarnPatched" in desktop_store
     assert "window does not fit in canvas, offsets" in desktop_store

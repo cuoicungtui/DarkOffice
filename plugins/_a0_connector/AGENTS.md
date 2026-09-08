@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own the current Agent Zero connector plugin for HTTP and WebSocket integration.
+- Own the current DarkOffice connector plugin for HTTP and WebSocket integration.
 - Provide remote execution, text-editing freshness, and connector runtime bridges.
 
 ## Ownership
@@ -44,7 +44,7 @@
 - Launcher gateway scopes expose file reading and writing separately. File
   writing depends on reading, and Code execution depends on file writing. Keep
   older gateway declarations without `file_write` read/write compatible.
-- Agent Zero WebUI exposes no Launcher gateway icon, menu, status, or control
+- DarkOffice WebUI exposes no Launcher gateway icon, menu, status, or control
   bridge. Host access settings, Disconnect/Reconnect, scope changes, and
   Computer Use approval belong only to attached or detached A0 Launcher chrome.
   Keep the authenticated gateway HTTP/WebSocket protocol available for the

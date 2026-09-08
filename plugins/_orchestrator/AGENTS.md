@@ -2,9 +2,9 @@
 
 ## Purpose
 
-- Provide a bundled Agent Zero plugin for delegating repository and coding work to external terminal/headless agents.
+- Provide a bundled DarkOffice plugin for delegating repository and coding work to external terminal/headless agents.
 - Keep heavy delegation instructions out of the always-loaded prompt by exposing the `orchestrator` skill instead of a `terminal_agent` tool.
-- Own adapter status metadata, settings UI, Codex device login APIs, and skill instructions for Agent Zero headless, Codex CLI, Claude Code, Cursor CLI, Gemini CLI, Grok Build, Hermes Agent, OpenCode, and future terminal agents.
+- Own adapter status metadata, settings UI, Codex device login APIs, and skill instructions for DarkOffice headless, Codex CLI, Claude Code, Cursor CLI, Gemini CLI, Grok Build, Hermes Agent, OpenCode, and future terminal agents.
 
 ## Ownership
 
@@ -15,11 +15,11 @@
 
 - Plugin imports must use `plugins._orchestrator...`.
 - The plugin must remain toolless: no `tools/terminal_agent.py`, no subprocess runner, and no `agent.system.tool.terminal_agent.md` prompt.
-- External agents are orchestrated through the ordinary Agent Zero shell/code execution tool after the `orchestrator` skill is loaded.
+- External agents are orchestrated through the ordinary DarkOffice shell/code execution tool after the `orchestrator` skill is loaded.
 - Adapters report installation, binary resolution, auth state, safe disconnect capability, and optional device-login capability. They do not build or run task commands.
 - Settings UI is for status and command defaults. It must not offer generic install buttons; install/login belongs to the skill-guided human-in-the-loop shell workflow.
 - Credentials must never be hardcoded or printed. Plugin-owned state belongs under `data/<adapter>/` and external CLI state stays in the CLI's own home/config paths.
-- Agent Zero headless is the first adapter. Its setup flow is the exception: ask whether to use this same Agent Zero instance or another/spun-up instance when the target is not specified.
+- DarkOffice headless is the first adapter. Its setup flow is the exception: ask whether to use this same DarkOffice instance or another/spun-up instance when the target is not specified.
 
 ## Work Guidance
 
@@ -28,7 +28,7 @@
 - For CLI login flows, show provider/menu choices in chat and send the user's selected option back to the active shell session. Do not send users to a Docker shell only to choose a menu.
 - After changing the skill, tell testers to start a fresh chat or reload `orchestrator`; previously loaded skill text can remain attached to old conversations.
 - Codex device login is the only settings-screen OAuth flow currently owned here. Add another only when the credential store and revocation/disconnect path are known.
-- Avoid recursive Agent Zero delegation loops. A0 headless prompts must tell the target instance to answer directly and not delegate back through terminal agents.
+- Avoid recursive DarkOffice delegation loops. A0 headless prompts must tell the target instance to answer directly and not delegate back through terminal agents.
 
 ## Verification
 

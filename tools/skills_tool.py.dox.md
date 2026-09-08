@@ -3,7 +3,7 @@
 ## Purpose
 
 - Own the `skills_tool.py` agent tool.
-- This module searches, loads, and lists Agent Zero skills and exposes effective slash-command definitions for the agent.
+- This module searches, loads, and lists DarkOffice skills and exposes effective slash-command definitions for the agent.
 - Keep this file-level DOX profile synchronized with `skills_tool.py` because this directory is intentionally flat.
 
 ## Ownership

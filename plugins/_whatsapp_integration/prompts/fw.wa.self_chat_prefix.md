@@ -1,2 +1,2 @@
-[🤖 Agent Zero]
+[🤖 DarkOffice]
 {{response_text}}

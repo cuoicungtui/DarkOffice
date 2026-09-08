@@ -238,7 +238,7 @@ import sys
 
 def install():
     """Called by framework after plugin is placed in usr/plugins/."""
-    # This installs into the Agent Zero FRAMEWORK runtime (/opt/venv-a0)
+    # This installs into the DarkOffice FRAMEWORK runtime (/opt/venv-a0)
     subprocess.run([sys.executable, "-m", "pip", "install", "some-package==1.0.0"], check=True)
 
 def uninstall():
@@ -247,7 +247,7 @@ def uninstall():
 
 def pre_update():
     """Called by framework immediately before plugin update pulls new code into place."""
-    # This installs into the Agent Zero FRAMEWORK runtime (/opt/venv-a0)
+    # This installs into the DarkOffice FRAMEWORK runtime (/opt/venv-a0)
     subprocess.run([sys.executable, "-m", "pip", "install", "some-package==1.0.0"], check=True)
 
 async def async_hook():

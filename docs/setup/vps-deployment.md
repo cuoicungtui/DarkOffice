@@ -1,8 +1,8 @@
-# Agent Zero Installation Guide
+# DarkOffice Installation Guide
 
-> **Purpose:** Step-by-step guide for deploying Agent Zero instances on VPS/dedicated servers  
-> **Author:** Auto-generated from deployment experience  
-> **Last Updated:** December 21 2025  
+> **Purpose:** Step-by-step guide for deploying DarkOffice instances on VPS/dedicated servers
+> **Author:** Auto-generated from deployment experience
+> **Last Updated:** December 21 2025
 > **Compatibility:** Docker-capable Linux servers (AlmaLinux, CentOS, Rocky, Ubuntu, Debian)
 
 ---
@@ -11,7 +11,7 @@
 
 1. [Prerequisites](#prerequisites)
 2. [Docker Installation](#docker-installation)
-3. [Agent Zero Container Deployment](#agent-zero-container-deployment)
+3. [DarkOffice Container Deployment](#darkoffice-container-deployment)
 4. [Apache Reverse Proxy Configuration](#apache-reverse-proxy-configuration)
 5. [SSL/TLS Configuration](#ssltls-configuration)
 6. [Authentication Setup](#authentication-setup)
@@ -118,7 +118,7 @@ docker run hello-world
 
 ---
 
-## Agent Zero Container Deployment
+## DarkOffice Container Deployment
 
 ### Step 1: Create Directory Structure
 
@@ -139,13 +139,13 @@ mkdir -p ${A0_PATH}/logs
 ```bash
 # Create .env file with authentication
 cat > ${A0_PATH}/.env << 'EOF'
-# Agent Zero Configuration
+# DarkOffice Configuration
 # Authentication (REQUIRED for web access)
 AUTH_LOGIN=your_username_here
 AUTH_PASSWORD=your_secure_password_here
 
 # Optional: Additional configuration
-# See Agent Zero documentation for all options
+# See DarkOffice documentation for all options
 EOF
 ```
 
@@ -211,7 +211,7 @@ httpd -M | grep -E "proxy|rewrite|ssl"
 Create `/etc/apache2/sites-available/a0-instance.conf`:
 
 ```apache
-# Agent Zero Reverse Proxy Configuration
+# DarkOffice Reverse Proxy Configuration
 # Instance: a0-instance
 # Domain: a0.example.com
 
@@ -269,7 +269,7 @@ systemctl reload apache2
 Edit `/etc/httpd/conf/extra/httpd-includes.conf`:
 
 ```apache
-# Agent Zero Proxy Configuration
+# DarkOffice Proxy Configuration
 # Instance: a0-instance
 # Domain: a0.example.com
 # Note: Use specific IP, not wildcards, for DirectAdmin compatibility
@@ -495,7 +495,7 @@ curl -I https://a0.example.com/
 
 # 7. Test login page loads
 curl -s https://a0.example.com/login | grep -i "<title>"
-# Expected: <title>Login - Agent Zero</title>
+# Expected: <title>Login - DarkOffice</title>
 ```
 
 ### WebSocket Verification
@@ -627,7 +627,7 @@ docker exec a0-instance cat /a0/.env
 
 ## Maintenance & Updates
 
-### Updating Agent Zero
+### Updating DarkOffice
 
 ```bash
 # Pull latest image
@@ -690,7 +690,7 @@ docker restart a0-instance
 docker logs a0-instance
 docker exec -it a0-instance bash
 
-# Apache Management  
+# Apache Management
 systemctl restart httpd    # RHEL/AlmaLinux
 systemctl restart apache2  # Debian/Ubuntu
 httpd -t                   # Test config
@@ -725,7 +725,7 @@ curl -I https://your-domain.com/login
 ### .env Template
 
 ```bash
-# Agent Zero Configuration Template
+# DarkOffice Configuration Template
 # Copy and customize for each instance
 
 # Authentication (REQUIRED for production)
@@ -733,7 +733,7 @@ AUTH_LOGIN=your_username
 AUTH_PASSWORD=your_secure_password
 
 # Optional: Additional settings
-# Refer to Agent Zero documentation for all options
+# Refer to DarkOffice documentation for all options
 ```
 
 ---
@@ -747,7 +747,7 @@ For running multiple A0 instances on the same server:
 mkdir -p /opt/a0-primary
 # ... create .env, run container on port 50080
 
-# Instance 2: a0-dev on port 50081  
+# Instance 2: a0-dev on port 50081
 mkdir -p /opt/a0-dev
 # ... create .env, run container on port 50081
 
@@ -765,6 +765,6 @@ Each instance needs:
 
 ---
 
-*This guide comes from successful Agent Zero deployments across DirectAdmin and standard Linux environments.*
+*This guide comes from successful DarkOffice deployments across DirectAdmin and standard Linux environments.*
 
 Contributed by @hurtdidit in the A0 Community.

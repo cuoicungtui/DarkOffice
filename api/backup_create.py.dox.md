@@ -24,6 +24,7 @@
 - `BackupCreate` defines `process(...)`.
 - `BackupCreate` defines `requires_auth(...)`.
 - `BackupCreate` defines `requires_loopback(...)`.
+- When callers omit `backup_name`, the endpoint uses the `darkoffice-backup` default filename prefix.
 - Observed side-effect areas: filesystem writes.
 - Imported dependency areas include: `helpers.api`, `helpers.backup`, `helpers.persist_chat`.
 

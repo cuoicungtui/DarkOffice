@@ -166,7 +166,7 @@ def test_skill_documents_human_setup_loop_and_a0_exception():
     assert "memory_load" in skill_text
     assert "memory_save" in skill_text
     assert "own local <agent>" in skill_text
-    assert "Agent Zero Docker/container shell" in skill_text
+    assert "DarkOffice Docker/container shell" in skill_text
     assert "For orchestrator, the user prefers Claude Code" in skill_text
     assert "Never use Computer Use" in skill_text
     assert "ACP may be available as a community plugin" in skill_text

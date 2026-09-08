@@ -155,9 +155,9 @@ def start_tailscaled(binary_path, notify=None):
     daemon_path = resolve_tailscaled_binary(binary_path)
     if not daemon_path:
         raise RuntimeError(
-            "Tailscale was prepared, but Agent Zero could not find the "
+            "Tailscale was prepared, but DarkOffice could not find the "
             "`tailscaled` daemon binary. Try Tailscale Remote Control again so "
-            "Agent Zero can re-download the static Tailscale package."
+            "DarkOffice can re-download the static Tailscale package."
         )
 
     if tailscale_daemon_ready(binary_path, TAILSCALE_SOCKET_PATH):
@@ -212,7 +212,7 @@ def start_tailscaled(binary_path, notify=None):
             process.wait(timeout=3)
     TAILSCALE_DAEMON_PID_PATH.unlink(missing_ok=True)
     message = (
-        "Agent Zero downloaded Tailscale, but could not start the `tailscaled` "
+        "DarkOffice downloaded Tailscale, but could not start the `tailscaled` "
         "background service in this container."
     )
     if details:
@@ -259,18 +259,18 @@ def tailscale_up_failure_message(output, *, timed_out=False):
     details = compact_output(output)
     if tailscale_daemon_hint(details):
         message = (
-            "Agent Zero started Tailscale and ran `tailscale up`, but the "
+            "DarkOffice started Tailscale and ran `tailscale up`, but the "
             "Tailscale background service stopped responding."
         )
     elif timed_out:
         message = (
-            "Agent Zero ran `tailscale up`, but it did not finish before the "
+            "DarkOffice ran `tailscale up`, but it did not finish before the "
             "setup timeout. If a Tailscale login link was shown, approve this "
             "container in your browser, then start Remote Control again."
         )
     else:
         message = (
-            "Agent Zero ran `tailscale up`, but Tailscale did not finish joining "
+            "DarkOffice ran `tailscale up`, but Tailscale did not finish joining "
             "this container to your tailnet. Complete any Tailscale login or "
             "admin approval it requested, then try Tailscale Remote Control again."
         )
@@ -322,7 +322,7 @@ def run_tailscale_up(
             notify_info(
                 notify,
                 "Open the Tailscale login link and approve this container. "
-                "Agent Zero will continue when Tailscale finishes setup.",
+                "DarkOffice will continue when Tailscale finishes setup.",
                 {"provider": "tailscale", "url": login_url},
             )
             login_announced = True
@@ -375,7 +375,7 @@ def ensure_tailscale_funnel_command(binary_path, socket_path=None):
 
     details = f" Details: {output}" if output else ""
     raise RuntimeError(
-        "Agent Zero prepared Tailscale, but this Tailscale binary does not "
+        "DarkOffice prepared Tailscale, but this Tailscale binary does not "
         "support `tailscale funnel`. Tailscale Remote Control needs Tailscale "
         "v1.38.3 or newer with Funnel support enabled for your tailnet."
         f"{details}"
@@ -397,7 +397,7 @@ def ensure_tailscale_ready(binary_path, notify=None):
         if completed.returncode != 0:
             details = compact_output([completed.stderr, completed.stdout])
             message = (
-                "Agent Zero ran `tailscale up`, but Tailscale status is still "
+                "DarkOffice ran `tailscale up`, but Tailscale status is still "
                 "not available. Tailscale may still need browser approval, admin "
                 "approval, or a running `tailscaled` service."
             )
@@ -423,7 +423,7 @@ def ensure_tailscale_ready(binary_path, notify=None):
         backend_state = str(payload.get("BackendState") or "").lower()
         if backend_state and backend_state != "running":
             raise RuntimeError(
-                "Agent Zero ran `tailscale up`, but this node is still not ready "
+                "DarkOffice ran `tailscale up`, but this node is still not ready "
                 "for Tailscale Funnel "
                 f"(state: {backend_state}). Complete Tailscale sign-in or admin "
                 "approval, then try again."
@@ -482,7 +482,7 @@ class TailscaleTunnel(CliTunnelHelper):
         notify_info(
             notify,
             "Open the Tailscale approval link to finish sign-in or enable Funnel. "
-            "Agent Zero will continue when Tailscale reports the public URL.",
+            "DarkOffice will continue when Tailscale reports the public URL.",
             {"provider": "tailscale", "url": login_url},
         )
 

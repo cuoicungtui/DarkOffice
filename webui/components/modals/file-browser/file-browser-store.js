@@ -1356,7 +1356,7 @@ const model = {
 
       const blob = await resp.blob();
       const url = URL.createObjectURL(blob);
-      const fallback = `agent-zero-files-${selectedFiles.length}.zip`;
+      const fallback = `darkoffice-files-${selectedFiles.length}.zip`;
       const link = document.createElement("a");
       link.href = url;
       link.download = this.getDownloadFilename(resp, fallback);

@@ -720,7 +720,7 @@ class TimeTravelService:
             self._initialize_shadow_repo(quarantine_existing=True)
         self._ensure_current_head_ref()
 
-        self._git("config", "user.name", "Agent Zero Time Travel")
+        self._git("config", "user.name", "DarkOffice Time Travel")
         self._git("config", "user.email", "time-travel@agent-zero.local")
         self._git("config", "core.autocrlf", "false")
         self._git("config", "core.filemode", "true")

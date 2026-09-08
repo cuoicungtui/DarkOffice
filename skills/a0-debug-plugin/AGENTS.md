@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Own the troubleshooting workflow for Agent Zero plugin loading, activation, API, frontend, extension, settings, and hook problems.
+- Own the troubleshooting workflow for DarkOffice plugin loading, activation, API, frontend, extension, settings, and hook problems.
 
 ## Ownership
 

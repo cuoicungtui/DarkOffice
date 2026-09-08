@@ -21,7 +21,7 @@ def test_welcome_screen_embeds_shared_new_chat_composer() -> None:
     assert 'path="chat/attachments/inputPreview.html"' in welcome
     assert 'path="chat/input/chat-bar-input.html"' in welcome
     assert "x-text=\"$store.welcomeStore.heroSubtitle\"" in welcome
-    assert "Hello! I'm Agent Zero" in welcome
+    assert "Hello! I'm DarkOffice" in welcome
     assert "is-setup-required" not in welcome
     assert "welcome-setup-composer" not in welcome
     assert "Configure your models to start chatting" not in welcome

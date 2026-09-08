@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Preview a user-selected harness export without changing Agent Zero state.
+Preview a user-selected harness export without changing DarkOffice state.
 
 ## Contract
 
@@ -14,4 +14,4 @@ Preview a user-selected harness export without changing Agent Zero state.
 
 ## Verification
 
-Run `python -m pytest plugins/_migrate_agents/tests -q` from the Agent Zero root.
+Run `python -m pytest plugins/_migrate_agents/tests -q` from the DarkOffice root.

@@ -28,15 +28,15 @@ If Claude Code reports `Not logged in` or asks for `/login`, do not open the TUI
 1. Claude subscription: `claude auth login --claudeai`
 2. Anthropic Console/API billing: `claude auth login --console`
 3. SSO: `claude auth login --sso`
-4. API key outside chat: ask the user to open Settings > External Services > Secrets Management and enter the key in `/a0/usr/.env`, right after `ANTHROPIC_API_KEY=`. The Agent Zero `.env` file is `/a0/usr/.env`, not `$WORKDIR/.env`.
+4. API key outside chat: ask the user to open Settings > External Services > Secrets Management and enter the key in `/a0/usr/.env`, right after `ANTHROPIC_API_KEY=`. The DarkOffice `.env` file is `/a0/usr/.env`, not `$WORKDIR/.env`.
 
 After the user chooses, run only that command and relay its browser/device instructions. If the user gives an email to prefill, add `--email "<email>"`. Wait for confirmation, then retry the smoke prompt. Do not redirect them to a Docker shell just to choose a menu option. Do not start plain `claude` for login; it opens the first-run TUI (theme/provider menus) and is not a safe agent-driven login surface. Do not run bare `claude auth login` when provider choice is still unknown.
 
 If a previous attempt already opened plain `claude` and the terminal shows theme/provider menus or no readable login URL, stop. Reset that terminal session; do not press Enter, do not send `/login`, and do not keep polling the stuck TUI. Then ask for the auth mode above and run the matching `claude auth login ...` command in a fresh terminal session.
 
-## Agent Zero Secrets
+## DarkOffice Secrets
 
-When using an API key from Agent Zero secrets, source `/a0/usr/.env` without printing it. Some Agent Zero installs store the Anthropic key as `API_KEY_ANTHROPIC`; map it to the CLI variable before running Claude Code:
+When using an API key from DarkOffice secrets, source `/a0/usr/.env` without printing it. Some DarkOffice installs store the Anthropic key as `API_KEY_ANTHROPIC`; map it to the CLI variable before running Claude Code:
 
 ```bash
 set -a

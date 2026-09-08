@@ -1,6 +1,6 @@
 # First-Run Onboarding
 
-Use onboarding the first time you open Agent Zero, or any time the Web UI says
+Use onboarding the first time you open DarkOffice, or any time the Web UI says
 your models still need setup. The wizard helps you pick Cloud, AI account, or
 Local access, configure a main model, choose a utility model, and start
 chatting.
@@ -15,7 +15,7 @@ composer is ready immediately.
 
 ![Welcome screen with account and channel setup cards](../res/usage/onboarding/onboarding-start.png)
 
-If you send a message before models are configured, Agent Zero creates the chat,
+If you send a message before models are configured, DarkOffice creates the chat,
 holds the message, and shows the model gate inside the conversation. Choose
 **Cloud provider**, **AI account**, or **Local model** to open onboarding.
 
@@ -64,7 +64,7 @@ appear for integrations such as Telegram, Email, WhatsApp, or plugins.
 
 ![Onboarding ready screen after setup](../res/usage/onboarding/onboarding-ready.png)
 
-Click **Start Chatting** to create a chat and begin using Agent Zero.
+Click **Start Chatting** to create a chat and begin using DarkOffice.
 
 > [!IMPORTANT]
 > Do not reuse the fake key shown in this guide. Paste your own provider key,

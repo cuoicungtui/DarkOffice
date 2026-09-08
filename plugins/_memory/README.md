@@ -1,6 +1,6 @@
 # Memory
 
-Provide persistent vector-based memory and knowledge retrieval for Agent Zero.
+Provide persistent vector-based memory and knowledge retrieval for DarkOffice.
 
 ## What It Does
 
@@ -50,4 +50,4 @@ This plugin stores memories and knowledge embeddings in a FAISS-backed vector da
 
 - **Name**: `_memory`
 - **Title**: `Memory`
-- **Description**: Provides persistent memory capabilities to Agent Zero agents.
+- **Description**: Provides persistent memory capabilities to DarkOffice agents.

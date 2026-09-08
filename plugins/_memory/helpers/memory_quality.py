@@ -6,7 +6,7 @@ from typing import Iterable
 
 _DURABLE_SUBJECT_RE = re.compile(
     r"\b(user|project|repo|repository|workspace|runtime|service|server|"
-    r"plugin|agent zero|a0|profile|team|organization|company)\b",
+    r"plugin|agent zero|darkoffice|a0|profile|team|organization|company)\b",
     re.IGNORECASE,
 )
 _DURABLE_RELATION_RE = re.compile(

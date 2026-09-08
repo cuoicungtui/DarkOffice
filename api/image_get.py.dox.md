@@ -15,7 +15,7 @@
   - `get_methods(cls) -> list[str]`
   - `async process(self, input: dict, request: Request) -> dict | Response`
 - Top-level functions:
-- `_resolve_allowed_image_path(path: str) -> str`: Resolve a requested image path and keep it inside Agent Zero's base dir.
+- `_resolve_allowed_image_path(path: str) -> str`: Resolve a requested image path and keep it inside DarkOffice's base dir.
 - `_set_image_headers(response: Response, filename: str, file_ext: str) -> None`
 - `_send_file_type_icon(file_ext, filename=...)`: Return appropriate icon for file type
 - `_send_fallback_icon(icon_name)`: Return fallback icon from public directory

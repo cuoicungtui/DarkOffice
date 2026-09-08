@@ -12,11 +12,11 @@ def test_onboarding_contains_unified_provider_step():
 
     assert "Cloud" in html
     assert "Local" in html
-    assert "Welcome to Agent Zero" in html
+    assert "Welcome to DarkOffice" in html
     assert "Choose your AI provider" in store
 
     # The illustrated Cloud/Local path screen is gone: one merged provider step.
-    assert "Choose how to use AI models in Agent Zero" not in html + store
+    assert "Choose how to use AI models in DarkOffice" not in html + store
     assert "path-card" not in html
     assert "cloud-card.webp" not in html
     assert "local-card.webp" not in html
@@ -138,7 +138,7 @@ def test_onboarding_provider_grid_names_are_present_in_metadata():
 
     for name in [
         "OpenRouter",
-        "Agent Zero API",
+        "DarkOffice API",
         "OpenAI",
         "Anthropic",
         "Google",

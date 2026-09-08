@@ -1254,7 +1254,7 @@ class Agent:
         if safety_checks:
             message = (
                 "Responses computer_call requested safety-check acknowledgement. "
-                "Agent Zero requires explicit user acknowledgement before executing it."
+                "DarkOffice requires explicit user acknowledgement before executing it."
             )
             output_item = {
                 "type": "computer_call_output",
@@ -1271,7 +1271,7 @@ class Agent:
 
         args = self._computer_call_args(item)
         if not args:
-            message = "Responses computer_call action is unsupported by Agent Zero."
+            message = "Responses computer_call action is unsupported by DarkOffice."
             output_item = {
                 "type": "computer_call_output",
                 "call_id": str(item.get("call_id") or item.get("id") or ""),
@@ -1310,7 +1310,7 @@ class Agent:
             item.get("approval_request_id") or item.get("id") or item.get("call_id") or ""
         )
         message = (
-            "Responses MCP approval request received. Agent Zero denied it because "
+            "Responses MCP approval request received. DarkOffice denied it because "
             "provider-hosted MCP approval requires explicit user approval."
         )
         output_item = {

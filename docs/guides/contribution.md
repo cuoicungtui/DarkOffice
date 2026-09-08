@@ -1,27 +1,27 @@
-# Contributing to Agent Zero
+# Contributing to DarkOffice
 
-Contributions to improve Agent Zero are very welcome!  This guide outlines how to contribute code, documentation, or other improvements.
+Contributions to improve DarkOffice are very welcome!  This guide outlines how to contribute code, documentation, or other improvements.
 
 ## Getting Started
 
 - See [Development Setup](../setup/dev-setup.md) for a local development environment.
 - See [Create a Small Plugin](create-plugin.md) before building a new plugin.
-- Use [DeepWiki for Agent Zero](https://deepwiki.com/agent0ai/agent-zero) for architecture and source-linked internals.
+- Use [DeepWiki for DarkOffice](https://deepwiki.com/agent0ai/agent-zero) for architecture and source-linked internals.
 
-1. **Fork the Repository:** Fork the Agent Zero repository on GitHub.
+1. **Fork the Repository:** Fork the DarkOffice repository on GitHub.
 2. **Clone Your Fork:** Clone your forked repository to your local machine.
 3. **Create a Branch:** Create a new branch for your changes. Use a descriptive name that reflects the purpose of your contribution (e.g., `fix-memory-leak`, `add-search-tool`, `improve-docs`).
 
 ## Making Changes
 
-- **Code Style:** Follow the existing code style. Agent Zero generally follows PEP 8 conventions.
+- **Code Style:** Follow the existing code style. DarkOffice generally follows PEP 8 conventions.
 - **Documentation:** Update the documentation if your changes affect user-facing functionality. The documentation is written in Markdown.
 - **Commit Messages:** Write clear and concise commit messages that explain the purpose of your changes.
 
 ## Submitting a Pull Request
 
 1. **Push Your Branch:** Push your branch to your forked repository on GitHub.
-2. **Create a Pull Request:** Create a pull request from your branch to the appropriate branch in the main Agent Zero repository.
+2. **Create a Pull Request:** Create a pull request from your branch to the appropriate branch in the main DarkOffice repository.
    - Search open and recently closed upstream PRs for overlapping work before opening a new one.
    - Target the branch currently used for comparable active upstream contributions or explicit maintainer guidance. Do not assume `development` is always correct.
    - Keep the source branch available on your fork until the pull request is merged or intentionally closed.
@@ -42,9 +42,9 @@ If your fork contains GitHub Actions workflows, be careful with GitHub's "Allow 
 
 ## Choosing The Right Publication Path
 
-- **Core bugfixes and docs for Agent Zero itself:** prepare them in a clean fork/clone of `agent-zero` and open a PR back to the upstream repository.
+- **Core bugfixes and docs for DarkOffice itself:** prepare them in a clean fork/clone of `agent-zero` and open a PR back to the upstream repository.
 - **Community plugins:** publish the plugin in its own public repository, then submit it to [`agent0ai/a0-plugins`](https://github.com/agent0ai/a0-plugins).
-- **Skills:** develop locally in `usr/skills/`, then move stable skills to `skills/` for Agent Zero contributions or publish them in a dedicated public repository/collection.
+- **Skills:** develop locally in `usr/skills/`, then move stable skills to `skills/` for DarkOffice contributions or publish them in a dedicated public repository/collection.
 - **Private experiments, credentials, local R&D, or customer-specific assets:** keep them out of public forks and upstream pull requests.
 
 For a contributor-focused decision guide that covers fixes, plugins, skills, and

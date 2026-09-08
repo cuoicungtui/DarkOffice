@@ -13,5 +13,5 @@ and input/output tokens. Unreported price and cache data are omitted. The
 context breakdown does not guess model-specific image token costs.
 
 For streamed OpenRouter chat calls, the plugin requests and drains LiteLLM's
-terminal usage event after Agent Zero has accepted the response. Price remains
+terminal usage event after DarkOffice has accepted the response. Price remains
 hidden when LiteLLM does not report a cost or map the selected model.

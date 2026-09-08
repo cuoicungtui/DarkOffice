@@ -76,7 +76,7 @@ def _feature_list() -> list[str]:
 
 
 class Capabilities(connector_base.PublicConnectorApiHandler):
-    """Return the connector discovery contract for current Agent Zero."""
+    """Return the connector discovery contract for current DarkOffice."""
 
     async def process(self, input: dict, request: Request) -> dict | Response:
         from helpers import login
