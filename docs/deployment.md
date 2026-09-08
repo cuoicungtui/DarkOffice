@@ -94,6 +94,11 @@ For the first server deployment, set `SERVER_PORT` to `5080` and leave
 values so the WebUI does not require login. Enable auth later only after the
 server URL, port, and deploy flow are verified.
 
+`SERVER_SSH_KEY` must be a private key whose public key is present in
+`~/.ssh/authorized_keys` for `SERVER_USER` on `SERVER_HOST`. The deploy workflow
+uses non-interactive public-key SSH only; it will not reuse WebUI auth secrets as
+an SSH password.
+
 ## Server Runtime Layout
 
 The workflows manage this layout:

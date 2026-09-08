@@ -129,6 +129,7 @@ Optional:
 - `AUTH_PASSWORD`
 
 `AUTH_LOGIN` and `AUTH_PASSWORD` are optional during the first server rollout. Deploy and rollback workflows must default to no WebUI login and use those secrets only when an explicit auth input is enabled.
+`SERVER_SSH_KEY` must be the private key for `SERVER_USER` on `SERVER_HOST`; its public key must already be authorized on the server. Do not use WebUI auth secrets as SSH credentials.
 
 Do not add registry secrets for the current pull-mount model. If DarkOffice later switches to publishing its own image, document the registry policy and add the required secrets in the same change.
 
