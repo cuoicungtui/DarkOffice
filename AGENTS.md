@@ -1,4 +1,4 @@
-# DarkOffice DOX
+# Agent Zero DOX
 
 ## Purpose
 
@@ -23,13 +23,11 @@
 
 ## Project-Wide Contracts
 
-- User-facing product names use `DarkOffice`. Preserve upstream attribution, URLs, package names, protocol identifiers, and legacy data compatibility.
-
 - Import `AgentContext` and `AgentContextType` from `agent`, not `helpers.context`.
 - Never commit secrets, `.env` files, API keys, tokens, or private user data.
 - Preserve authentication and CSRF protections.
 - Use Linux paths and commands in examples.
-- When a live Dockerized DarkOffice target is explicitly named, verify that exact runtime instead of assuming a fixed localhost port.
+- When a live Dockerized Agent Zero target is explicitly named, verify that exact runtime instead of assuming a fixed localhost port.
 - Message-loop completion flows through a response tool with `break_loop`; plain or malformed Chat Completions text enters repair, and native Responses output text is normalized through the same response-tool path.
 - Reuse the startup-preloaded local embedding model for matching runtime configurations; wrappers retain their own rate-limit configuration while sharing the underlying inference model.
 - Prompt Markdown may retain fenced JSON examples for readability; final system-prompt rendering removes only their JSON fence markers before model calls and preserves non-JSON fences.
@@ -79,7 +77,7 @@ Ask before:
 | [plugins/AGENTS.md](plugins/AGENTS.md) | Bundled system plugins and custom-plugin architecture. |
 | [prompts/AGENTS.md](prompts/AGENTS.md) | Core prompt templates. |
 | [scripts/AGENTS.md](scripts/AGENTS.md) | Repository maintenance scripts and automation inputs. |
-| [skills/AGENTS.md](skills/AGENTS.md) | Bundled DarkOffice skills. |
+| [skills/AGENTS.md](skills/AGENTS.md) | Bundled Agent Zero skills. |
 | [tests/AGENTS.md](tests/AGENTS.md) | Pytest regression and contract tests. |
 | [tools/AGENTS.md](tools/AGENTS.md) | Core agent tool implementations. |
 | [webui/AGENTS.md](webui/AGENTS.md) | Alpine.js WebUI shell, components, JavaScript, CSS, and assets. |
