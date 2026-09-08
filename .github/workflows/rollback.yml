@@ -66,19 +66,21 @@ jobs:
       - name: Configure SSH
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
-          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
           SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
           SERVER_USER: ${{ secrets.SERVER_USER }}
         run: |
+          SSH_PORT="${SERVER_SSH_PORT:-22}"
+
           test -n "$SERVER_HOST"
-          test -n "$SERVER_PORT"
+          test -n "$SSH_PORT"
           test -n "$SERVER_SSH_KEY"
           test -n "$SERVER_USER"
 
           install -m 700 -d ~/.ssh
           printf '%s\n' "$SERVER_SSH_KEY" > ~/.ssh/darkoffice_key
           chmod 600 ~/.ssh/darkoffice_key
-          ssh-keyscan -p "$SERVER_PORT" -H "$SERVER_HOST" >> ~/.ssh/known_hosts
+          ssh-keyscan -p "$SSH_PORT" -H "$SERVER_HOST" >> ~/.ssh/known_hosts
 
       - name: Package rollback source
         run: |
@@ -96,12 +98,13 @@ jobs:
       - name: Upload rollback release and compose file
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
-          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
           SERVER_USER: ${{ secrets.SERVER_USER }}
           RELEASE_SHA: ${{ steps.revision.outputs.short_sha }}
         run: |
+          SSH_PORT="${SERVER_SSH_PORT:-22}"
           SSH_TARGET="${SERVER_USER}@${SERVER_HOST}"
-          SSH_OPTS="-i ~/.ssh/darkoffice_key -p ${SERVER_PORT}"
+          SSH_OPTS="-i ~/.ssh/darkoffice_key -p ${SSH_PORT}"
           RELEASE_DIR="${DARKOFFICE_SERVER_ROOT}/releases/${RELEASE_SHA}"
 
           ssh $SSH_OPTS "$SSH_TARGET" "mkdir -p '${DARKOFFICE_SERVER_ROOT}/releases' '${DARKOFFICE_SERVER_ROOT}/usr' '${RELEASE_DIR}'"
@@ -113,13 +116,16 @@ jobs:
       - name: Write server environment
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
-          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
+          SERVER_APP_PORT: ${{ secrets.SERVER_PORT }}
           SERVER_USER: ${{ secrets.SERVER_USER }}
           AUTH_LOGIN: ${{ secrets.AUTH_LOGIN }}
           AUTH_PASSWORD: ${{ secrets.AUTH_PASSWORD }}
         run: |
+          SSH_PORT="${SERVER_SSH_PORT:-22}"
+          DEPLOY_HTTP_PORT="${SERVER_APP_PORT:-$DARKOFFICE_HTTP_PORT}"
           SSH_TARGET="${SERVER_USER}@${SERVER_HOST}"
-          SSH_OPTS="-i ~/.ssh/darkoffice_key -p ${SERVER_PORT}"
+          SSH_OPTS="-i ~/.ssh/darkoffice_key -p ${SSH_PORT}"
 
           if [ "${{ inputs.enable_auth }}" = "true" ]; then
             test -n "$AUTH_LOGIN"
@@ -136,7 +142,7 @@ jobs:
             printf 'DARKOFFICE_CONTAINER_NAME=darkoffice\n'
             printf 'DARKOFFICE_SOURCE_DIR=%s/current\n' "$DARKOFFICE_SERVER_ROOT"
             printf 'DARKOFFICE_DATA_DIR=%s/usr\n' "$DARKOFFICE_SERVER_ROOT"
-            printf 'DARKOFFICE_HTTP_PORT=%s\n' "$DARKOFFICE_HTTP_PORT"
+            printf 'DARKOFFICE_HTTP_PORT=%s\n' "$DEPLOY_HTTP_PORT"
             printf 'BRANCH=local\n'
             printf 'AUTH_LOGIN=%s\n' "$DEPLOY_AUTH_LOGIN"
             printf 'AUTH_PASSWORD=%s\n' "$DEPLOY_AUTH_PASSWORD"
@@ -145,12 +151,13 @@ jobs:
       - name: Switch rollback release and restart
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
-          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
           SERVER_USER: ${{ secrets.SERVER_USER }}
           RELEASE_SHA: ${{ steps.revision.outputs.short_sha }}
         run: |
+          SSH_PORT="${SERVER_SSH_PORT:-22}"
           SSH_TARGET="${SERVER_USER}@${SERVER_HOST}"
-          SSH_OPTS="-i ~/.ssh/darkoffice_key -p ${SERVER_PORT}"
+          SSH_OPTS="-i ~/.ssh/darkoffice_key -p ${SSH_PORT}"
           RELEASE_DIR="${DARKOFFICE_SERVER_ROOT}/releases/${RELEASE_SHA}"
 
           ssh $SSH_OPTS "$SSH_TARGET" "
@@ -164,17 +171,20 @@ jobs:
       - name: Smoke test rollback
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
-          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
+          SERVER_APP_PORT: ${{ secrets.SERVER_PORT }}
           SERVER_USER: ${{ secrets.SERVER_USER }}
         run: |
+          SSH_PORT="${SERVER_SSH_PORT:-22}"
+          DEPLOY_HTTP_PORT="${SERVER_APP_PORT:-$DARKOFFICE_HTTP_PORT}"
           SSH_TARGET="${SERVER_USER}@${SERVER_HOST}"
-          SSH_OPTS="-i ~/.ssh/darkoffice_key -p ${SERVER_PORT}"
+          SSH_OPTS="-i ~/.ssh/darkoffice_key -p ${SSH_PORT}"
 
           ssh $SSH_OPTS "$SSH_TARGET" "
             set -eu
             for attempt in \$(seq 1 60); do
-              if curl -fsS 'http://127.0.0.1:${DARKOFFICE_HTTP_PORT}/api/health'; then
-                curl -fsS 'http://127.0.0.1:${DARKOFFICE_HTTP_PORT}/login' >/dev/null
+              if curl -fsS 'http://127.0.0.1:${DEPLOY_HTTP_PORT}/api/health'; then
+                curl -fsS 'http://127.0.0.1:${DEPLOY_HTTP_PORT}/login' >/dev/null
                 exit 0
               fi
               sleep 5

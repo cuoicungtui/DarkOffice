@@ -79,18 +79,20 @@ the current no-login rollout:
 | Secret | Purpose |
 | --- | --- |
 | `SERVER_HOST` | Server IP or host. |
-| `SERVER_PORT` | SSH port, not the app HTTP port. |
+| `SERVER_PORT` | App HTTP port exposed on the server. Use `5080` for the current no-domain deploy. |
 | `SERVER_USER` | SSH user used by the workflow. |
 | `SERVER_SSH_KEY` | Private SSH key for that user. |
+| `SERVER_SSH_PORT` | Optional SSH port. Defaults to `22` when not set. |
 | `AUTH_LOGIN` | Optional WebUI username. Used only when `enable_auth` is true. |
 | `AUTH_PASSWORD` | Optional WebUI password. Used only when `enable_auth` is true. |
 
 No `GHCR_USER` or `GHCR_TOKEN` secret is required for this pull-mount phase.
 
-For the first server deployment, leave `enable_auth` unchecked. The workflow
-writes empty `AUTH_LOGIN` and `AUTH_PASSWORD` values so the WebUI does not
-require login. Enable auth later only after the server URL, port, and deploy flow
-are verified.
+For the first server deployment, set `SERVER_PORT` to `5080` and leave
+`enable_auth` unchecked. The workflow uses SSH port `22` unless the optional
+`SERVER_SSH_PORT` secret exists. It writes empty `AUTH_LOGIN` and `AUTH_PASSWORD`
+values so the WebUI does not require login. Enable auth later only after the
+server URL, port, and deploy flow are verified.
 
 ## Server Runtime Layout
 
@@ -131,7 +133,8 @@ The deploy workflow performs these steps:
 3. Validate compose and run focused tests.
 4. Upload the source archive to `/opt/darkoffice/releases/<sha>`.
 5. Write `/opt/darkoffice/.env` from workflow inputs and GitHub Secrets, with
-   auth disabled unless `enable_auth` is checked.
+   auth disabled unless `enable_auth` is checked. `SERVER_PORT` controls the
+   exposed app port; SSH uses `SERVER_SSH_PORT` or port `22`.
 6. Switch `/opt/darkoffice/current`.
 7. Run Docker Compose and smoke-test `http://127.0.0.1:5080/api/health` on the
    server.

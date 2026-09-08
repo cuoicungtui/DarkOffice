@@ -118,9 +118,13 @@ Do not require `GHCR_USER` or `GHCR_TOKEN` while DarkOffice uses pull-mount depl
 Expected GitHub Secrets for SSH deploy:
 
 - `SERVER_HOST`
-- `SERVER_PORT`
 - `SERVER_USER`
 - `SERVER_SSH_KEY`
+- `SERVER_PORT` for the exposed app HTTP port.
+
+Optional:
+
+- `SERVER_SSH_PORT` if SSH does not listen on port `22`.
 - `AUTH_LOGIN`
 - `AUTH_PASSWORD`
 
