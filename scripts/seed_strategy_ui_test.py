@@ -6,6 +6,12 @@ Run inside the DarkOffice runtime after Plane integration is configured:
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+# A direct script invocation starts with scripts/ on sys.path, not the project root.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 from plugins._strategy.helpers import services
 from plugins._strategy.helpers.plane import HttpPlaneGateway
 
