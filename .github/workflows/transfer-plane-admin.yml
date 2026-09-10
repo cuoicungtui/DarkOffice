@@ -1,0 +1,76 @@
+name: Transfer Plane Admin
+
+on:
+  workflow_dispatch:
+    inputs:
+      workspace_slug:
+        description: Workspace to transfer
+        required: true
+        default: darkoffice
+        type: string
+      from_email:
+        description: Existing incorrect Plane admin account email
+        required: true
+        type: string
+      to_email:
+        description: Existing correct Plane account email
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: plane-admin-transfer
+  cancel-in-progress: false
+
+env:
+  PLANE_SERVER_ROOT: /opt/plane
+
+jobs:
+  transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Validate inputs
+        env:
+          WORKSPACE_SLUG: ${{ inputs.workspace_slug }}
+          FROM_EMAIL: ${{ inputs.from_email }}
+          TO_EMAIL: ${{ inputs.to_email }}
+        run: |
+          [[ "$WORKSPACE_SLUG" =~ ^[a-z0-9-]+$ ]]
+          [[ "$FROM_EMAIL" =~ ^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$ ]]
+          [[ "$TO_EMAIL" =~ ^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$ ]]
+          test "$FROM_EMAIL" != "$TO_EMAIL"
+
+      - name: Configure SSH
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          test -n "$SERVER_HOST" && test -n "$SERVER_SSH_KEY" && test -n "$SERVER_USER"
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SERVER_SSH_KEY" > ~/.ssh/darkoffice_key
+          chmod 600 ~/.ssh/darkoffice_key
+          ssh-keyscan -p "${SERVER_SSH_PORT:-22}" -H "$SERVER_HOST" >> ~/.ssh/known_hosts
+
+      - name: Transfer instance and workspace administration
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          WORKSPACE_SLUG: ${{ inputs.workspace_slug }}
+          FROM_EMAIL: ${{ inputs.from_email }}
+          TO_EMAIL: ${{ inputs.to_email }}
+        run: |
+          set -eu
+          SSH_OPTS=(-i ~/.ssh/darkoffice_key -p "${SERVER_SSH_PORT:-22}" -o BatchMode=yes -o IdentitiesOnly=yes)
+          # shellcheck disable=SC2029
+          ssh "${SSH_OPTS[@]}" "${SERVER_USER}@${SERVER_HOST}" "
+            set -eu
+            cd '/opt/plane'
+            if docker compose version >/dev/null 2>&1; then COMPOSE='docker compose'; else COMPOSE='docker-compose'; fi
+            \$COMPOSE --env-file .env -f docker-compose.plane.yml exec -T -e WORKSPACE_SLUG='${WORKSPACE_SLUG}' -e FROM_EMAIL='${FROM_EMAIL}' -e TO_EMAIL='${TO_EMAIL}' api python manage.py shell -c \"from django.db import transaction; from plane.db.models import Profile, User, Workspace, WorkspaceMember; from plane.license.models import Instance, InstanceAdmin; import os; slug=os.environ['WORKSPACE_SLUG']; old=User.objects.get(email__iexact=os.environ['FROM_EMAIL']); new=User.objects.get(email__iexact=os.environ['TO_EMAIL']); workspace=Workspace.objects.get(slug=slug); instance=Instance.objects.first(); assert instance is not None, 'Plane instance is not initialized'; with transaction.atomic(): new_member,_=WorkspaceMember.objects.get_or_create(workspace=workspace,member=new,defaults={'role':20,'company_role':''}); new_member.role=20; new_member.is_active=True; new_member.save(update_fields=['role','is_active','updated_at']); workspace.owner=new; workspace.save(update_fields=['owner','updated_at']); InstanceAdmin.objects.update_or_create(instance=instance,user=new,defaults={'role':20}); InstanceAdmin.objects.filter(instance=instance,user=old).delete(); WorkspaceMember.objects.filter(workspace=workspace,member=old).exclude(member=new).update(is_active=False); profile,_=Profile.objects.get_or_create(user=new); profile.last_workspace_id=workspace.id; profile.is_onboarded=True; profile.save(update_fields=['last_workspace_id','is_onboarded','updated_at']); print('Plane administration transferred')\"
+          "
