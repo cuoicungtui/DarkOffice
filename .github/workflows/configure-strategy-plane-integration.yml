@@ -51,5 +51,5 @@ jobs:
           ssh "${SSH_OPTS[@]}" "${SERVER_USER}@${SERVER_HOST}" "
             set -eu
             cd '${DARKOFFICE_SERVER_ROOT}'
-            docker exec -e PROJECT_TITLE='${PROJECT_TITLE}' darkoffice python -c \"\$(printf '%s' '$SCRIPT_B64' | base64 -d)\"
+            docker exec -e PROJECT_TITLE='${PROJECT_TITLE}' darkoffice python3 -c \"\$(printf '%s' '$SCRIPT_B64' | base64 -d)\"
           "
