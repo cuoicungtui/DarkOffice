@@ -139,5 +139,6 @@ jobs:
             \$COMPOSE --env-file .env -f docker-compose.plane.yml up -d --remove-orphans
             for attempt in \$(seq 1 30); do curl -fsS 'http://127.0.0.1:${PLANE_HTTP_PORT}/' >/dev/null && exit 0; sleep 2; done
             \$COMPOSE --env-file .env -f docker-compose.plane.yml ps
+            \$COMPOSE --env-file .env -f docker-compose.plane.yml logs --tail=120 proxy api migrator
             exit 1
           "
