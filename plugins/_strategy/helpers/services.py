@@ -49,7 +49,9 @@ def process_sync(limit: int = 20) -> dict[str, int]:
             payload=json.loads(command["payload_json"]); node=repo.get_node(payload["node_id"])
             if not node: raise RuntimeError("Strategy node no longer exists")
             existing=gateway.get_work_item_by_external_id(node["plane_project_ref_id"],node["id"])
-            values={"name":node["title"],"description_html":node["description"],"external_source":"darkoffice_strategy","external_id":node["id"]}
+            values={"name":node["title"],"external_source":"darkoffice_strategy","external_id":node["id"]}
+            if node["description"].strip():
+                values["description_html"]=node["description"]
             parent_remote=repo.representative_remote_id(node["parent_id"]) if node.get("parent_id") else None
             if parent_remote: values["parent"]=parent_remote
             remote=existing or gateway.create_work_item(node["plane_project_ref_id"],values)
