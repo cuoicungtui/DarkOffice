@@ -1,8 +1,19 @@
 <div x-data>
-  <button type="button" class="dropdown-item" title="Chiến lược" @click="globalThis.DarkOfficeStrategy?.open('strategy')">
+  <style>
+    .strategy-menu-link {
+      color: var(--color-text);
+    }
+
+    .strategy-menu-link x-icon {
+      color: #2563eb;
+    }
+
+    .strategy-menu-link:hover {
+      background: color-mix(in srgb, #2563eb 9%, var(--color-panel));
+      color: #1d4ed8;
+    }
+  </style>
+  <button type="button" class="dropdown-item strategy-menu-link" title="Chiến lược" @click="globalThis.DarkOfficeStrategy?.open('strategy')">
     <x-icon name="track_changes"></x-icon><span>Chiến lược</span>
-  </button>
-  <button type="button" class="dropdown-item" title="Công việc dự án" @click="globalThis.DarkOfficeStrategy?.open('projects')">
-    <x-icon name="account_tree"></x-icon><span>Công việc dự án</span>
   </button>
 </div>

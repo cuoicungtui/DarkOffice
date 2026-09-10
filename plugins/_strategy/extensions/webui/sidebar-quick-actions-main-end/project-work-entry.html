@@ -1,0 +1,23 @@
+<div x-data>
+  <style>
+    #strategy-project-work-entry {
+      color: #0f766e;
+    }
+
+    #strategy-project-work-entry:hover {
+      background: color-mix(in srgb, #0f766e 10%, var(--color-panel));
+      border-color: color-mix(in srgb, #0f766e 34%, var(--color-border));
+      color: #0b5e57;
+    }
+  </style>
+  <button
+    id="strategy-project-work-entry"
+    type="button"
+    class="config-button"
+    title="Công việc dự án"
+    aria-label="Công việc dự án"
+    @click="globalThis.DarkOfficeStrategy?.open('projects')"
+  >
+    <x-icon name="account_tree"></x-icon>
+  </button>
+</div>
