@@ -17,6 +17,9 @@
 - Verify backend imports and plugin hooks with `/opt/venv-a0`; packages installed into `/opt/venv` do not prove framework compatibility.
 - Do not bake secrets, local `.env` values, or user data into images.
 - Keep compose mounts aligned with `usr/` and other runtime-state expectations.
+- The DarkOffice runtime may join the external `plane-integration` network. Its
+  name and all Plane credentials are environment supplied; do not replace this
+  with a committed network ID or secret.
 - Image changes that affect GitHub publishing must stay synchronized with `.github/workflows/docker-publish.yml`.
 
 ## Work Guidance
@@ -38,3 +41,4 @@ Direct child DOX files:
 | --- | --- |
 | [base/AGENTS.md](base/AGENTS.md) | Base image Dockerfile, copied filesystem, and installation scripts. |
 | [run/AGENTS.md](run/AGENTS.md) | Runnable image Dockerfile, compose example, entrypoints, and install scripts. |
+| [plane/AGENTS.md](plane/AGENTS.md) | Image-pinned Plane production Compose manifest. |

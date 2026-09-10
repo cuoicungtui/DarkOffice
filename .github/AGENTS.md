@@ -33,6 +33,11 @@
 - Release-note generation reads `scripts/openrouter_release_notes_system_prompt.md` from the repository root and requires OpenRouter credentials from workflow environment variables.
 - Release notes compare against the previous published GitHub release tag and fall back to `No release notes.` when no meaningful summary is generated.
 - Keep workflow secrets in GitHub Actions secrets or environment variables. Do not commit credentials, tokens, or generated release bodies containing private data.
+- Plane deployment and its one-time data cutover are independent from the
+  DarkOffice release workflow. The workflow may pass Plane integration values
+  only from server secrets; migration backups are never uploaded to git.
+- `workflows/deploy-plane-server.yml` deploys the checked-in Plane image
+  manifest manually and requires a public Plane URL as an explicit input.
 - Workflow scripts must fail loudly with actionable messages when required environment variables or git refs are missing.
 
 ## Work Guidance

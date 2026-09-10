@@ -15,9 +15,24 @@ services:
       A0_SELF_UPDATE_HEALTH_TIMEOUT_SECONDS: ${A0_SELF_UPDATE_HEALTH_TIMEOUT_SECONDS:-180}
       AUTH_LOGIN: ${AUTH_LOGIN:-}
       AUTH_PASSWORD: ${AUTH_PASSWORD:-}
+      PLANE_API_BASE_URL: ${PLANE_API_BASE_URL:-}
+      PLANE_PUBLIC_BASE_URL: ${PLANE_PUBLIC_BASE_URL:-}
+      PLANE_WORKSPACE_SLUG: ${PLANE_WORKSPACE_SLUG:-}
+      PLANE_API_KEY: ${PLANE_API_KEY:-}
+      PLANE_WEBHOOK_SECRET: ${PLANE_WEBHOOK_SECRET:-}
     ulimits:
       nofile:
         soft: 65535
         hard: 65535
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      default:
+      plane-integration:
+        aliases:
+          - darkoffice
+
+networks:
+  plane-integration:
+    name: ${PLANE_DARKOFFICE_NETWORK:-plane-integration}
+    external: true

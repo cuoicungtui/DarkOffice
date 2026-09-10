@@ -1,0 +1,135 @@
+name: Deploy Plane Server
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Git ref containing the verified Plane manifest
+        required: true
+        default: main
+        type: string
+      public_url:
+        description: Public Plane URL, for example https://plane.example.com
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: plane-server
+  cancel-in-progress: false
+
+env:
+  PLANE_SERVER_ROOT: /opt/plane
+  PLANE_HTTP_PORT: "13200"
+  PLANE_DARKOFFICE_NETWORK: plane-integration
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Validate Plane Compose manifest
+        env:
+          APP_DOMAIN: plane.example.com
+          WEB_URL: https://plane.example.com
+          CORS_ALLOWED_ORIGINS: https://plane.example.com
+          API_BASE_URL: https://plane.example.com/api
+          POSTGRES_PASSWORD: placeholder
+          RABBITMQ_PASSWORD: placeholder
+          SECRET_KEY: placeholder
+          LIVE_SERVER_SECRET_KEY: placeholder
+          AWS_ACCESS_KEY_ID: placeholder
+          AWS_SECRET_ACCESS_KEY: placeholder
+          CERT_EMAIL: ""
+          CERT_ACME_CA: ""
+          CERT_ACME_DNS: ""
+          WEBHOOK_ALLOWED_HOSTS: darkoffice
+        run: docker compose -f docker/plane/docker-compose.plane.yml config >/dev/null
+
+      - name: Configure SSH
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          test -n "$SERVER_HOST" && test -n "$SERVER_SSH_KEY" && test -n "$SERVER_USER"
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SERVER_SSH_KEY" > ~/.ssh/darkoffice_key
+          chmod 600 ~/.ssh/darkoffice_key
+          ssh-keyscan -p "${SERVER_SSH_PORT:-22}" -H "$SERVER_HOST" >> ~/.ssh/known_hosts
+
+      - name: Upload Plane manifest
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          SSH_OPTS="-i ~/.ssh/darkoffice_key -p ${SERVER_SSH_PORT:-22} -o BatchMode=yes -o IdentitiesOnly=yes"
+          SSH_TARGET="${SERVER_USER}@${SERVER_HOST}"
+          ssh $SSH_OPTS "$SSH_TARGET" "mkdir -p '${PLANE_SERVER_ROOT}'"
+          tar -C docker/plane -czf - docker-compose.plane.yml | ssh $SSH_OPTS "$SSH_TARGET" "tar -xzf - -C '${PLANE_SERVER_ROOT}'"
+
+      - name: Write protected Plane environment
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          PUBLIC_URL: ${{ inputs.public_url }}
+          POSTGRES_PASSWORD: ${{ secrets.PLANE_POSTGRES_PASSWORD }}
+          RABBITMQ_PASSWORD: ${{ secrets.PLANE_RABBITMQ_PASSWORD }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.PLANE_MINIO_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PLANE_MINIO_SECRET_KEY }}
+          SECRET_KEY: ${{ secrets.PLANE_SECRET_KEY }}
+          LIVE_SERVER_SECRET_KEY: ${{ secrets.PLANE_LIVE_SERVER_SECRET_KEY }}
+        run: |
+          set -eu
+          case "$PUBLIC_URL" in http://*|https://*) ;; *) echo 'public_url must start with http:// or https://' >&2; exit 1;; esac
+          APP_DOMAIN="$(python3 -c 'from urllib.parse import urlsplit; import os; print(urlsplit(os.environ["PUBLIC_URL"]).hostname or "")')"
+          test -n "$APP_DOMAIN"
+          DB_PASSWORD="$(python3 -c 'from urllib.parse import quote; import os; print(quote(os.environ["POSTGRES_PASSWORD"], safe=""))')"
+          MQ_PASSWORD="$(python3 -c 'from urllib.parse import quote; import os; print(quote(os.environ["RABBITMQ_PASSWORD"], safe=""))')"
+          {
+            printf 'COMPOSE_PROJECT_NAME=plane\n'
+            printf 'APP_DOMAIN=%s\n' "$APP_DOMAIN"
+            printf 'APP_RELEASE=v1.4.2\n'
+            printf 'LISTEN_HTTP_PORT=%s\n' "$PLANE_HTTP_PORT"
+            printf 'LISTEN_HTTPS_PORT=443\n'
+            printf 'WEB_URL=%s\n' "$PUBLIC_URL"
+            printf 'CORS_ALLOWED_ORIGINS=%s\n' "$PUBLIC_URL"
+            printf 'API_BASE_URL=%s/api\n' "$PUBLIC_URL"
+            printf 'SITE_ADDRESS=:80\nDEBUG=0\nUSE_MINIO=1\n'
+            printf 'PGHOST=plane-db\nPGDATABASE=plane\nPOSTGRES_USER=plane\nPOSTGRES_DB=plane\nPOSTGRES_PORT=5432\n'
+            printf 'POSTGRES_PASSWORD=%s\n' "$POSTGRES_PASSWORD"
+            printf 'DATABASE_URL=postgresql://plane:%s@plane-db/plane\n' "$DB_PASSWORD"
+            printf 'REDIS_HOST=plane-redis\nREDIS_PORT=6379\nREDIS_URL=redis://plane-redis:6379/\n'
+            printf 'RABBITMQ_HOST=plane-mq\nRABBITMQ_PORT=5672\nRABBITMQ_USER=plane\nRABBITMQ_PASSWORD=%s\nRABBITMQ_VHOST=plane\n' "$RABBITMQ_PASSWORD"
+            printf 'AMQP_URL=amqp://plane:%s@plane-mq:5672/plane\n' "$MQ_PASSWORD"
+            printf 'SECRET_KEY=%s\nLIVE_SERVER_SECRET_KEY=%s\n' "$SECRET_KEY" "$LIVE_SERVER_SECRET_KEY"
+            printf 'AWS_ACCESS_KEY_ID=%s\nAWS_SECRET_ACCESS_KEY=%s\nAWS_S3_ENDPOINT_URL=http://plane-minio:9000\nAWS_S3_BUCKET_NAME=uploads\n' "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY"
+            printf 'MINIO_ENDPOINT_SSL=0\nWEBHOOK_ALLOWED_HOSTS=darkoffice\nWEBHOOK_ALLOWED_IPS=\n'
+            printf 'CERT_EMAIL=\nCERT_ACME_CA=\nCERT_ACME_DNS=\nPLANE_DARKOFFICE_NETWORK=%s\n' "$PLANE_DARKOFFICE_NETWORK"
+          } | ssh -i ~/.ssh/darkoffice_key -p "${SERVER_SSH_PORT:-22}" -o BatchMode=yes -o IdentitiesOnly=yes "${SERVER_USER}@${SERVER_HOST}" "umask 077 && cat > '${PLANE_SERVER_ROOT}/.env'"
+
+      - name: Deploy and smoke test Plane
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          ssh -i ~/.ssh/darkoffice_key -p "${SERVER_SSH_PORT:-22}" -o BatchMode=yes -o IdentitiesOnly=yes "${SERVER_USER}@${SERVER_HOST}" "
+            set -eu
+            docker network inspect '${PLANE_DARKOFFICE_NETWORK}' >/dev/null 2>&1 || docker network create '${PLANE_DARKOFFICE_NETWORK}'
+            cd '${PLANE_SERVER_ROOT}'
+            docker compose --env-file .env -f docker-compose.plane.yml pull
+            docker compose --env-file .env -f docker-compose.plane.yml up -d --remove-orphans
+            for attempt in \$(seq 1 30); do curl -fsS 'http://127.0.0.1:${PLANE_HTTP_PORT}/' >/dev/null && exit 0; sleep 2; done
+            docker compose --env-file .env -f docker-compose.plane.yml ps
+            exit 1
+          "

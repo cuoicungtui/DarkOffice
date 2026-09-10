@@ -151,6 +151,8 @@ jobs:
           SERVER_USER: ${{ secrets.SERVER_USER }}
           AUTH_LOGIN: ${{ secrets.AUTH_LOGIN }}
           AUTH_PASSWORD: ${{ secrets.AUTH_PASSWORD }}
+          PLANE_API_KEY: ${{ secrets.PLANE_API_KEY }}
+          PLANE_WEBHOOK_SECRET: ${{ secrets.PLANE_WEBHOOK_SECRET }}
         run: |
           SSH_PORT="${SERVER_SSH_PORT:-22}"
           DEPLOY_HTTP_PORT="${SERVER_APP_PORT:-$DARKOFFICE_HTTP_PORT}"
@@ -177,6 +179,12 @@ jobs:
             printf 'BRANCH=local\n'
             printf 'AUTH_LOGIN=%s\n' "$DEPLOY_AUTH_LOGIN"
             printf 'AUTH_PASSWORD=%s\n' "$DEPLOY_AUTH_PASSWORD"
+            printf 'PLANE_API_BASE_URL=http://plane-api:8000/api/v1\n'
+            printf 'PLANE_PUBLIC_BASE_URL=\n'
+            printf 'PLANE_WORKSPACE_SLUG=darkoffice\n'
+            printf 'PLANE_API_KEY=%s\n' "$PLANE_API_KEY"
+            printf 'PLANE_WEBHOOK_SECRET=%s\n' "$PLANE_WEBHOOK_SECRET"
+            printf 'PLANE_DARKOFFICE_NETWORK=plane-integration\n'
           } | ssh $SSH_OPTS "$SSH_TARGET" "umask 077 && cat > '${DARKOFFICE_SERVER_ROOT}/.env'"
 
       - name: Switch release and restart
@@ -203,6 +211,7 @@ jobs:
             fi
             ln -sfn '${RELEASE_DIR}' '${DARKOFFICE_SERVER_ROOT}/current'
             docker pull '${DARKOFFICE_BASE_IMAGE}'
+            docker network inspect plane-integration >/dev/null 2>&1 || docker network create plane-integration
             # The source bind mount uses a release symlink. Remove the old
             # container first so Compose resolves the new symlink target. This
             # also works with the server's legacy Docker Compose v1, whose
