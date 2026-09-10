@@ -1,0 +1,55 @@
+name: Configure Strategy Plane Integration
+
+on:
+  workflow_dispatch:
+    inputs:
+      project_title:
+        description: Existing Plane project used for the integration objective
+        required: true
+        default: DarkOffice Execution
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: darkoffice-strategy-plane-configuration
+  cancel-in-progress: false
+
+env:
+  DARKOFFICE_SERVER_ROOT: /opt/darkoffice
+
+jobs:
+  configure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Configure SSH
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          test -n "$SERVER_HOST" && test -n "$SERVER_SSH_KEY" && test -n "$SERVER_USER"
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SERVER_SSH_KEY" > ~/.ssh/darkoffice_key
+          chmod 600 ~/.ssh/darkoffice_key
+          ssh-keyscan -p "${SERVER_SSH_PORT:-22}" -H "$SERVER_HOST" >> ~/.ssh/known_hosts
+
+      - name: Create the operational strategy branch and Plane work
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          PROJECT_TITLE: ${{ inputs.project_title }}
+        run: |
+          set -eu
+          SSH_OPTS=(-i ~/.ssh/darkoffice_key -p "${SERVER_SSH_PORT:-22}" -o BatchMode=yes -o IdentitiesOnly=yes)
+          SCRIPT_B64='ZnJvbSBwbHVnaW5zLl9zdHJhdGVneS5oZWxwZXJzIGltcG9ydCBzZXJ2aWNlcwppbXBvcnQgb3MKCnByb2plY3RfdGl0bGUgPSBvcy5lbnZpcm9uWyJQUk9KRUNUX1RJVExFIl0KcmVwbyA9IHNlcnZpY2VzLnJlcG9zaXRvcnkoKQpzZXJ2aWNlcy5zeW5jX3Byb2plY3RzKCkKZGFzaGJvYXJkID0gcmVwby5kYXNoYm9hcmQoKQpwcm9qZWN0ID0gbmV4dCgoaXRlbSBmb3IgaXRlbSBpbiBkYXNoYm9hcmRbInBsYW5lX29iamVjdHMiXSBpZiBpdGVtWyJraW5kIl0gPT0gInByb2plY3QiIGFuZCBpdGVtWyJ0aXRsZSJdID09IHByb2plY3RfdGl0bGUpLCBOb25lKQppZiBwcm9qZWN0IGlzIE5vbmU6CiAgICByYWlzZSBSdW50aW1lRXJyb3IoZiJQbGFuZSBwcm9qZWN0IHtwcm9qZWN0X3RpdGxlIXJ9IHdhcyBub3Qgc3luY2VkIikKCmRlZiBlbnN1cmUoa2luZCwgdGl0bGUsIHBhcmVudF9pZD1Ob25lLCBwcm9qZWN0X2lkPU5vbmUpOgogICAgZm9yIG5vZGUgaW4gcmVwby5saXN0X25vZGVzKCk6CiAgICAgICAgaWYgbm9kZVsia2luZCJdID09IGtpbmQgYW5kIG5vZGVbInRpdGxlIl0gPT0gdGl0bGUgYW5kIG5vZGUuZ2V0KCJwYXJlbnRfaWQiKSA9PSBwYXJlbnRfaWQ6CiAgICAgICAgICAgIHJldHVybiBub2RlCiAgICB2YWx1ZXMgPSB7ImtpbmQiOiBraW5kLCAidGl0bGUiOiB0aXRsZSwgInBhcmVudF9pZCI6IHBhcmVudF9pZCwgImxpZmVjeWNsZSI6ICJvbl90cmFjayJ9CiAgICBpZiBwcm9qZWN0X2lkOgogICAgICAgIHZhbHVlc1sicGxhbmVfcHJvamVjdF9yZWZfaWQiXSA9IHByb2plY3RfaWQKICAgIHJldHVybiBzZXJ2aWNlcy5jcmVhdGVfbm9kZSh2YWx1ZXMsICJjaS1jb25maWd1cmF0aW9uIikKCm5vcnRoID0gZW5zdXJlKCJub3J0aF9zdGFyIiwgIkRpZXUgaGFuaCBtdWMgdGlldSB2YSB0aHVjIHRoaSB0aG9uZyBuaGF0IikKcGlsbGFyID0gZW5zdXJlKCJwaWxsYXIiLCAiTmVuIHRhbmcgdmFuIGhhbmggRGFya09mZmljZSIsIG5vcnRoWyJpZCJdKQpvYmplY3RpdmUgPSBlbnN1cmUoIm9iamVjdGl2ZSIsICJEb25nIGJvIGNoaWVuIGx1b2Mgdm9pIFBsYW5lIiwgcGlsbGFyWyJpZCJdLCBwcm9qZWN0WyJyZW1vdGVfaWQiXSkKa2V5X3Jlc3VsdCA9IGVuc3VyZSgia2V5X3Jlc3VsdCIsICJUaWVuIGRvIHRodWMgdGhpIHRpY2ggaG9wIFBsYW5lIiwgb2JqZWN0aXZlWyJpZCJdKQppbml0aWF0aXZlID0gZW5zdXJlKCJpbml0aWF0aXZlIiwgIlZhbiBoYW5oIHdlYmhvb2sgdGllbiBkbyBQbGFuZSIsIG9iamVjdGl2ZVsiaWQiXSkKaWYgbm90IGFueShtZXRyaWNbIm5vZGVfaWQiXSA9PSBrZXlfcmVzdWx0WyJpZCJdIGZvciBtZXRyaWMgaW4gcmVwby5kYXNoYm9hcmQoKVsibWV0cmljcyJdKToKICAgIHJlcG8uY3JlYXRlX21ldHJpYyh7Im5vZGVfaWQiOiBrZXlfcmVzdWx0WyJpZCJdLCAibmFtZSI6ICJUaWVuIGRvIHRodWMgdGhpIHRob25nIFBsYW5lIiwgInVuaXQiOiAiJSIsICJkaXJlY3Rpb24iOiAiaW5jcmVhc2UiLCAiYmFzZWxpbmUiOiAwLCAidGFyZ2V0IjogMTAwfSwgYWN0b3I9ImNpLWNvbmZpZ3VyYXRpb24iKQpyZXN1bHQgPSBzZXJ2aWNlcy5wcm9jZXNzX3N5bmMoKQpwcmludChmIlN0cmF0ZWd5IG5vZGVzIHtsZW4ocmVwby5saXN0X25vZGVzKCkpfTsgb3V0Ym94IHByb2Nlc3NlZCB7cmVzdWx0WydvdXRib3gnXX0iKQ=='
+          # shellcheck disable=SC2029
+          ssh "${SSH_OPTS[@]}" "${SERVER_USER}@${SERVER_HOST}" "
+            set -eu
+            cd '${DARKOFFICE_SERVER_ROOT}'
+            docker exec -e PROJECT_TITLE='${PROJECT_TITLE}' darkoffice python -c \"\$(printf '%s' '$SCRIPT_B64' | base64 -d)\"
+          "
