@@ -37,6 +37,9 @@ class StrategyRepository(ABC):
     @abstractmethod
     def dashboard(self, filters: dict[str, Any] | None = None) -> dict[str, Any]: ...
 
+    @abstractmethod
+    def sync_status(self) -> dict[str, list[dict[str, Any]]]: ...
+
 
 class UnitOfWork(ABC):
     @abstractmethod
@@ -312,6 +315,13 @@ class SqliteStrategyRepository(StrategyRepository):
         states={}
         for item in work_items: states[item.get("state_group") or "unknown"]=states.get(item.get("state_group") or "unknown",0)+1
         return {"nodes":nodes,"metrics":metrics,"plane_objects":objects,"links":links,"work_item_states":states,"sync":queues,"generated_at":now()}
+
+    def sync_status(self) -> dict[str, list[dict[str, Any]]]:
+        """Return queue diagnostics without exposing payloads or credentials."""
+        with self._connect() as connection:
+            inbox=[self._row(row) for row in connection.execute("SELECT status,attempts,error,updated_at FROM sync_inbox WHERE status!='complete' ORDER BY updated_at").fetchall()]
+            outbox=[self._row(row) for row in connection.execute("SELECT status,attempts,error,updated_at FROM sync_outbox WHERE status!='complete' ORDER BY updated_at").fetchall()]
+        return {"inbox":inbox,"outbox":outbox}
 
     def _enqueue(self, connection: sqlite3.Connection, node_id: str, operation: str, payload: dict[str, Any], depends_on: str | None = None) -> str:
         identifier,timestamp=new_id(),now()

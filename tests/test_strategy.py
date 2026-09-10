@@ -27,6 +27,15 @@ def test_nested_objective_inherits_plane_project_and_enqueues(repository: Sqlite
     assert len(repository.claim_outbox()) == 2
 
 
+def test_sync_status_reports_pending_outbox_without_payload(repository: SqliteStrategyRepository) -> None:
+    repository.create_node({"kind": "objective", "title": "Deliver", "plane_project_ref_id": "plane-project"}, actor="test")
+
+    status = repository.sync_status()
+
+    assert len(status["outbox"]) == 1
+    assert "payload_json" not in status["outbox"][0]
+
+
 def test_invalid_parent_kind_is_rejected(repository: SqliteStrategyRepository) -> None:
     initiative = repository.create_node({"kind": "initiative", "title": "Deliver", "plane_project_ref_id": "plane-project"}, actor="test")
     with pytest.raises(ValueError, match="cannot be placed"):
