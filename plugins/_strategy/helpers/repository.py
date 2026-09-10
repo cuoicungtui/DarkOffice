@@ -169,11 +169,15 @@ class SqliteStrategyRepository(StrategyRepository):
             ).fetchone():
                 raise ValueError("Only one active North Star is allowed")
             self._validate_parent(connection, node["parent_id"], kind, identifier)
-            if kind in {"objective", "initiative"} and not node["plane_project_ref_id"]:
+            if kind == "objective" and not node["plane_project_ref_id"]:
+                raise ValueError("Objective requires a Plane project")
+            if kind == "initiative" and not node["plane_project_ref_id"]:
                 inherited = self._inherited_project(connection, node["parent_id"])
                 if not inherited:
-                    raise ValueError("Objective and Initiative require a Plane project")
+                    raise ValueError("Initiative requires a Plane project")
                 node["plane_project_ref_id"] = inherited
+            if kind == "objective":
+                self._assert_objective_project_available(connection, node["plane_project_ref_id"], identifier)
             connection.execute("INSERT INTO strategy_nodes(id,parent_id,kind,title,description,period_id,org_unit_id,owner_ref,sort_order,lifecycle,plane_project_ref_id,created_at,updated_at) VALUES (:id,:parent_id,:kind,:title,:description,:period_id,:org_unit_id,:owner_ref,:sort_order,:lifecycle,:plane_project_ref_id,:created_at,:updated_at)", node)
             if kind in {"objective", "initiative"}:
                 self._enqueue(connection, identifier, "create_work_item", {"node_id": identifier})
@@ -181,7 +185,7 @@ class SqliteStrategyRepository(StrategyRepository):
             return self._row(connection.execute("SELECT * FROM strategy_nodes WHERE id=?", (identifier,)).fetchone())
 
     def update_node(self, identifier: str, values: dict[str, Any], *, actor: str) -> dict[str, Any]:
-        allowed = {"title", "description", "lifecycle", "owner_ref", "sort_order", "period_id", "org_unit_id", "parent_id"}
+        allowed = {"title", "description", "lifecycle", "owner_ref", "sort_order", "period_id", "org_unit_id", "parent_id", "plane_project_ref_id"}
         changes = {key: value for key, value in values.items() if key in allowed}
         with self.transaction() as connection:
             current = connection.execute("SELECT * FROM strategy_nodes WHERE id=?", (identifier,)).fetchone()
@@ -189,6 +193,12 @@ class SqliteStrategyRepository(StrategyRepository):
                 raise KeyError("Strategy node not found")
             if "parent_id" in changes:
                 self._validate_parent(connection, changes["parent_id"] or None, current["kind"], identifier)
+            if "plane_project_ref_id" in changes and current["kind"] not in {"objective", "initiative"}:
+                raise ValueError("Only Objectives and Initiatives can link to a Plane project")
+            if "plane_project_ref_id" in changes and not changes["plane_project_ref_id"]:
+                raise ValueError("Objective and Initiative require a Plane project")
+            if "plane_project_ref_id" in changes and current["kind"] == "objective":
+                self._assert_objective_project_available(connection, changes["plane_project_ref_id"], identifier)
             if "lifecycle" in changes and changes["lifecycle"] not in LIFECYCLES:
                 raise ValueError("Unsupported lifecycle")
             expected = int(values.get("version", current["version"]))
@@ -364,6 +374,18 @@ class SqliteStrategyRepository(StrategyRepository):
             if row["plane_project_ref_id"]: return str(row["plane_project_ref_id"])
             parent_id=row["parent_id"]
         return None
+
+    @staticmethod
+    def _assert_objective_project_available(
+        connection: sqlite3.Connection, project_id: str, node_id: str
+    ) -> None:
+        existing = connection.execute(
+            "SELECT id FROM strategy_nodes WHERE kind='objective' AND plane_project_ref_id=? "
+            "AND archived_at IS NULL AND id!=? LIMIT 1",
+            (project_id, node_id),
+        ).fetchone()
+        if existing:
+            raise ValueError("A Plane project can belong to only one active Objective")
 
     @staticmethod
     def _state_group(connection: sqlite3.Connection, remote: dict[str, Any]) -> str | None:

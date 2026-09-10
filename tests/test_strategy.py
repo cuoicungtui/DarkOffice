@@ -25,13 +25,25 @@ def test_only_one_active_north_star_is_allowed(repository: SqliteStrategyReposit
         repository.create_node({"kind": "north_star", "title": "Another direction"}, actor="test")
 
 
-def test_nested_objective_inherits_plane_project_and_enqueues(repository: SqliteStrategyRepository) -> None:
+def test_nested_objective_requires_its_own_plane_project_and_enqueues(repository: SqliteStrategyRepository) -> None:
     north = repository.create_node({"kind": "north_star", "title": "North"}, actor="test")
     pillar = repository.create_node({"kind": "pillar", "title": "Growth", "parent_id": north["id"]}, actor="test")
     parent = repository.create_node({"kind": "objective", "title": "Parent", "parent_id": pillar["id"], "plane_project_ref_id": "plane-project"}, actor="test")
-    child = repository.create_node({"kind": "objective", "title": "Child", "parent_id": parent["id"]}, actor="test")
-    assert child["plane_project_ref_id"] == "plane-project"
+    with pytest.raises(ValueError, match="Objective requires a Plane project"):
+        repository.create_node({"kind": "objective", "title": "Child", "parent_id": parent["id"]}, actor="test")
+    child = repository.create_node({"kind": "objective", "title": "Child", "parent_id": parent["id"], "plane_project_ref_id": "another-plane-project"}, actor="test")
+    assert child["plane_project_ref_id"] == "another-plane-project"
     assert len(repository.claim_outbox()) == 2
+
+
+def test_plane_project_can_belong_to_only_one_active_objective(repository: SqliteStrategyRepository) -> None:
+    first = repository.create_node({"kind": "objective", "title": "First", "plane_project_ref_id": "plane-project"}, actor="test")
+    with pytest.raises(ValueError, match="only one active Objective"):
+        repository.create_node({"kind": "objective", "title": "Second", "plane_project_ref_id": "plane-project"}, actor="test")
+    second = repository.create_node({"kind": "objective", "title": "Second", "plane_project_ref_id": "another-project"}, actor="test")
+    with pytest.raises(ValueError, match="only one active Objective"):
+        repository.update_node(second["id"], {"plane_project_ref_id": "plane-project", "version": second["version"]}, actor="test")
+    assert repository.get_node(first["id"])["plane_project_ref_id"] == "plane-project"
 
 
 def test_sync_status_reports_pending_outbox_without_payload(repository: SqliteStrategyRepository) -> None:
