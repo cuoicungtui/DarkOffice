@@ -127,9 +127,17 @@ jobs:
             set -eu
             docker network inspect '${PLANE_DARKOFFICE_NETWORK}' >/dev/null 2>&1 || docker network create '${PLANE_DARKOFFICE_NETWORK}'
             cd '${PLANE_SERVER_ROOT}'
-            docker compose --env-file .env -f docker-compose.plane.yml pull
-            docker compose --env-file .env -f docker-compose.plane.yml up -d --remove-orphans
+            if docker compose version >/dev/null 2>&1; then
+              COMPOSE='docker compose'
+            elif command -v docker-compose >/dev/null 2>&1; then
+              COMPOSE='docker-compose'
+            else
+              echo 'Docker Compose is required.' >&2
+              exit 1
+            fi
+            \$COMPOSE --env-file .env -f docker-compose.plane.yml pull
+            \$COMPOSE --env-file .env -f docker-compose.plane.yml up -d --remove-orphans
             for attempt in \$(seq 1 30); do curl -fsS 'http://127.0.0.1:${PLANE_HTTP_PORT}/' >/dev/null && exit 0; sleep 2; done
-            docker compose --env-file .env -f docker-compose.plane.yml ps
+            \$COMPOSE --env-file .env -f docker-compose.plane.yml ps
             exit 1
           "
