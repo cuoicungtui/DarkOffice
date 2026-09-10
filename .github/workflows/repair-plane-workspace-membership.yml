@@ -1,0 +1,76 @@
+name: Repair Plane Workspace Membership
+
+on:
+  workflow_dispatch:
+    inputs:
+      workspace_slug:
+        description: Workspace slug whose owner membership should be reconciled
+        required: true
+        default: darkoffice
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: plane-workspace-repair
+  cancel-in-progress: false
+
+env:
+  PLANE_SERVER_ROOT: /opt/plane
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Validate workspace slug
+        env:
+          WORKSPACE_SLUG: ${{ inputs.workspace_slug }}
+        run: |
+          case "$WORKSPACE_SLUG" in
+            ''|*[!a-z0-9-]*) echo 'workspace_slug must contain only lowercase letters, digits, and hyphens.' >&2; exit 1 ;;
+          esac
+
+      - name: Configure SSH
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          test -n "$SERVER_HOST" && test -n "$SERVER_SSH_KEY" && test -n "$SERVER_USER"
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SERVER_SSH_KEY" > ~/.ssh/darkoffice_key
+          chmod 600 ~/.ssh/darkoffice_key
+          ssh-keyscan -p "${SERVER_SSH_PORT:-22}" -H "$SERVER_HOST" >> ~/.ssh/known_hosts
+
+      - name: Reconcile owner membership and profile
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          WORKSPACE_SLUG: ${{ inputs.workspace_slug }}
+        run: |
+          set -eu
+          SSH_OPTS="-i ~/.ssh/darkoffice_key -p ${SERVER_SSH_PORT:-22} -o BatchMode=yes -o IdentitiesOnly=yes"
+          ssh $SSH_OPTS "${SERVER_USER}@${SERVER_HOST}" "
+            set -eu
+            cd '${PLANE_SERVER_ROOT}'
+            if docker compose version >/dev/null 2>&1; then COMPOSE='docker compose'; else COMPOSE='docker-compose'; fi
+            WORKSPACE_SLUG='${WORKSPACE_SLUG}' \
+              \$COMPOSE --env-file .env -f docker-compose.plane.yml exec -T api python manage.py shell -c \"
+from plane.db.models import Profile, Workspace, WorkspaceMember
+slug = __import__('os').environ['WORKSPACE_SLUG']
+workspace = Workspace.objects.get(slug=slug)
+membership, created = WorkspaceMember.objects.get_or_create(workspace=workspace, member=workspace.owner, defaults={'role': 20, 'company_role': ''})
+membership.role = 20
+membership.is_active = True
+membership.save(update_fields=['role', 'is_active', 'updated_at'])
+profile, _ = Profile.objects.get_or_create(user=workspace.owner)
+profile.last_workspace_id = workspace.id
+profile.is_onboarded = True
+profile.save(update_fields=['last_workspace_id', 'is_onboarded', 'updated_at'])
+print('Plane workspace membership reconciled for ' + slug + '; created=' + str(created))
+\"
+          "
