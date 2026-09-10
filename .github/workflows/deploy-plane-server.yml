@@ -114,9 +114,9 @@ jobs:
             printf 'SECRET_KEY=%s\nLIVE_SERVER_SECRET_KEY=%s\n' "$SECRET_KEY" "$LIVE_SERVER_SECRET_KEY"
             printf 'AWS_ACCESS_KEY_ID=%s\nAWS_SECRET_ACCESS_KEY=%s\nAWS_S3_ENDPOINT_URL=http://plane-minio:9000\nAWS_S3_BUCKET_NAME=uploads\n' "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY"
             printf 'MINIO_ENDPOINT_SSL=0\nWEBHOOK_ALLOWED_HOSTS=darkoffice\nWEBHOOK_ALLOWED_IPS=\n'
-            # Leave CERT_ACME_CA unset so the proxy uses its built-in default.
-            # An explicitly empty value renders an invalid Caddy directive.
-            printf 'CERT_EMAIL=\nCERT_ACME_DNS=\nPLANE_DARKOFFICE_NETWORK=%s\n' "$PLANE_DARKOFFICE_NETWORK"
+            # Compose interpolates a missing value as empty. Caddy requires a
+            # concrete ACME endpoint when the proxy environment includes it.
+            printf 'CERT_EMAIL=\nCERT_ACME_CA=https://acme-v02.api.letsencrypt.org/directory\nCERT_ACME_DNS=\nPLANE_DARKOFFICE_NETWORK=%s\n' "$PLANE_DARKOFFICE_NETWORK"
           } | ssh -i ~/.ssh/darkoffice_key -p "${SERVER_SSH_PORT:-22}" -o BatchMode=yes -o IdentitiesOnly=yes "${SERVER_USER}@${SERVER_HOST}" "umask 077 && cat > '${PLANE_SERVER_ROOT}/.env'"
 
       - name: Deploy and smoke test Plane
