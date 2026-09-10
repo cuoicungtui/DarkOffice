@@ -304,7 +304,7 @@ class SqliteStrategyRepository(StrategyRepository):
     def dashboard(self, filters: dict[str, Any] | None = None) -> dict[str, Any]:
         nodes=self.list_nodes(filters)
         with self._connect() as connection:
-            metrics=[self._row(row) for row in connection.execute("SELECT m.*, max(c.observed_at) AS last_checkin_at, (SELECT value FROM metric_checkins x WHERE x.metric_id=m.id ORDER BY x.observed_at DESC LIMIT 1) AS current_value FROM metric_definitions m").fetchall()]
+            metrics=[self._row(row) for row in connection.execute("SELECT m.*, (SELECT max(x.observed_at) FROM metric_checkins x WHERE x.metric_id=m.id) AS last_checkin_at, (SELECT x.value FROM metric_checkins x WHERE x.metric_id=m.id ORDER BY x.observed_at DESC LIMIT 1) AS current_value FROM metric_definitions m").fetchall()]
             objects=[self._row(row) for row in connection.execute("SELECT * FROM plane_objects WHERE deleted_at IS NULL ORDER BY synced_at DESC").fetchall()]
             links=[self._row(row) for row in connection.execute("SELECT * FROM strategy_plane_links").fetchall()]
             queues={"inbox_pending":connection.execute("SELECT count(*) FROM sync_inbox WHERE status!='complete'").fetchone()[0],"outbox_pending":connection.execute("SELECT count(*) FROM sync_outbox WHERE status!='complete'").fetchone()[0]}

@@ -38,3 +38,15 @@ def test_webhook_payload_is_idempotent(repository: SqliteStrategyRepository) -> 
     payload = {"event": "issue", "data": {"id": "issue-1"}}
     assert repository.receive_webhook(connection["id"], "delivery-1", "issue", payload)
     assert not repository.receive_webhook(connection["id"], "delivery-2", "issue", payload)
+
+
+def test_dashboard_returns_latest_metric_checkin(repository: SqliteStrategyRepository) -> None:
+    node = repository.create_node({"kind": "north_star", "title": "Sustainable growth"}, actor="test")
+    metric = repository.create_metric({"node_id": node["id"], "name": "Revenue", "unit": "%"}, actor="test")
+    repository.create_checkin({"metric_id": metric["id"], "value": 42, "observed_at": "2026-09-10T00:00:00Z"}, actor="test")
+
+    dashboard = repository.dashboard()
+
+    assert len(dashboard["metrics"]) == 1
+    assert dashboard["metrics"][0]["current_value"] == 42.0
+    assert dashboard["metrics"][0]["last_checkin_at"] == "2026-09-10T00:00:00Z"
