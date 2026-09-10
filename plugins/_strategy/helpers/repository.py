@@ -120,6 +120,19 @@ class SqliteStrategyRepository(StrategyRepository):
             try:
                 for statement in statements:
                     connection.execute(statement)
+                # Convert only known, early sample labels.  This is idempotent and
+                # leaves user-created titles and Plane-sourced project names intact.
+                for old_title, new_title in {
+                    "Dieu hanh muc tieu va thuc thi thong nhat": "Điều hành mục tiêu và thực thi thống nhất",
+                    "Nen tang van hanh DarkOffice": "Nền tảng vận hành DarkOffice",
+                    "Dong bo chien luoc voi Plane": "Đồng bộ chiến lược với Plane",
+                    "Tien do thuc thi tich hop Plane": "Tiến độ thực thi tích hợp Plane",
+                    "Van hanh webhook tien do Plane": "Vận hành webhook tiến độ Plane",
+                }.items():
+                    connection.execute(
+                        "UPDATE strategy_nodes SET title=?, updated_at=? WHERE title=?",
+                        (new_title, now(), old_title),
+                    )
                 connection.execute("INSERT OR REPLACE INTO schema_migrations(version, checksum, applied_at) VALUES (?, ?, ?)", (self.SCHEMA_VERSION, checksum, now()))
             finally:
                 connection.close()

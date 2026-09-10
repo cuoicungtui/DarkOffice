@@ -75,3 +75,16 @@ def test_plane_work_item_uses_projected_state_group(repository: SqliteStrategyRe
     item = repository.upsert_plane_object(connection["id"], {"id": "work-item", "name": "Finish", "state": "done-state"}, "work_item")
 
     assert item["state_group"] == "completed"
+
+
+def test_migration_converts_known_sample_titles_to_vietnamese(tmp_path: Path) -> None:
+    path = tmp_path / "strategy.sqlite3"
+    repository = SqliteStrategyRepository(str(path))
+    repository.create_node(
+        {"kind": "north_star", "title": "Dieu hanh muc tieu va thuc thi thong nhat"},
+        actor="test",
+    )
+
+    migrated = SqliteStrategyRepository(str(path))
+
+    assert migrated.list_nodes()[0]["title"] == "Điều hành mục tiêu và thực thi thống nhất"
