@@ -131,13 +131,20 @@ jobs:
             cd '${PLANE_SERVER_ROOT}'
             if docker compose version >/dev/null 2>&1; then
               COMPOSE='docker compose'
+              LEGACY_COMPOSE=0
             elif command -v docker-compose >/dev/null 2>&1; then
               COMPOSE='docker-compose'
+              LEGACY_COMPOSE=1
             else
               echo 'Docker Compose is required.' >&2
               exit 1
             fi
             \$COMPOSE --env-file .env -f docker-compose.plane.yml pull
+            # docker-compose 1.29 cannot recreate containers on recent Docker
+            # Engines (KeyError: ContainerConfig). `down` keeps named volumes.
+            if [ "\$LEGACY_COMPOSE" = 1 ]; then
+              \$COMPOSE --env-file .env -f docker-compose.plane.yml down --remove-orphans
+            fi
             \$COMPOSE --env-file .env -f docker-compose.plane.yml up -d --remove-orphans
             for attempt in \$(seq 1 30); do curl -fsS 'http://127.0.0.1:${PLANE_HTTP_PORT}/' >/dev/null && exit 0; sleep 2; done
             \$COMPOSE --env-file .env -f docker-compose.plane.yml ps
