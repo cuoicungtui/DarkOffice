@@ -1,0 +1,53 @@
+name: Configure Plane Webhook
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: plane-webhook-configuration
+  cancel-in-progress: false
+
+env:
+  PLANE_SERVER_ROOT: /opt/plane
+  PLANE_WORKSPACE_SLUG: darkoffice
+  DARKOFFICE_WEBHOOK_URL: http://darkoffice/api/plane_webhook
+
+jobs:
+  configure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Configure SSH
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          test -n "$SERVER_HOST" && test -n "$SERVER_SSH_KEY" && test -n "$SERVER_USER"
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SERVER_SSH_KEY" > ~/.ssh/darkoffice_key
+          chmod 600 ~/.ssh/darkoffice_key
+          ssh-keyscan -p "${SERVER_SSH_PORT:-22}" -H "$SERVER_HOST" >> ~/.ssh/known_hosts
+
+      - name: Create or update the internal DarkOffice webhook
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          PLANE_WEBHOOK_SECRET: ${{ secrets.PLANE_WEBHOOK_SECRET }}
+        run: |
+          set -eu
+          test -n "$PLANE_WEBHOOK_SECRET"
+          SSH_OPTS=(-i ~/.ssh/darkoffice_key -p "${SERVER_SSH_PORT:-22}" -o BatchMode=yes -o IdentitiesOnly=yes)
+          SCRIPT_B64='ZnJvbSBwbGFuZS5kYi5tb2RlbHMgaW1wb3J0IFdlYmhvb2ssIFdvcmtzcGFjZQppbXBvcnQgb3MKd29ya3NwYWNlID0gV29ya3NwYWNlLm9iamVjdHMuZ2V0KHNsdWc9b3MuZW52aXJvblsiV09SS1NQQUNFX1NMVUciXSkKdXJsID0gb3MuZW52aXJvblsiV0VCSE9PS19VUkwiXQpzZWNyZXQgPSBvcy5lbnZpcm9uWyJQTEFORV9XRUJIT09LX1NFQ1JFVCJdCndlYmhvb2sgPSBXZWJob29rLm9iamVjdHMuZmlsdGVyKHdvcmtzcGFjZT13b3Jrc3BhY2UsIHVybD11cmwsIGRlbGV0ZWRfYXRfX2lzbnVsbD1UcnVlKS5maXJzdCgpCmZpZWxkcyA9IHsiaXNfYWN0aXZlIjogVHJ1ZSwgInNlY3JldF9rZXkiOiBzZWNyZXQsICJwcm9qZWN0IjogVHJ1ZSwgImlzc3VlIjogVHJ1ZSwgIm1vZHVsZSI6IFRydWUsICJjeWNsZSI6IFRydWUsICJpc3N1ZV9jb21tZW50IjogRmFsc2V9CmlmIHdlYmhvb2sgaXMgTm9uZToKICAgIFdlYmhvb2sub2JqZWN0cy5jcmVhdGUod29ya3NwYWNlPXdvcmtzcGFjZSwgdXJsPXVybCwgKipmaWVsZHMpCiAgICBwcmludCgiQ3JlYXRlZCBpbnRlcm5hbCBEYXJrT2ZmaWNlIHdlYmhvb2siKQplbHNlOgogICAgZm9yIGZpZWxkLCB2YWx1ZSBpbiBmaWVsZHMuaXRlbXMoKToKICAgICAgICBzZXRhdHRyKHdlYmhvb2ssIGZpZWxkLCB2YWx1ZSkKICAgIHdlYmhvb2suc2F2ZSgpCiAgICBwcmludCgiVXBkYXRlZCBpbnRlcm5hbCBEYXJrT2ZmaWNlIHdlYmhvb2siKQ=='
+          # shellcheck disable=SC2029
+          ssh "${SSH_OPTS[@]}" "${SERVER_USER}@${SERVER_HOST}" "
+            set -eu
+            cd '${PLANE_SERVER_ROOT}'
+            if docker compose version >/dev/null 2>&1; then COMPOSE='docker compose'; else COMPOSE='docker-compose'; fi
+            \$COMPOSE --env-file .env -f docker-compose.plane.yml exec -T -e WORKSPACE_SLUG='${PLANE_WORKSPACE_SLUG}' -e WEBHOOK_URL='${DARKOFFICE_WEBHOOK_URL}' -e PLANE_WEBHOOK_SECRET='${PLANE_WEBHOOK_SECRET}' api python manage.py shell -c \"\$(printf '%s' '$SCRIPT_B64' | base64 -d)\"
+          "
