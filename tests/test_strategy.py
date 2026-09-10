@@ -59,3 +59,12 @@ def test_dashboard_returns_latest_metric_checkin(repository: SqliteStrategyRepos
     assert len(dashboard["metrics"]) == 1
     assert dashboard["metrics"][0]["current_value"] == 42.0
     assert dashboard["metrics"][0]["last_checkin_at"] == "2026-09-10T00:00:00Z"
+
+
+def test_plane_work_item_uses_projected_state_group(repository: SqliteStrategyRepository) -> None:
+    connection = repository.ensure_connection({"api_base_url": "http://plane", "public_base_url": "http://plane", "workspace_slug": "darkoffice"})
+    repository.upsert_plane_object(connection["id"], {"id": "done-state", "name": "Done", "group": "completed"}, "state")
+
+    item = repository.upsert_plane_object(connection["id"], {"id": "work-item", "name": "Finish", "state": "done-state"}, "work_item")
+
+    assert item["state_group"] == "completed"

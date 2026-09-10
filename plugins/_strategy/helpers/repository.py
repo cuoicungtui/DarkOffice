@@ -285,7 +285,7 @@ class SqliteStrategyRepository(StrategyRepository):
         timestamp=now()
         with self.transaction() as connection:
             existing=connection.execute("SELECT id FROM plane_objects WHERE connection_id=? AND kind=? AND remote_id=?",(connection_id,kind,remote_id)).fetchone()
-            values=(remote.get("project") or remote.get("project_id"),str(remote.get("name") or remote.get("title") or ""),self._state_group(remote),remote.get("start_date"),remote.get("target_date"),remote.get("completed_at"),remote.get("updated_at"),timestamp,json.dumps(remote,separators=(",",":")))
+            values=(remote.get("project") or remote.get("project_id"),str(remote.get("name") or remote.get("title") or ""),self._state_group(connection,remote),remote.get("start_date"),remote.get("target_date"),remote.get("completed_at"),remote.get("updated_at"),timestamp,json.dumps(remote,separators=(",",":")))
             if existing:
                 connection.execute("UPDATE plane_objects SET project_ref_id=?,title=?,state_group=?,start_date=?,target_date=?,completed_at=?,source_updated_at=?,synced_at=?,raw_json=?,deleted_at=NULL WHERE id=?",(*values,existing["id"]))
                 identifier=existing["id"]
@@ -349,9 +349,18 @@ class SqliteStrategyRepository(StrategyRepository):
         return None
 
     @staticmethod
-    def _state_group(remote: dict[str, Any]) -> str | None:
+    def _state_group(connection: sqlite3.Connection, remote: dict[str, Any]) -> str | None:
         state=remote.get("state")
-        return str(state.get("group") or state.get("name") or "").lower() if isinstance(state,dict) else str(state or remote.get("state_group") or "").lower() or None
+        if isinstance(state,dict):
+            return str(state.get("group") or state.get("name") or "").lower() or None
+        state_id=str(state or remote.get("state_group") or "")
+        if not state_id:
+            return None
+        row=connection.execute("SELECT raw_json FROM plane_objects WHERE kind='state' AND remote_id=? AND deleted_at IS NULL ORDER BY synced_at DESC LIMIT 1",(state_id,)).fetchone()
+        if row:
+            definition=json.loads(row["raw_json"])
+            return str(definition.get("group") or definition.get("name") or state_id).lower()
+        return state_id.lower()
 
     @staticmethod
     def _row(row: sqlite3.Row | None) -> dict[str, Any]:

@@ -69,6 +69,8 @@ def sync_projects() -> int:
     count=0
     for project in gateway.list_projects():
         repo.upsert_plane_object(connection["id"],project,"project"); count+=1
+        for state in gateway.list_states(project["id"]):
+            repo.upsert_plane_object(connection["id"],state,"state"); count+=1
         for item in gateway.list_work_items(project["id"]):
             repo.upsert_plane_object(connection["id"],item,"work_item"); count+=1
         for module in gateway.list_modules(project["id"]):
