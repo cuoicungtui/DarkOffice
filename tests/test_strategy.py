@@ -18,6 +18,13 @@ def test_objective_requires_plane_project(repository: SqliteStrategyRepository) 
         repository.create_node({"kind": "objective", "title": "Grow"}, actor="test")
 
 
+def test_only_one_active_north_star_is_allowed(repository: SqliteStrategyRepository) -> None:
+    repository.create_node({"kind": "north_star", "title": "One direction"}, actor="test")
+
+    with pytest.raises(ValueError, match="one active North Star"):
+        repository.create_node({"kind": "north_star", "title": "Another direction"}, actor="test")
+
+
 def test_nested_objective_inherits_plane_project_and_enqueues(repository: SqliteStrategyRepository) -> None:
     north = repository.create_node({"kind": "north_star", "title": "North"}, actor="test")
     pillar = repository.create_node({"kind": "pillar", "title": "Growth", "parent_id": north["id"]}, actor="test")

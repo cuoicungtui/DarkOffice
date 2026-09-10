@@ -151,6 +151,10 @@ class SqliteStrategyRepository(StrategyRepository):
         identifier, timestamp = new_id(), now()
         node = {"id": identifier, "parent_id": values.get("parent_id") or None, "kind": kind, "title": title, "description": str(values.get("description") or ""), "period_id": values.get("period_id") or None, "org_unit_id": values.get("org_unit_id") or None, "owner_ref": values.get("owner_ref") or None, "sort_order": int(values.get("sort_order") or 0), "lifecycle": lifecycle, "plane_project_ref_id": values.get("plane_project_ref_id") or None, "created_at": timestamp, "updated_at": timestamp}
         with self.transaction() as connection:
+            if kind == "north_star" and connection.execute(
+                "SELECT 1 FROM strategy_nodes WHERE kind='north_star' AND archived_at IS NULL"
+            ).fetchone():
+                raise ValueError("Only one active North Star is allowed")
             self._validate_parent(connection, node["parent_id"], kind, identifier)
             if kind in {"objective", "initiative"} and not node["plane_project_ref_id"]:
                 inherited = self._inherited_project(connection, node["parent_id"])
