@@ -1,0 +1,51 @@
+name: Verify Strategy Runtime
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: darkoffice-strategy-runtime-verification
+  cancel-in-progress: false
+
+env:
+  DARKOFFICE_SERVER_ROOT: /opt/darkoffice
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Configure SSH
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          set -eu
+          test -n "$SERVER_HOST" && test -n "$SERVER_SSH_KEY" && test -n "$SERVER_USER"
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SERVER_SSH_KEY" > ~/.ssh/darkoffice_key
+          chmod 600 ~/.ssh/darkoffice_key
+          ssh-keyscan -p "${SERVER_SSH_PORT:-22}" -H "$SERVER_HOST" >> ~/.ssh/known_hosts
+
+      - name: Verify webhook projection and active strategy assets
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          set -eu
+          SSH_OPTS=(-i ~/.ssh/darkoffice_key -p "${SERVER_SSH_PORT:-22}" -o BatchMode=yes -o IdentitiesOnly=yes)
+          SCRIPT_B64='ZnJvbSBwbHVnaW5zLl9zdHJhdGVneS5oZWxwZXJzIGltcG9ydCBzZXJ2aWNlcwppbXBvcnQganNvbgoKcmVwbyA9IHNlcnZpY2VzLnJlcG9zaXRvcnkoKQpkYXNoYm9hcmQgPSByZXBvLmRhc2hib2FyZCgpCml0ZW0gPSBuZXh0KCh4IGZvciB4IGluIGRhc2hib2FyZFsicGxhbmVfb2JqZWN0cyJdIGlmIHhbImtpbmQiXSA9PSAid29ya19pdGVtIiBhbmQgeFsicmVtb3RlX2lkIl0gPT0gIjM5Y2MzNTVkLTFhOWUtNDUyMy1hOGZmLTRlNDI0ZTFmMDk0YSIpLCBOb25lKQpwcmludChqc29uLmR1bXBzKHsiZGFya29fNSI6IHsibm90X2ZvdW5kIjogaXRlbSBpcyBOb25lLCAic3RhdGVfZ3JvdXAiOiBpdGVtLmdldCgic3RhdGVfZ3JvdXAiKSBpZiBpdGVtIGVsc2UgTm9uZSwgInN5bmNlZF9hdCI6IGl0ZW0uZ2V0KCJzeW5jZWRfYXQiKSBpZiBpdGVtIGVsc2UgTm9uZX0sICJzeW5jX3F1ZXVlIjogcmVwby5zeW5jX3N0YXR1cygpLCAiY291bnRzIjogeyJ3b3JrX2l0ZW1zIjogbGVuKFt4IGZvciB4IGluIGRhc2hib2FyZFsicGxhbmVfb2JqZWN0cyJdIGlmIHhbImtpbmQiXSA9PSAid29ya19pdGVtIl0pLCAic3RyYXRlZ3lfbm9kZXMiOiBsZW4oZGFzaGJvYXJkWyJub2RlcyJdKX19LCBlbnN1cmVfYXNjaWk9RmFsc2UpKQ=='
+          ssh "${SSH_OPTS[@]}" "${SERVER_USER}@${SERVER_HOST}" "
+            set -eu
+            cd '${DARKOFFICE_SERVER_ROOT}'
+            echo 'Strategy source assets:'
+            docker exec darkoffice sh -lc 'find /a0/plugins /a0/usr/plugins -path "*strategy-surface.js" -type f -print 2>/dev/null | sort | xargs -r sha256sum'
+            echo 'Webhook projection:'
+            docker exec -w /a0 darkoffice python3 -c \"\$(printf '%s' '$SCRIPT_B64' | base64 -d)\"
+          "
