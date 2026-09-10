@@ -45,7 +45,15 @@ class HttpPlaneGateway:
 
     def get_work_item_by_external_id(self, project_id: str, external_id: str) -> dict[str, Any] | None:
         query=urlencode({"external_source":"darkoffice_strategy","external_id":external_id})
-        rows=self._get(f"/workspaces/{self.workspace_slug}/projects/{project_id}/work-items/?{query}")
+        try:
+            rows=self._get(f"/workspaces/{self.workspace_slug}/projects/{project_id}/work-items/?{query}")
+        except RuntimeError as error:
+            # Plane CE v1.4.2 does not accept custom external-ID filters here.
+            # Fall back to the project listing so retry/idempotency still work.
+            if "Plane API 404:" not in str(error):
+                raise
+            rows=self.list_work_items(project_id)
+        rows=[item for item in rows if item.get("external_source")=="darkoffice_strategy" and item.get("external_id")==external_id]
         return rows[0] if rows else None
 
     def create_work_item(self, project_id: str, values: dict[str, Any]) -> dict[str, Any]:
