@@ -42,6 +42,9 @@
   `docker-compose` v1. For the legacy path, it removes containers before `up`
   to avoid the Docker Engine `ContainerConfig` recreate defect; named volumes
   must never be passed to `down -v`.
+- The DarkOffice deploy workflow also removes legacy Compose containers by the
+  `com.docker.compose.service=darkoffice` label. Container names are not a
+  reliable migration key on existing server releases.
 - Workflow scripts must fail loudly with actionable messages when required environment variables or git refs are missing.
 
 ## Work Guidance

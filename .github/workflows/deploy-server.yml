@@ -203,8 +203,10 @@ jobs:
             set -eu
             if docker compose version >/dev/null 2>&1; then
               COMPOSE='docker compose'
+              LEGACY_COMPOSE=0
             elif command -v docker-compose >/dev/null 2>&1; then
               COMPOSE='docker-compose'
+              LEGACY_COMPOSE=1
             else
               echo 'Docker Compose is required: install the Docker Compose plugin or docker-compose.' >&2
               exit 1
@@ -217,6 +219,9 @@ jobs:
             # also works with the server's legacy Docker Compose v1, whose
             # recreate path fails on modern image metadata.
             docker rm -f '${DARKOFFICE_CONTAINER_NAME:-darkoffice}' >/dev/null 2>&1 || true
+            if [ "\$LEGACY_COMPOSE" = 1 ]; then
+              docker ps -aq --filter 'label=com.docker.compose.service=darkoffice' | xargs -r docker rm -f
+            fi
             \$COMPOSE --env-file '${DARKOFFICE_SERVER_ROOT}/.env' -f '${DARKOFFICE_SERVER_ROOT}/docker-compose.yml' up -d --remove-orphans
             ls -1dt '${DARKOFFICE_SERVER_ROOT}'/releases/* | tail -n +6 | xargs -r rm -rf
           "
