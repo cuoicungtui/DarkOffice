@@ -80,6 +80,8 @@ jobs:
       - name: Start pull-mount container
         run: |
           mkdir -p tmp/docker-ci-usr
+          docker network inspect "${PLANE_DARKOFFICE_NETWORK:-plane-integration}" >/dev/null 2>&1 || \
+            docker network create "${PLANE_DARKOFFICE_NETWORK:-plane-integration}"
           docker compose -f docker/run/docker-compose.darkoffice.yml up -d
 
       - name: Smoke test WebUI health
