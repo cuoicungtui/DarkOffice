@@ -1,0 +1,46 @@
+name: Seed Strategy UI Test Data
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: darkoffice-strategy-ui-test-seed
+  cancel-in-progress: false
+
+env:
+  DARKOFFICE_SERVER_ROOT: /opt/darkoffice
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Configure SSH
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          set -eu
+          test -n "$SERVER_HOST" && test -n "$SERVER_SSH_KEY" && test -n "$SERVER_USER"
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SERVER_SSH_KEY" > ~/.ssh/darkoffice_key
+          chmod 600 ~/.ssh/darkoffice_key
+          ssh-keyscan -p "${SERVER_SSH_PORT:-22}" -H "$SERVER_HOST" >> ~/.ssh/known_hosts
+
+      - name: Seed hierarchy test data in the server runtime
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          set -eu
+          ssh -i ~/.ssh/darkoffice_key -p "${SERVER_SSH_PORT:-22}" -o BatchMode=yes -o IdentitiesOnly=yes "${SERVER_USER}@${SERVER_HOST}" "
+            set -eu
+            cd '${DARKOFFICE_SERVER_ROOT}'
+            docker exec -w /a0 darkoffice python3 scripts/seed_strategy_ui_test.py
+          "
