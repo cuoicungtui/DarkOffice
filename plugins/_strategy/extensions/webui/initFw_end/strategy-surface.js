@@ -198,7 +198,7 @@ function mount() {
   // must always return the user to the destination instead of leaving this overlay up.
   const closeOnNavigation = (event) => {
     if (surface.hidden || surface.contains(event.target)) return;
-    const target = event.target.closest?.("a[href], [data-route], [data-page], [data-nav]");
+    const target = event.target.closest?.("a[href], [data-route], [data-page], [data-nav], .chat-container");
     if (!target) return;
     const href = target.getAttribute("href") || "";
     if (href.startsWith("#") && href === window.location.hash) return;
