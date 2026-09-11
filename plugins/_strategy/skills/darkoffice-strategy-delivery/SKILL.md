@@ -1,7 +1,7 @@
 ---
 name: darkoffice-strategy-delivery
 description: Apply approved strategy objectives and Work Charts to their Plane projects, then monitor project-derived progress. Use for strategy, Plane project, or execution-task changes.
-version: 2.0.0
+version: 2.0.1
 ---
 
 # Chiến lược đến Dự án Thực thi
@@ -18,7 +18,7 @@ Skill này điều hành toàn bộ luồng DarkOffice Strategy và Plane qua CL
 
 ## Luồng bắt buộc
 
-1. Đọc trạng thái hiện có bằng `sh /a0/plugins/_strategy/scripts/darkoffice delivery inspect`.
+1. Đọc trạng thái hiện có bằng `sh /a0/plugins/_strategy/scripts/darkoffice delivery inspect`. Để tìm run dở của một Objective, dùng `inspect --objective-id <id>`; kết quả có trường `runs`. Không truy vấn trực tiếp SQLite hoặc giả định tên cột của execution ledger.
 2. Chuẩn bị delivery specification JSON với Work Chart có `status: "ready_for_handoff"`, `id`, `version`, item ID duy nhất, title và dependency. Project mới bắt buộc `identifier`.
 3. Chạy `sh /a0/plugins/_strategy/scripts/darkoffice delivery prepare --spec-file <file>`; trình bày **phiếu áp dụng** bằng tiếng Việt từ `application_sheet` gồm Objective, Project, task, dependency và tác động.
 4. Chỉ khi người dùng xác nhận đúng phiếu trong cuộc hội thoại hiện tại, chạy `sh /a0/plugins/_strategy/scripts/darkoffice delivery apply --confirmation-token <token>`.

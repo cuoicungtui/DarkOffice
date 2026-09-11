@@ -58,6 +58,9 @@ class StrategyRepository(ABC):
     @abstractmethod
     def complete_execution_run(self, run_id: str, *, actor: str, error: str | None = None) -> dict[str, Any]: ...
 
+    @abstractmethod
+    def list_execution_runs(self, objective_id: str | None = None) -> list[dict[str, Any]]: ...
+
 
 class UnitOfWork(ABC):
     @abstractmethod
@@ -474,6 +477,17 @@ class SqliteStrategyRepository(StrategyRepository):
         with self._connect() as connection:
             row = connection.execute("SELECT * FROM strategy_execution_runs WHERE id=?", (run_id,)).fetchone()
             return self._row(row) if row else None
+
+    def list_execution_runs(self, objective_id: str | None = None) -> list[dict[str, Any]]:
+        with self._connect() as connection:
+            if objective_id:
+                rows = connection.execute(
+                    "SELECT * FROM strategy_execution_runs WHERE objective_id=? ORDER BY started_at DESC",
+                    (objective_id,),
+                ).fetchall()
+            else:
+                rows = connection.execute("SELECT * FROM strategy_execution_runs ORDER BY started_at DESC").fetchall()
+            return [self._row(row) for row in rows]
 
     def list_execution_items(self, run_id: str) -> list[dict[str, Any]]:
         with self._connect() as connection:

@@ -33,6 +33,7 @@ class ExecutionOrchestrator:
         if objective_id:
             result["objective"] = self.repository.get_node(objective_id)
             result["execution"] = self.repository.execution_status(objective_id)
+            result["runs"] = self.repository.list_execution_runs(objective_id)
         if run_id:
             result["run"] = self.repository.get_execution_run(run_id)
             result["items"] = self.repository.list_execution_items(run_id)

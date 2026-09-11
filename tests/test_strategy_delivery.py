@@ -100,6 +100,17 @@ def test_apply_creates_one_project_and_task_per_chart_item_then_resumes_without_
     assert len(repository.list_execution_items(result["run"]["id"])) == 2
 
 
+def test_inspect_lists_execution_runs_for_an_objective(
+    delivery: tuple[SqliteStrategyRepository, FakePlane, ExecutionOrchestrator],
+) -> None:
+    _, _, orchestrator = delivery
+    result = orchestrator.apply(orchestrator.prepare(specification(), actor="test")["preparation"]["token"], actor="test")
+
+    inspected = orchestrator.inspect(objective_id=result["objective"]["id"])
+
+    assert [run["id"] for run in inspected["runs"]] == [result["run"]["id"]]
+
+
 def test_objective_relink_keeps_project_history(delivery: tuple[SqliteStrategyRepository, FakePlane, ExecutionOrchestrator]) -> None:
     repository, plane, orchestrator = delivery
     first = orchestrator.apply(orchestrator.prepare(specification(), actor="test")["preparation"]["token"], actor="test")
