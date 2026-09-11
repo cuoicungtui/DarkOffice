@@ -22,4 +22,4 @@ def test_bootstrap_force_replaces_modified_skill(tmp_path: Path) -> None:
 
     bootstrap_skills.install(tmp_path, force=True)
 
-    assert "Thực thi Chiến lược" in (target / "SKILL.md").read_text(encoding="utf-8")
+    assert "Chiến lược đến Dự án Thực thi" in (target / "SKILL.md").read_text(encoding="utf-8")

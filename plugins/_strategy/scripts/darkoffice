@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+
+if [ "${1:-}" != "delivery" ]; then
+  echo "Usage: darkoffice delivery <inspect|prepare|apply|resume|reconcile|task-update>" >&2
+  exit 2
+fi
+shift
+exec python3 -m plugins._strategy.delivery_cli "$@"

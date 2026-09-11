@@ -81,7 +81,7 @@ class SqliteUnitOfWork(UnitOfWork):
 class SqliteStrategyRepository(StrategyRepository):
     """SQLite implementation. No caller receives a SQLite cursor or connection."""
 
-    SCHEMA_VERSION = "2"
+    SCHEMA_VERSION = "3"
 
     def __init__(self, database_path: str | None = None):
         default = Path(os.environ.get("DARKOFFICE_STRATEGY_DB", "usr/strategy/strategy.sqlite3"))
@@ -133,6 +133,9 @@ class SqliteStrategyRepository(StrategyRepository):
             "CREATE TABLE IF NOT EXISTS audit_events (id TEXT PRIMARY KEY, actor_ref TEXT NOT NULL, action TEXT NOT NULL, entity_type TEXT NOT NULL, entity_id TEXT NOT NULL, changes_json TEXT NOT NULL DEFAULT '{}', correlation_id TEXT, created_at TEXT NOT NULL)",
             "CREATE TABLE IF NOT EXISTS strategy_execution_runs (id TEXT PRIMARY KEY, work_chart_id TEXT NOT NULL, work_chart_version TEXT NOT NULL, objective_id TEXT NOT NULL REFERENCES strategy_nodes(id), plane_project_ref_id TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending', request_hash TEXT NOT NULL, error TEXT, started_at TEXT NOT NULL, completed_at TEXT, UNIQUE(work_chart_id, work_chart_version, objective_id))",
             "CREATE TABLE IF NOT EXISTS strategy_execution_items (id TEXT PRIMARY KEY, run_id TEXT NOT NULL REFERENCES strategy_execution_runs(id), work_chart_item_id TEXT NOT NULL, plane_work_item_ref_id TEXT, status TEXT NOT NULL DEFAULT 'pending', error TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, UNIQUE(run_id, work_chart_item_id))",
+            "CREATE TABLE IF NOT EXISTS strategy_objective_project_history (id TEXT PRIMARY KEY, objective_id TEXT NOT NULL REFERENCES strategy_nodes(id), plane_project_ref_id TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'active', linked_at TEXT NOT NULL, unlinked_at TEXT, actor_ref TEXT NOT NULL, UNIQUE(objective_id, plane_project_ref_id, linked_at))",
+            "CREATE TABLE IF NOT EXISTS strategy_delivery_preparations (token TEXT PRIMARY KEY, payload_json TEXT NOT NULL, request_hash TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'prepared', expires_at TEXT NOT NULL, created_at TEXT NOT NULL, applied_at TEXT)",
+            "CREATE TABLE IF NOT EXISTS strategy_execution_payloads (run_id TEXT PRIMARY KEY REFERENCES strategy_execution_runs(id), payload_json TEXT NOT NULL, created_at TEXT NOT NULL)",
         ]
         checksum = hashlib.sha256("\n".join(statements).encode()).hexdigest()
         with self._lock:
@@ -208,6 +211,8 @@ class SqliteStrategyRepository(StrategyRepository):
             if kind == "objective":
                 self._assert_objective_project_available(connection, node["plane_project_ref_id"], identifier)
             connection.execute("INSERT INTO strategy_nodes(id,parent_id,kind,title,description,period_id,org_unit_id,owner_ref,sort_order,lifecycle,plane_project_ref_id,created_at,updated_at) VALUES (:id,:parent_id,:kind,:title,:description,:period_id,:org_unit_id,:owner_ref,:sort_order,:lifecycle,:plane_project_ref_id,:created_at,:updated_at)", node)
+            if kind == "objective":
+                self._record_objective_project_history(connection, identifier, str(node["plane_project_ref_id"]), actor)
             self._audit(connection, actor, "strategy_node.created", "strategy_node", identifier, node)
             return self._row(connection.execute("SELECT * FROM strategy_nodes WHERE id=?", (identifier,)).fetchone())
 
@@ -237,6 +242,12 @@ class SqliteStrategyRepository(StrategyRepository):
             params.extend([now(), identifier, expected])
             if connection.execute(f"UPDATE strategy_nodes SET {', '.join(parts)} WHERE id=? AND version=?", params).rowcount != 1:
                 raise ValueError("The strategy node was changed by another request")
+            if current["kind"] == "objective" and "plane_project_ref_id" in changes and changes["plane_project_ref_id"] != current["plane_project_ref_id"]:
+                connection.execute(
+                    "UPDATE strategy_objective_project_history SET status='closed', unlinked_at=? WHERE objective_id=? AND status='active'",
+                    (now(), identifier),
+                )
+                self._record_objective_project_history(connection, identifier, str(changes["plane_project_ref_id"]), actor)
             updated = self._row(connection.execute("SELECT * FROM strategy_nodes WHERE id=?", (identifier,)).fetchone())
             self._audit(connection, actor, "strategy_node.updated", "strategy_node", identifier, changes)
             return updated
@@ -459,6 +470,69 @@ class SqliteStrategyRepository(StrategyRepository):
             self._audit(connection, actor, "strategy_execution.completed", "strategy_execution_run", run_id, {"status": status, "error": error})
             return self._row(row)
 
+    def get_execution_run(self, run_id: str) -> dict[str, Any] | None:
+        with self._connect() as connection:
+            row = connection.execute("SELECT * FROM strategy_execution_runs WHERE id=?", (run_id,)).fetchone()
+            return self._row(row) if row else None
+
+    def list_execution_items(self, run_id: str) -> list[dict[str, Any]]:
+        with self._connect() as connection:
+            return [self._row(row) for row in connection.execute("SELECT * FROM strategy_execution_items WHERE run_id=? ORDER BY created_at", (run_id,)).fetchall()]
+
+    def save_execution_payload(self, run_id: str, payload: dict[str, Any]) -> None:
+        with self.transaction() as connection:
+            connection.execute(
+                "INSERT OR REPLACE INTO strategy_execution_payloads(run_id,payload_json,created_at) VALUES (?,?,?)",
+                (run_id, json.dumps(payload, separators=(",", ":"), sort_keys=True), now()),
+            )
+
+    def get_execution_payload(self, run_id: str) -> dict[str, Any] | None:
+        with self._connect() as connection:
+            row = connection.execute("SELECT payload_json FROM strategy_execution_payloads WHERE run_id=?", (run_id,)).fetchone()
+            return json.loads(row["payload_json"]) if row else None
+
+    def broken_execution_mappings(self) -> list[dict[str, Any]]:
+        with self._connect() as connection:
+            rows = connection.execute(
+                "SELECT r.id AS run_id,r.objective_id,i.work_chart_item_id,i.plane_work_item_ref_id "
+                "FROM strategy_execution_items i JOIN strategy_execution_runs r ON r.id=i.run_id "
+                "LEFT JOIN plane_objects po ON po.kind='work_item' AND po.remote_id=i.plane_work_item_ref_id "
+                "WHERE i.plane_work_item_ref_id IS NOT NULL AND (po.id IS NULL OR po.deleted_at IS NOT NULL) "
+                "ORDER BY r.started_at,i.created_at"
+            ).fetchall()
+            return [self._row(row) for row in rows]
+
+    def prepare_delivery(self, token: str, payload: dict[str, Any], *, actor: str, expires_at: str) -> dict[str, Any]:
+        encoded = json.dumps(payload, separators=(",", ":"), sort_keys=True)
+        with self.transaction() as connection:
+            connection.execute(
+                "INSERT INTO strategy_delivery_preparations(token,payload_json,request_hash,expires_at,created_at) VALUES (?,?,?,?,?)",
+                (token, encoded, hashlib.sha256(encoded.encode()).hexdigest(), expires_at, now()),
+            )
+            self._audit(connection, actor, "strategy_delivery.prepared", "strategy_delivery_preparation", token, {"expires_at": expires_at})
+            return {"token": token, "expires_at": expires_at, "status": "prepared"}
+
+    def consume_delivery_preparation(self, token: str, *, actor: str) -> dict[str, Any]:
+        with self.transaction() as connection:
+            row = connection.execute("SELECT * FROM strategy_delivery_preparations WHERE token=?", (token,)).fetchone()
+            if not row:
+                raise KeyError("Delivery preparation not found")
+            if row["status"] != "prepared":
+                raise ValueError("Delivery preparation was already applied")
+            if row["expires_at"] <= now():
+                raise ValueError("Delivery preparation has expired")
+            connection.execute("UPDATE strategy_delivery_preparations SET status='applying', applied_at=? WHERE token=?", (now(), token))
+            self._audit(connection, actor, "strategy_delivery.applying", "strategy_delivery_preparation", token, {})
+            result = self._row(row)
+            result["payload"] = json.loads(result.pop("payload_json"))
+            return result
+
+    def finish_delivery_preparation(self, token: str, *, actor: str, error: str | None = None) -> None:
+        with self.transaction() as connection:
+            status = "failed" if error else "complete"
+            connection.execute("UPDATE strategy_delivery_preparations SET status=? WHERE token=?", (status, token))
+            self._audit(connection, actor, f"strategy_delivery.{status}", "strategy_delivery_preparation", token, {"error": error})
+
     def upsert_plane_object(self, connection_id: str, remote: dict[str, Any], kind: str) -> dict[str, Any]:
         remote_id=str(remote.get("id") or "")
         if not remote_id:
@@ -474,6 +548,23 @@ class SqliteStrategyRepository(StrategyRepository):
                 identifier=new_id()
                 connection.execute("INSERT INTO plane_objects(id,connection_id,remote_id,kind,project_ref_id,title,state_group,start_date,target_date,completed_at,source_updated_at,synced_at,raw_json) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",(identifier,connection_id,remote_id,kind,*values))
             return self._row(connection.execute("SELECT * FROM plane_objects WHERE id=?",(identifier,)).fetchone())
+
+    def mark_missing_plane_objects(
+        self, connection_id: str, kind: str, remote_ids: set[str], project_ref_id: str | None = None
+    ) -> int:
+        clauses = ["connection_id=?", "kind=?", "deleted_at IS NULL"]
+        params: list[Any] = [connection_id, kind]
+        if project_ref_id is not None:
+            clauses.append("project_ref_id=?")
+            params.append(project_ref_id)
+        if remote_ids:
+            clauses.append(f"remote_id NOT IN ({','.join('?' for _ in remote_ids)})")
+            params.extend(sorted(remote_ids))
+        with self.transaction() as connection:
+            return connection.execute(
+                f"UPDATE plane_objects SET deleted_at=?, synced_at=? WHERE {' AND '.join(clauses)}",
+                [now(), now(), *params],
+            ).rowcount
 
     def link_node_to_plane(self, node_id: str, object_id: str, role: str = "representative") -> None:
         with self.transaction() as connection:
@@ -540,6 +631,15 @@ class SqliteStrategyRepository(StrategyRepository):
         ).fetchone()
         if existing:
             raise ValueError("A Plane project can belong to only one active Objective")
+
+    @staticmethod
+    def _record_objective_project_history(
+        connection: sqlite3.Connection, objective_id: str, project_id: str, actor: str
+    ) -> None:
+        connection.execute(
+            "INSERT INTO strategy_objective_project_history(id,objective_id,plane_project_ref_id,status,linked_at,actor_ref) VALUES (?,?,?,?,?,?)",
+            (new_id(), objective_id, project_id, "active", now(), actor),
+        )
 
     @staticmethod
     def _state_group(connection: sqlite3.Connection, remote: dict[str, Any]) -> str | None:

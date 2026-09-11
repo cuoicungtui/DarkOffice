@@ -36,7 +36,26 @@ The connector stores only `env:PLANE_API_KEY` and `env:PLANE_WEBHOOK_SECRET` ref
 
 Plane and DarkOffice can release independently. Back up the SQLite database with SQLite's backup API before a strategy schema migration. Restoring strategy data is a separate operation from rolling back application code.
 
-## MCP and Strategy execution skill
+## Delivery CLI and optional MCP compatibility
+
+The default agent integration is the single `darkoffice-strategy-delivery` skill.
+It calls the internal CLI and does not require Plane or Strategy MCP schemas in
+the agent context:
+
+```sh
+sh /a0/plugins/_strategy/scripts/darkoffice delivery inspect
+sh /a0/plugins/_strategy/scripts/darkoffice delivery prepare --spec-file delivery.json
+sh /a0/plugins/_strategy/scripts/darkoffice delivery apply --confirmation-token TOKEN
+```
+
+`prepare` checks `ready_for_handoff` and returns an application sheet plus a
+short-lived confirmation token. Only use `apply` after the user confirms that
+exact sheet. `resume` continues the same durable execution run without creating
+duplicate Plane work items. The CLI emits JSON with stable error codes and reads
+credentials only from the injected runtime environment.
+
+MCP remains a legacy, optional compatibility path. Do not register the template
+below for the default agent profile.
 
 DarkOffice uses two local stdio MCP servers. The committed template is
 [`plugins/_strategy/mcp/strategy-mcp.json`](../plugins/_strategy/mcp/strategy-mcp.json).
@@ -60,13 +79,12 @@ Install the user-owned agent skill once after deploying strategy source:
 python -m plugins._strategy.bootstrap_skills
 ```
 
-The installer writes `usr/skills/darkoffice-strategy-execution` and records
-source hashes. A later upgrade refuses to overwrite a locally edited skill;
-use `--force` only when deliberately replacing the local version.
+The installer writes `usr/skills/darkoffice-strategy-delivery` and records
+source hashes. It retires only an unchanged managed copy of the old execution
+skill; locally edited skills are preserved. A later upgrade refuses to overwrite
+a locally edited delivery skill; use `--force` only when deliberately replacing it.
 
-The Strategy MCP exposes read tools for dashboard, nodes, Plane project
-projections, execution progress, and sync status. Structural tools require
-`confirmed=true`; the installed skill additionally requires an explicit
-user confirmation before it uses them. Objective creation never creates a
-representative Plane task. An accepted Work Chart creates a run ledger and one
-Plane task for each chart item.
+Objective creation never creates a representative Plane task. An accepted Work
+Chart creates a run ledger and one Plane task for each chart item. The webhook
+worker treats every event as a signal and re-reads the current Plane project
+before updating local projections.

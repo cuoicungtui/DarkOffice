@@ -30,13 +30,20 @@ def update_node(identifier: str, values: dict[str, Any], actor: str) -> dict[str
 
 
 def process_sync(limit: int = 20) -> dict[str, int]:
-    repo=repository(); processed={"inbox":0,"outbox":0}
+    repo=repository(); gateway=HttpPlaneGateway.from_environment(); processed={"inbox":0,"outbox":0}
     for message in repo.claim_inbox(limit):
         try:
             payload=json.loads(message["payload_json"])
             data=payload.get("data") or {}
             kind={"issue":"work_item","module":"module","cycle":"cycle","project":"project"}.get(message["event"],message["event"])
-            if data.get("id"):
+            project_id = data.get("project") or data.get("project_id")
+            if isinstance(project_id,dict): project_id=project_id.get("id")
+            if kind == "project": project_id=data.get("id")
+            # Webhooks are signals only. Re-read the current project state so an
+            # old or abbreviated event can never overwrite the projection.
+            if gateway and project_id:
+                _sync_project(repo,gateway,message["connection_id"],str(project_id))
+            elif data.get("id"):
                 repo.upsert_plane_object(message["connection_id"],data,kind)
             repo.finish_inbox(message["id"]); processed["inbox"]+=1
         except Exception as error:
@@ -50,17 +57,35 @@ def sync_projects() -> int:
     repo=repository(); gateway=HttpPlaneGateway.from_environment(); connection=repo.connection()
     if not gateway or not connection: return 0
     count=0
-    for project in gateway.list_projects():
-        repo.upsert_plane_object(connection["id"],project,"project"); count+=1
-        for state in gateway.list_states(project["id"]):
-            repo.upsert_plane_object(connection["id"],state,"state"); count+=1
-        for item in gateway.list_work_items(project["id"]):
-            repo.upsert_plane_object(connection["id"],item,"work_item"); count+=1
-        for module in gateway.list_modules(project["id"]):
-            repo.upsert_plane_object(connection["id"],module,"module"); count+=1
-        for cycle in gateway.list_cycles(project["id"]):
-            repo.upsert_plane_object(connection["id"],cycle,"cycle"); count+=1
+    projects=gateway.list_projects()
+    for project in projects:
+        count += _sync_project(repo,gateway,connection["id"],str(project["id"]),project)
+    repo.mark_missing_plane_objects(connection["id"],"project",{str(project["id"]) for project in projects})
     repo.capture_execution_snapshots()
+    return count
+
+
+def reconcile_plane() -> dict[str, Any]:
+    return {"processed": process_sync(), "imported": sync_projects(), "broken_execution_mappings": repository().broken_execution_mappings()}
+
+
+def _sync_project(repo: SqliteStrategyRepository, gateway: HttpPlaneGateway, connection_id: str, project_id: str, project: dict[str, Any] | None = None) -> int:
+    project = project or gateway.get_project(project_id)
+    repo.upsert_plane_object(connection_id,project,"project")
+    count=1
+    for kind, values in (
+        ("state", gateway.list_states(project_id)),
+        ("work_item", gateway.list_work_items(project_id)),
+        ("module", gateway.list_modules(project_id)),
+        ("cycle", gateway.list_cycles(project_id)),
+    ):
+        remote_ids: set[str] = set()
+        for value in values:
+            value.setdefault("project",project_id)
+            repo.upsert_plane_object(connection_id,value,kind); count+=1
+            remote_ids.add(str(value["id"]))
+        if kind != "state":
+            repo.mark_missing_plane_objects(connection_id,kind,remote_ids,project_id)
     return count
 
 

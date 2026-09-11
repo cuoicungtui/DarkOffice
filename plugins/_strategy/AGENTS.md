@@ -16,7 +16,7 @@ Own DarkOffice's strategy model, Plane projections, durable synchronisation queu
 
 - Callers use services and DTO dictionaries, never SQLite cursors.
 - Secrets stay in environment variables; database records store references only.
-- Strategy nodes never create Plane work automatically. The approved Work Chart execution skill creates Plane work through Plane MCP, while the strategy execution ledger records idempotent mappings after each external operation.
+- Strategy nodes never create Plane work automatically. The approved `darkoffice-strategy-delivery` skill invokes the internal delivery CLI, while the strategy execution ledger records idempotent mappings after each external operation.
 - Plane work status is read-only to DarkOffice; strategy title, description, and hierarchy remain owned here.
 
 ## Work Guidance
