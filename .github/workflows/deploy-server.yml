@@ -1,6 +1,6 @@
 name: Deploy DarkOffice Server
 
-on:
+"on":
   workflow_dispatch:
     inputs:
       ref:
