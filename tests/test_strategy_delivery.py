@@ -91,6 +91,10 @@ def test_apply_creates_one_project_and_task_per_chart_item_then_resumes_without_
     assert len(plane.work_items) == 2
     assert len(plane.relations) == 1
     assert result["run"]["status"] == "complete"
+    for work_item in plane.work_items.values():
+        assert work_item["description_html"].startswith("<p>")
+        assert "darkoffice-work-chart:" in work_item["description_html"]
+        assert "<!--" not in work_item["description_html"]
     resumed = orchestrator.resume(result["run"]["id"], actor="test")
     assert resumed["created"] == []
     assert len(repository.list_execution_items(result["run"]["id"])) == 2

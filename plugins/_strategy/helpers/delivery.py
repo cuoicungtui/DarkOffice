@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import secrets
 from datetime import datetime, timedelta, timezone
+from html import escape
 from typing import Any
 
 from .plane import HttpPlaneGateway, PlaneGateway
@@ -244,10 +245,14 @@ class ExecutionOrchestrator:
         return {"operation": operation, "project_id": project_id, "work_item_id": work_item_id, "comment_html": comment_html}
 
     def _create_work_item(self, project_id: str, item: dict[str, Any], external_id: str) -> dict[str, Any]:
-        marker = f"<!-- darkoffice-work-chart:{external_id} -->"
+        description = str(item.get("description_html") or item.get("description") or "").strip()
+        marker = f"darkoffice-work-chart:{external_id}"
+        # Plane CE validates editor HTML and rejects HTML comments. Render chart text
+        # as a safe paragraph and retain a searchable idempotency marker.
+        content = escape(description).replace("\n", "<br>") or "Công việc được tạo từ Work Chart DarkOffice."
         values = {
             "name": item["title"],
-            "description_html": f"{item.get('description_html') or item.get('description') or ''}{marker}",
+            "description_html": f"<p>{content}</p><p>{marker}</p>",
             "priority": item.get("priority") or "none",
             "external_source": "darkoffice_strategy",
             "external_id": external_id,
