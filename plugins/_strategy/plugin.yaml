@@ -1,5 +1,5 @@
 name: _strategy
 title: Strategy and project work
 description: Strategy management, Plane execution monitoring, and synchronisation.
-version: 0.1.0
+version: 0.2.0
 always_enabled: true

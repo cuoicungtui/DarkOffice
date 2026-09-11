@@ -16,7 +16,7 @@ Own DarkOffice's strategy model, Plane projections, durable synchronisation queu
 
 - Callers use services and DTO dictionaries, never SQLite cursors.
 - Secrets stay in environment variables; database records store references only.
-- Objective and Initiative Plane work is created through the outbox, never during an open database transaction that calls the network.
+- Strategy nodes never create Plane work automatically. The approved Work Chart execution skill creates Plane work through Plane MCP, while the strategy execution ledger records idempotent mappings after each external operation.
 - Plane work status is read-only to DarkOffice; strategy title, description, and hierarchy remain owned here.
 
 ## Work Guidance
@@ -25,7 +25,7 @@ Keep schema upgrades in `repository.py` migration versions and preserve UUIDs fo
 
 ## Verification
 
-Run `pytest tests/test_strategy.py` and `python -m compileall plugins/_strategy api/strategy.py api/plane_webhook.py`.
+Run `pytest tests/test_strategy.py tests/test_strategy_skill_bootstrap.py` and `python -m compileall plugins/_strategy api/strategy.py api/plane_webhook.py`.
 
 ## Child DOX Index
 

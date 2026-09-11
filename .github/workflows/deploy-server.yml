@@ -180,6 +180,7 @@ jobs:
             printf 'AUTH_LOGIN=%s\n' "$DEPLOY_AUTH_LOGIN"
             printf 'AUTH_PASSWORD=%s\n' "$DEPLOY_AUTH_PASSWORD"
             printf 'PLANE_API_BASE_URL=http://plane-api:8000/api/v1\n'
+            printf 'PLANE_BASE_URL=http://plane-api:8000\n'
             printf 'PLANE_PUBLIC_BASE_URL=\n'
             printf 'PLANE_WORKSPACE_SLUG=darkoffice\n'
             printf 'PLANE_API_KEY=%s\n' "$PLANE_API_KEY"

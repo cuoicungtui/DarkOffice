@@ -89,6 +89,7 @@
 - Servers may define `disabled_tools` as a list of MCP tool names. Disabled tools are omitted from agent-facing prompts, status counts, `has_tool`, and calls, while detail views can still retrieve them through `get_all_tools()` with a `disabled` flag so users can re-enable them.
 - Server-specific `init_timeout` and `tool_timeout` override global MCP client timeout settings for list-tools and call-tool operations.
 - Local stdio server configs accept either strict MCP JSON (`command: "uvx", args: [...]`) or manager-style command lines (`command: "uvx package"`) and normalize them before spawning the process.
+- Local stdio servers inherit the DarkOffice process environment, then apply explicit `env` configuration overrides. This permits Docker-injected secrets without persisting them in MCP JSON settings.
 - MCP image and image-resource content is materialized to scoped artifact files and returned both as model-visible image attachments and as path metadata (`attachments`/`media_paths`) for downstream delivery.
 - MCP config locks must not be held across awaited server initialization or tool-call operations. Slow or wedged MCP servers must not block status reads, prompt construction, unrelated MCP servers, or later tool calls through the shared config lock.
 - MCP client session work runs inside disposable isolated `DeferredTask` workers with an outer timeout. Normal `AsyncExitStack` cleanup is also bounded; if cleanup or transport shutdown does not finish, the operation reports failure or warning while DarkOffice keeps control of the agent loop.

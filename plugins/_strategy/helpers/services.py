@@ -30,7 +30,7 @@ def update_node(identifier: str, values: dict[str, Any], actor: str) -> dict[str
 
 
 def process_sync(limit: int = 20) -> dict[str, int]:
-    repo=repository(); gateway=HttpPlaneGateway.from_environment(); processed={"inbox":0,"outbox":0}
+    repo=repository(); processed={"inbox":0,"outbox":0}
     for message in repo.claim_inbox(limit):
         try:
             payload=json.loads(message["payload_json"])
@@ -41,25 +41,8 @@ def process_sync(limit: int = 20) -> dict[str, int]:
             repo.finish_inbox(message["id"]); processed["inbox"]+=1
         except Exception as error:
             repo.finish_inbox(message["id"],str(error))
-    if not gateway: return processed
-    connection=repo.connection()
-    if not connection: return processed
-    for command in repo.claim_outbox(limit):
-        try:
-            payload=json.loads(command["payload_json"]); node=repo.get_node(payload["node_id"])
-            if not node: raise RuntimeError("Strategy node no longer exists")
-            existing=gateway.get_work_item_by_external_id(node["plane_project_ref_id"],node["id"])
-            values={"name":node["title"],"external_source":"darkoffice_strategy","external_id":node["id"]}
-            if node["description"].strip():
-                values["description_html"]=node["description"]
-            parent_remote=repo.representative_remote_id(node["parent_id"]) if node.get("parent_id") else None
-            if parent_remote: values["parent"]=parent_remote
-            remote=existing or gateway.create_work_item(node["plane_project_ref_id"],values)
-            plane_object=repo.upsert_plane_object(connection["id"],remote,"work_item")
-            repo.link_node_to_plane(node["id"],plane_object["id"])
-            repo.finish_outbox(command["id"]); processed["outbox"]+=1
-        except Exception as error:
-            repo.finish_outbox(command["id"],str(error))
+    if processed["inbox"]:
+        repo.capture_execution_snapshots()
     return processed
 
 
@@ -77,8 +60,46 @@ def sync_projects() -> int:
             repo.upsert_plane_object(connection["id"],module,"module"); count+=1
         for cycle in gateway.list_cycles(project["id"]):
             repo.upsert_plane_object(connection["id"],cycle,"cycle"); count+=1
+    repo.capture_execution_snapshots()
     return count
 
 
 def public_dashboard(filters: dict[str, Any] | None = None) -> dict[str, Any]:
     return repository().dashboard(filters)
+
+
+def list_available_plane_projects() -> list[dict[str, Any]]:
+    return repository().list_plane_projects()
+
+
+def execution_status(objective_id: str) -> dict[str, Any]:
+    return repository().execution_status(objective_id)
+
+
+def link_objective_to_plane_project(
+    objective_id: str, plane_project_ref_id: str, version: int | None, actor: str
+) -> dict[str, Any]:
+    # Refresh first so a project just created through Plane MCP can be validated
+    # against the local projection before the one-to-one link is persisted.
+    sync_projects()
+    project_ids = {project["remote_id"] for project in repository().list_plane_projects()}
+    if plane_project_ref_id not in project_ids:
+        raise ValueError("Plane project is not available in the current projection")
+    changes: dict[str, Any] = {"plane_project_ref_id": plane_project_ref_id}
+    if version is not None:
+        changes["version"] = version
+    return update_node(objective_id, changes, actor)
+
+
+def start_execution_run(values: dict[str, Any], actor: str) -> dict[str, Any]:
+    return repository().create_execution_run(values, actor=actor)
+
+
+def record_execution_item(
+    run_id: str, work_chart_item_id: str, plane_work_item_ref_id: str, actor: str
+) -> dict[str, Any]:
+    return repository().record_execution_item(run_id, work_chart_item_id, plane_work_item_ref_id, actor=actor)
+
+
+def complete_execution_run(run_id: str, actor: str, error: str | None = None) -> dict[str, Any]:
+    return repository().complete_execution_run(run_id, actor=actor, error=error)

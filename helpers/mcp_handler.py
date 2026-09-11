@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import os
 import re
 from typing import (
     List,
@@ -1554,7 +1555,10 @@ class MCPClientLocal(MCPClientBase):
         server_params = StdioServerParameters(
             command=server.command,
             args=server.args,
-            env=server.env,
+            # A local MCP launcher must inherit container/runtime configuration
+            # (for example a secret injected by Docker). Config-level values are
+            # still allowed as explicit, non-secret overrides.
+            env={**os.environ, **(server.env or {})},
             encoding=server.encoding,
             encoding_error_handler=server.encoding_error_handler,
         )

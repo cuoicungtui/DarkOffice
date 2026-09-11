@@ -40,6 +40,24 @@ class StrategyRepository(ABC):
     @abstractmethod
     def sync_status(self) -> dict[str, list[dict[str, Any]]]: ...
 
+    @abstractmethod
+    def get_node(self, identifier: str) -> dict[str, Any] | None: ...
+
+    @abstractmethod
+    def list_plane_projects(self) -> list[dict[str, Any]]: ...
+
+    @abstractmethod
+    def execution_status(self, node_id: str) -> dict[str, Any]: ...
+
+    @abstractmethod
+    def create_execution_run(self, values: dict[str, Any], *, actor: str) -> dict[str, Any]: ...
+
+    @abstractmethod
+    def record_execution_item(self, run_id: str, item_id: str, plane_work_item_ref_id: str, *, actor: str) -> dict[str, Any]: ...
+
+    @abstractmethod
+    def complete_execution_run(self, run_id: str, *, actor: str, error: str | None = None) -> dict[str, Any]: ...
+
 
 class UnitOfWork(ABC):
     @abstractmethod
@@ -63,7 +81,7 @@ class SqliteUnitOfWork(UnitOfWork):
 class SqliteStrategyRepository(StrategyRepository):
     """SQLite implementation. No caller receives a SQLite cursor or connection."""
 
-    SCHEMA_VERSION = "1"
+    SCHEMA_VERSION = "2"
 
     def __init__(self, database_path: str | None = None):
         default = Path(os.environ.get("DARKOFFICE_STRATEGY_DB", "usr/strategy/strategy.sqlite3"))
@@ -113,6 +131,8 @@ class SqliteStrategyRepository(StrategyRepository):
             "CREATE TABLE IF NOT EXISTS sync_outbox (id TEXT PRIMARY KEY, node_id TEXT REFERENCES strategy_nodes(id), operation TEXT NOT NULL, idempotency_key TEXT NOT NULL UNIQUE, payload_json TEXT NOT NULL, depends_on TEXT REFERENCES sync_outbox(id), status TEXT NOT NULL DEFAULT 'pending', attempts INTEGER NOT NULL DEFAULT 0, next_attempt_at TEXT NOT NULL, lease_until TEXT, error TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
             "CREATE TABLE IF NOT EXISTS sync_runs (id TEXT PRIMARY KEY, connection_id TEXT REFERENCES plane_connections(id), scope TEXT NOT NULL, cursor TEXT, status TEXT NOT NULL, stats_json TEXT NOT NULL DEFAULT '{}', started_at TEXT NOT NULL, finished_at TEXT)",
             "CREATE TABLE IF NOT EXISTS audit_events (id TEXT PRIMARY KEY, actor_ref TEXT NOT NULL, action TEXT NOT NULL, entity_type TEXT NOT NULL, entity_id TEXT NOT NULL, changes_json TEXT NOT NULL DEFAULT '{}', correlation_id TEXT, created_at TEXT NOT NULL)",
+            "CREATE TABLE IF NOT EXISTS strategy_execution_runs (id TEXT PRIMARY KEY, work_chart_id TEXT NOT NULL, work_chart_version TEXT NOT NULL, objective_id TEXT NOT NULL REFERENCES strategy_nodes(id), plane_project_ref_id TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending', request_hash TEXT NOT NULL, error TEXT, started_at TEXT NOT NULL, completed_at TEXT, UNIQUE(work_chart_id, work_chart_version, objective_id))",
+            "CREATE TABLE IF NOT EXISTS strategy_execution_items (id TEXT PRIMARY KEY, run_id TEXT NOT NULL REFERENCES strategy_execution_runs(id), work_chart_item_id TEXT NOT NULL, plane_work_item_ref_id TEXT, status TEXT NOT NULL DEFAULT 'pending', error TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, UNIQUE(run_id, work_chart_item_id))",
         ]
         checksum = hashlib.sha256("\n".join(statements).encode()).hexdigest()
         with self._lock:
@@ -133,6 +153,15 @@ class SqliteStrategyRepository(StrategyRepository):
                         "UPDATE strategy_nodes SET title=?, updated_at=? WHERE title=?",
                         (new_title, now(), old_title),
                     )
+                # Earlier releases automatically queued representative tasks for
+                # Objectives and Initiatives. Keep the audit rows, but never let
+                # the worker create those tasks after the Work Chart workflow took
+                # ownership of task creation.
+                connection.execute(
+                    "UPDATE sync_outbox SET status='complete', error='superseded by Work Chart execution', updated_at=? "
+                    "WHERE operation='create_work_item' AND status!='complete'",
+                    (now(),),
+                )
                 connection.execute("INSERT OR REPLACE INTO schema_migrations(version, checksum, applied_at) VALUES (?, ?, ?)", (self.SCHEMA_VERSION, checksum, now()))
             finally:
                 connection.close()
@@ -179,8 +208,6 @@ class SqliteStrategyRepository(StrategyRepository):
             if kind == "objective":
                 self._assert_objective_project_available(connection, node["plane_project_ref_id"], identifier)
             connection.execute("INSERT INTO strategy_nodes(id,parent_id,kind,title,description,period_id,org_unit_id,owner_ref,sort_order,lifecycle,plane_project_ref_id,created_at,updated_at) VALUES (:id,:parent_id,:kind,:title,:description,:period_id,:org_unit_id,:owner_ref,:sort_order,:lifecycle,:plane_project_ref_id,:created_at,:updated_at)", node)
-            if kind in {"objective", "initiative"}:
-                self._enqueue(connection, identifier, "create_work_item", {"node_id": identifier})
             self._audit(connection, actor, "strategy_node.created", "strategy_node", identifier, node)
             return self._row(connection.execute("SELECT * FROM strategy_nodes WHERE id=?", (identifier,)).fetchone())
 
@@ -304,6 +331,133 @@ class SqliteStrategyRepository(StrategyRepository):
         with self._connect() as connection:
             row=connection.execute("SELECT * FROM strategy_nodes WHERE id=?",(identifier,)).fetchone()
             return self._row(row) if row else None
+
+    def list_plane_projects(self) -> list[dict[str, Any]]:
+        with self._connect() as connection:
+            return [
+                self._row(row)
+                for row in connection.execute(
+                    "SELECT * FROM plane_objects WHERE kind='project' AND deleted_at IS NULL ORDER BY title"
+                ).fetchall()
+            ]
+
+    def execution_status(self, node_id: str) -> dict[str, Any]:
+        node = self.get_node(node_id)
+        if not node:
+            raise KeyError("Strategy node not found")
+        if node["kind"] != "objective":
+            raise ValueError("Execution progress is available only for Objectives")
+        project_id = node.get("plane_project_ref_id")
+        if not project_id:
+            return {"objective_id": node_id, "plane_project_ref_id": None, "progress": None, "counts": {"total": 0, "completed": 0, "cancelled": 0}}
+        with self._connect() as connection:
+            rows = connection.execute(
+                "SELECT remote_id,state_group,raw_json FROM plane_objects "
+                "WHERE kind='work_item' AND project_ref_id=? AND deleted_at IS NULL",
+                (project_id,),
+            ).fetchall()
+        items = [self._row(row) for row in rows]
+        parent_ids: set[str] = set()
+        for item in items:
+            try:
+                raw = json.loads(item["raw_json"])
+            except (TypeError, ValueError):
+                raw = {}
+            parent = raw.get("parent") or raw.get("parent_id")
+            if isinstance(parent, dict):
+                parent = parent.get("id")
+            if parent:
+                parent_ids.add(str(parent))
+        leaves = [item for item in items if item["remote_id"] not in parent_ids]
+        valid = [item for item in leaves if (item.get("state_group") or "").lower() not in {"cancelled", "canceled"}]
+        completed = [item for item in valid if (item.get("state_group") or "").lower() in {"completed", "done"}]
+        cancelled = len(leaves) - len(valid)
+        progress = round((len(completed) / len(valid)) * 100, 2) if valid else None
+        return {
+            "objective_id": node_id,
+            "plane_project_ref_id": project_id,
+            "progress": progress,
+            "counts": {"total": len(valid), "completed": len(completed), "cancelled": cancelled},
+        }
+
+    def capture_execution_snapshots(self) -> int:
+        objectives = [node for node in self.list_nodes({"kind": "objective"}) if node.get("plane_project_ref_id")]
+        captured = 0
+        with self.transaction() as connection:
+            for objective in objectives:
+                status = self.execution_status(objective["id"])
+                connection.execute(
+                    "INSERT INTO progress_snapshots(id,node_id,captured_at,execution_progress,counts_json,calculation_version) VALUES (?,?,?,?,?,?)",
+                    (new_id(), objective["id"], now(), status["progress"], json.dumps(status["counts"], separators=(",", ":")), "execution-v2"),
+                )
+                captured += 1
+        return captured
+
+    def create_execution_run(self, values: dict[str, Any], *, actor: str) -> dict[str, Any]:
+        chart_id = str(values.get("work_chart_id") or "").strip()
+        chart_version = str(values.get("work_chart_version") or "").strip()
+        objective_id = str(values.get("objective_id") or "").strip()
+        item_ids = [str(item).strip() for item in values.get("work_chart_item_ids") or [] if str(item).strip()]
+        if not chart_id or not chart_version or not objective_id:
+            raise ValueError("Work Chart id, version, and Objective are required")
+        objective = self.get_node(objective_id)
+        if not objective or objective["kind"] != "objective" or not objective.get("plane_project_ref_id"):
+            raise ValueError("Execution runs require an Objective linked to a Plane project")
+        request_hash = hashlib.sha256(json.dumps(sorted(item_ids), separators=(",", ":")).encode()).hexdigest()
+        timestamp = now()
+        with self.transaction() as connection:
+            existing = connection.execute(
+                "SELECT * FROM strategy_execution_runs WHERE work_chart_id=? AND work_chart_version=? AND objective_id=?",
+                (chart_id, chart_version, objective_id),
+            ).fetchone()
+            if existing:
+                if existing["request_hash"] != request_hash:
+                    raise ValueError("The existing execution run has a different Work Chart item set")
+                return self._row(existing)
+            identifier = new_id()
+            connection.execute(
+                "INSERT INTO strategy_execution_runs(id,work_chart_id,work_chart_version,objective_id,plane_project_ref_id,status,request_hash,started_at) VALUES (?,?,?,?,?,?,?,?)",
+                (identifier, chart_id, chart_version, objective_id, objective["plane_project_ref_id"], "running", request_hash, timestamp),
+            )
+            for item_id in item_ids:
+                connection.execute(
+                    "INSERT INTO strategy_execution_items(id,run_id,work_chart_item_id,status,created_at,updated_at) VALUES (?,?,?,?,?,?)",
+                    (new_id(), identifier, item_id, "pending", timestamp, timestamp),
+                )
+            self._audit(connection, actor, "strategy_execution.started", "strategy_execution_run", identifier, {"work_chart_id": chart_id, "work_chart_version": chart_version, "objective_id": objective_id, "item_count": len(item_ids)})
+            return self._row(connection.execute("SELECT * FROM strategy_execution_runs WHERE id=?", (identifier,)).fetchone())
+
+    def record_execution_item(self, run_id: str, item_id: str, plane_work_item_ref_id: str, *, actor: str) -> dict[str, Any]:
+        with self.transaction() as connection:
+            current = connection.execute(
+                "SELECT * FROM strategy_execution_items WHERE run_id=? AND work_chart_item_id=?", (run_id, item_id)
+            ).fetchone()
+            if not current:
+                raise KeyError("Work Chart item is not part of the execution run")
+            if current["plane_work_item_ref_id"] and current["plane_work_item_ref_id"] != plane_work_item_ref_id:
+                raise ValueError("Work Chart item is already mapped to a different Plane work item")
+            if connection.execute(
+                "UPDATE strategy_execution_items SET plane_work_item_ref_id=?,status='complete',error=NULL,updated_at=? WHERE run_id=? AND work_chart_item_id=?",
+                (plane_work_item_ref_id, now(), run_id, item_id),
+            ).rowcount != 1:
+                raise KeyError("Work Chart item is not part of the execution run")
+            row = connection.execute(
+                "SELECT * FROM strategy_execution_items WHERE run_id=? AND work_chart_item_id=?", (run_id, item_id)
+            ).fetchone()
+            self._audit(connection, actor, "strategy_execution.item_recorded", "strategy_execution_item", row["id"], {"plane_work_item_ref_id": plane_work_item_ref_id})
+            return self._row(row)
+
+    def complete_execution_run(self, run_id: str, *, actor: str, error: str | None = None) -> dict[str, Any]:
+        with self.transaction() as connection:
+            status = "failed" if error else "complete"
+            if connection.execute(
+                "UPDATE strategy_execution_runs SET status=?,error=?,completed_at=? WHERE id=?",
+                (status, error, now(), run_id),
+            ).rowcount != 1:
+                raise KeyError("Execution run not found")
+            row = connection.execute("SELECT * FROM strategy_execution_runs WHERE id=?", (run_id,)).fetchone()
+            self._audit(connection, actor, "strategy_execution.completed", "strategy_execution_run", run_id, {"status": status, "error": error})
+            return self._row(row)
 
     def upsert_plane_object(self, connection_id: str, remote: dict[str, Any], kind: str) -> dict[str, Any]:
         remote_id=str(remote.get("id") or "")

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "darkoffice-strategy": {
+      "command": "/opt/venv-a0/bin/python",
+      "args": ["-m", "plugins._strategy.mcp_server"]
+    },
+    "plane": {
+      "command": "sh",
+      "args": ["/a0/plugins/_strategy/scripts/run-plane-mcp.sh"]
+    }
+  }
+}

@@ -25,7 +25,7 @@ def test_only_one_active_north_star_is_allowed(repository: SqliteStrategyReposit
         repository.create_node({"kind": "north_star", "title": "Another direction"}, actor="test")
 
 
-def test_nested_objective_requires_its_own_plane_project_and_enqueues(repository: SqliteStrategyRepository) -> None:
+def test_nested_objective_requires_its_own_plane_project_without_enqueuing_work(repository: SqliteStrategyRepository) -> None:
     north = repository.create_node({"kind": "north_star", "title": "North"}, actor="test")
     pillar = repository.create_node({"kind": "pillar", "title": "Growth", "parent_id": north["id"]}, actor="test")
     parent = repository.create_node({"kind": "objective", "title": "Parent", "parent_id": pillar["id"], "plane_project_ref_id": "plane-project"}, actor="test")
@@ -33,7 +33,7 @@ def test_nested_objective_requires_its_own_plane_project_and_enqueues(repository
         repository.create_node({"kind": "objective", "title": "Child", "parent_id": parent["id"]}, actor="test")
     child = repository.create_node({"kind": "objective", "title": "Child", "parent_id": parent["id"], "plane_project_ref_id": "another-plane-project"}, actor="test")
     assert child["plane_project_ref_id"] == "another-plane-project"
-    assert len(repository.claim_outbox()) == 2
+    assert repository.claim_outbox() == []
 
 
 def test_plane_project_can_belong_to_only_one_active_objective(repository: SqliteStrategyRepository) -> None:
@@ -46,13 +46,12 @@ def test_plane_project_can_belong_to_only_one_active_objective(repository: Sqlit
     assert repository.get_node(first["id"])["plane_project_ref_id"] == "plane-project"
 
 
-def test_sync_status_reports_pending_outbox_without_payload(repository: SqliteStrategyRepository) -> None:
+def test_sync_status_has_no_automatic_work_item_outbox(repository: SqliteStrategyRepository) -> None:
     repository.create_node({"kind": "objective", "title": "Deliver", "plane_project_ref_id": "plane-project"}, actor="test")
 
     status = repository.sync_status()
 
-    assert len(status["outbox"]) == 1
-    assert "payload_json" not in status["outbox"][0]
+    assert status["outbox"] == []
 
 
 def test_invalid_parent_kind_is_rejected(repository: SqliteStrategyRepository) -> None:
@@ -87,6 +86,45 @@ def test_plane_work_item_uses_projected_state_group(repository: SqliteStrategyRe
     item = repository.upsert_plane_object(connection["id"], {"id": "work-item", "name": "Finish", "state": "done-state"}, "work_item")
 
     assert item["state_group"] == "completed"
+
+
+def test_execution_run_is_idempotent_and_records_chart_to_plane_mapping(repository: SqliteStrategyRepository) -> None:
+    objective = repository.create_node(
+        {"kind": "objective", "title": "Deliver", "plane_project_ref_id": "plane-project"}, actor="test"
+    )
+    values = {
+        "work_chart_id": "chart-1",
+        "work_chart_version": "6",
+        "objective_id": objective["id"],
+        "work_chart_item_ids": ["item-a", "item-b"],
+    }
+
+    first = repository.create_execution_run(values, actor="test")
+    second = repository.create_execution_run(values, actor="test")
+    item = repository.record_execution_item(first["id"], "item-a", "plane-work-a", actor="test")
+
+    assert second["id"] == first["id"]
+    assert item["plane_work_item_ref_id"] == "plane-work-a"
+    assert item["status"] == "complete"
+    with pytest.raises(ValueError, match="different Plane"):
+        repository.record_execution_item(first["id"], "item-a", "plane-work-other", actor="test")
+    with pytest.raises(ValueError, match="different Work Chart item"):
+        repository.create_execution_run({**values, "work_chart_item_ids": ["item-a"]}, actor="test")
+
+
+def test_execution_status_counts_only_leaf_non_cancelled_work_items(repository: SqliteStrategyRepository) -> None:
+    connection = repository.ensure_connection({"api_base_url": "http://plane", "public_base_url": "http://plane", "workspace_slug": "darkoffice"})
+    objective = repository.create_node(
+        {"kind": "objective", "title": "Deliver", "plane_project_ref_id": "plane-project"}, actor="test"
+    )
+    repository.upsert_plane_object(connection["id"], {"id": "parent", "project": "plane-project", "name": "Parent", "state_group": "started"}, "work_item")
+    repository.upsert_plane_object(connection["id"], {"id": "done", "project": "plane-project", "name": "Done", "parent": "parent", "state_group": "completed"}, "work_item")
+    repository.upsert_plane_object(connection["id"], {"id": "cancelled", "project": "plane-project", "name": "Cancelled", "parent": "parent", "state_group": "cancelled"}, "work_item")
+
+    status = repository.execution_status(objective["id"])
+
+    assert status["progress"] == 100.0
+    assert status["counts"] == {"total": 1, "completed": 1, "cancelled": 1}
 
 
 def test_migration_converts_known_sample_titles_to_vietnamese(tmp_path: Path) -> None:

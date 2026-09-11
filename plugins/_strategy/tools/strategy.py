@@ -13,11 +13,23 @@ class StrategyTool(Tool):
         try:
             if action in {"dashboard","list"}:
                 data=services.public_dashboard(); return Response(json.dumps(data,ensure_ascii=False),False)
+            if action == "node":
+                node=services.repository().get_node(str(kwargs.get("id") or self.args.get("id") or ""))
+                if not node: raise KeyError("Strategy node not found")
+                return Response(json.dumps(node,ensure_ascii=False),False)
+            if action == "plane_projects":
+                return Response(json.dumps(services.list_available_plane_projects(),ensure_ascii=False),False)
+            if action == "execution_status":
+                return Response(json.dumps(services.execution_status(str(kwargs.get("objective_id") or self.args.get("objective_id") or "")),ensure_ascii=False),False)
+            if action == "sync_status":
+                return Response(json.dumps(services.repository().sync_status(),ensure_ascii=False),False)
             if action == "create":
+                if not bool(kwargs.get("confirmed") or self.args.get("confirmed")):
+                    raise ValueError("This structural change requires explicit user confirmation")
                 node=services.create_node(kwargs or self.args,"agent")
                 return Response(f"Created {node['kind']}: {node['title']}",False)
             if action == "sync":
                 return Response(json.dumps(services.process_sync(),ensure_ascii=False),False)
         except (ValueError,RuntimeError,KeyError) as error:
             return Response(str(error),False)
-        return Response("Supported strategy actions: dashboard, list, create, sync.",False)
+        return Response("Supported strategy actions: dashboard, list, node, plane_projects, execution_status, sync_status, create, sync.",False)
