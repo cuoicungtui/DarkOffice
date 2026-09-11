@@ -13,6 +13,7 @@ class Strategy(ApiHandler):
             if action == "list_nodes": return {"ok":True,"nodes":services.repository().list_nodes(input.get("filters"))}
             if action == "plane_projects": return {"ok":True,"projects":services.list_available_plane_projects()}
             if action == "execution_status": return {"ok":True,"data":services.execution_status(str(input.get("objective_id") or ""))}
+            if action == "project_execution_health": return {"ok":True,"data":services.project_execution_health(input.get("project_id"))}
             if action == "sync_status": return {"ok":True,"data":services.repository().sync_status()}
             if action == "create_node": return {"ok":True,"node":services.create_node(input.get("node") or {},actor)}
             if action == "update_node": return {"ok":True,"node":services.update_node(str(input.get("id") or ""),input.get("node") or {},actor)}

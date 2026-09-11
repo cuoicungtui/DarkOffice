@@ -66,7 +66,10 @@ def sync_projects() -> int:
 
 
 def reconcile_plane() -> dict[str, Any]:
-    return {"processed": process_sync(), "imported": sync_projects(), "broken_execution_mappings": repository().broken_execution_mappings()}
+    result = {"processed": process_sync(), "imported": sync_projects(), "broken_execution_mappings": repository().broken_execution_mappings()}
+    result["project_health"] = repository().project_execution_health()
+    result["alerts"] = result["project_health"]["alerts"]
+    return result
 
 
 def _sync_project(repo: SqliteStrategyRepository, gateway: HttpPlaneGateway, connection_id: str, project_id: str, project: dict[str, Any] | None = None) -> int:
@@ -99,6 +102,10 @@ def list_available_plane_projects() -> list[dict[str, Any]]:
 
 def execution_status(objective_id: str) -> dict[str, Any]:
     return repository().execution_status(objective_id)
+
+
+def project_execution_health(project_id: str | None = None) -> dict[str, Any]:
+    return repository().project_execution_health(project_id)
 
 
 def link_objective_to_plane_project(

@@ -29,7 +29,8 @@ class ExecutionOrchestrator:
         self.gateway = gateway
 
     def inspect(self, objective_id: str | None = None, run_id: str | None = None) -> dict[str, Any]:
-        result: dict[str, Any] = {"schema_version": 1, "dashboard": self.repository.dashboard(), "sync": self.repository.sync_status()}
+        health = self.repository.project_execution_health()
+        result: dict[str, Any] = {"schema_version": 1, "dashboard": self.repository.dashboard(), "project_health": health, "alerts": health["alerts"], "sync": self.repository.sync_status()}
         if objective_id:
             result["objective"] = self.repository.get_node(objective_id)
             result["execution"] = self.repository.execution_status(objective_id)

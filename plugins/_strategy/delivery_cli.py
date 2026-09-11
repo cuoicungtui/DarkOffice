@@ -38,6 +38,8 @@ def _parser() -> argparse.ArgumentParser:
     resume = commands.add_parser("resume")
     resume.add_argument("--run-id", required=True)
     commands.add_parser("reconcile")
+    commands.add_parser("install-review-task")
+    commands.add_parser("setup-e2e")
     task = commands.add_parser("task-update")
     task.add_argument("--confirmation-token", required=True)
     return parser
@@ -57,6 +59,13 @@ def main(argv: list[str] | None = None) -> int:
             result = orchestrator.resume(args.run_id, actor="strategy-delivery-cli")
         elif args.command == "reconcile":
             result = {"schema_version": 1, **services.reconcile_plane()}
+        elif args.command == "install-review-task":
+            from .review_task import ensure_review_task
+            import asyncio
+            result = {"schema_version": 1, "scheduled_task": asyncio.run(ensure_review_task()).model_dump(mode="json")}
+        elif args.command == "setup-e2e":
+            from .e2e_setup import setup
+            result = {"schema_version": 1, "e2e": setup()}
         else:
             result = orchestrator.apply(args.confirmation_token, actor="strategy-delivery-cli")
         print(json.dumps({"ok": True, "data": result}, ensure_ascii=False, default=str))

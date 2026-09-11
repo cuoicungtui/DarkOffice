@@ -127,6 +127,24 @@ def test_execution_status_counts_only_leaf_non_cancelled_work_items(repository: 
     assert status["counts"] == {"total": 1, "completed": 1, "cancelled": 1}
 
 
+def test_project_execution_health_classifies_operational_alerts(repository: SqliteStrategyRepository) -> None:
+    connection = repository.ensure_connection({"api_base_url": "http://plane", "public_base_url": "http://plane", "workspace_slug": "darkoffice"})
+    repository.upsert_plane_object(connection["id"], {"id": "project-1", "name": "E2E", "updated_at": "2026-09-11T00:00:00Z"}, "project")
+    repository.upsert_plane_object(connection["id"], {"id": "late", "project": "project-1", "name": "Late", "state_group": "completed", "target_date": "2026-09-10", "completed_at": "2026-09-11T01:00:00Z"}, "work_item")
+    repository.upsert_plane_object(connection["id"], {"id": "overdue", "project": "project-1", "name": "Overdue", "state_group": "started", "target_date": "2026-09-10"}, "work_item")
+    repository.upsert_plane_object(connection["id"], {"id": "no-date", "project": "project-1", "name": "No date", "state_group": "todo"}, "work_item")
+    repository.upsert_plane_object(connection["id"], {"id": "parent", "project": "project-1", "name": "Parent", "state_group": "started"}, "work_item")
+    repository.upsert_plane_object(connection["id"], {"id": "child", "project": "project-1", "name": "Child", "parent": "parent", "state_group": "backlog", "target_date": "2026-09-20"}, "work_item")
+    health = repository.project_execution_health("project-1")["projects"][0]
+
+    assert health["total"] == 4
+    assert health["done"] == 1
+    assert health["overdue"] == 1
+    assert health["late_completed"] == 1
+    assert health["without_due_date"] == 1
+    assert health["not_started"] == 1
+
+
 def test_migration_converts_known_sample_titles_to_vietnamese(tmp_path: Path) -> None:
     path = tmp_path / "strategy.sqlite3"
     repository = SqliteStrategyRepository(str(path))

@@ -50,6 +50,9 @@ class StrategyRepository(ABC):
     def execution_status(self, node_id: str) -> dict[str, Any]: ...
 
     @abstractmethod
+    def project_execution_health(self, project_id: str | None = None) -> dict[str, Any]: ...
+
+    @abstractmethod
     def create_execution_run(self, values: dict[str, Any], *, actor: str) -> dict[str, Any]: ...
 
     @abstractmethod
@@ -394,6 +397,95 @@ class SqliteStrategyRepository(StrategyRepository):
             "counts": {"total": len(valid), "completed": len(completed), "cancelled": cancelled},
         }
 
+    def project_execution_health(self, project_id: str | None = None) -> dict[str, Any]:
+        """Return one source of truth for project execution monitoring."""
+        generated = now()
+        today = datetime.now(timezone.utc).date()
+        with self._connect() as connection:
+            project_rows = connection.execute(
+                "SELECT * FROM plane_objects WHERE kind='project' AND deleted_at IS NULL "
+                + ("AND remote_id=? " if project_id else "") + "ORDER BY title",
+                (project_id,) if project_id else (),
+            ).fetchall()
+            work_rows = connection.execute(
+                "SELECT * FROM plane_objects WHERE kind='work_item' AND deleted_at IS NULL"
+            ).fetchall()
+            objective_rows = connection.execute(
+                "SELECT id,title,plane_project_ref_id FROM strategy_nodes "
+                "WHERE kind='objective' AND archived_at IS NULL AND plane_project_ref_id IS NOT NULL"
+            ).fetchall()
+        objects = [self._row(row) for row in work_rows]
+        projects: list[dict[str, Any]] = []
+        alerts: list[dict[str, Any]] = []
+        parent_ids: set[str] = set()
+        decoded: dict[str, dict[str, Any]] = {}
+        for item in objects:
+            try:
+                raw = json.loads(item.get("raw_json") or "{}")
+            except (TypeError, ValueError):
+                raw = {}
+            decoded[item["remote_id"]] = raw
+            parent = raw.get("parent") or raw.get("parent_id")
+            if isinstance(parent, dict):
+                parent = parent.get("id")
+            if parent:
+                parent_ids.add(str(parent))
+        for project_row in project_rows:
+            project = self._row(project_row)
+            pid = str(project["remote_id"])
+            leaves = [item for item in objects if str(item.get("project_ref_id") or "") == pid and item["remote_id"] not in parent_ids]
+            def state(item: dict[str, Any]) -> str:
+                return str(item.get("state_group") or "unknown").lower().replace("-", "_")
+            cancelled = [item for item in leaves if state(item) in {"cancelled", "canceled"}]
+            valid = [item for item in leaves if item not in cancelled]
+            done = [item for item in valid if state(item) in {"done", "completed"}]
+            overdue: list[dict[str, Any]] = []
+            late: list[dict[str, Any]] = []
+            no_due: list[dict[str, Any]] = []
+            not_started: list[dict[str, Any]] = []
+            for item in valid:
+                raw = decoded.get(item["remote_id"], {})
+                target = item.get("target_date") or raw.get("target_date")
+                completed_at = item.get("completed_at") or raw.get("completed_at")
+                start = item.get("start_date") or raw.get("start_date")
+                target_date = str(target)[:10] if target else None
+                if target_date:
+                    try:
+                        target_day = datetime.fromisoformat(target_date).date()
+                    except ValueError:
+                        target_day = None
+                    if target_day and state(item) not in {"done", "completed"} and target_day < today:
+                        overdue.append(item)
+                    if target_day and completed_at and str(completed_at)[:10] > target_date:
+                        late.append(item)
+                elif state(item) not in {"done", "completed"}:
+                    no_due.append(item)
+                if state(item) in {"backlog", "todo"} and target_date and not start:
+                    not_started.append(item)
+            health = {
+                "project_id": pid,
+                "title": project.get("title") or pid,
+                "valid_leaf_count": len(valid),
+                "total": len(valid),
+                "backlog": sum(state(i) == "backlog" for i in valid),
+                "todo": sum(state(i) == "todo" for i in valid),
+                "in_progress": sum(state(i) in {"started", "in_progress"} for i in valid),
+                "done": len(done),
+                "cancelled": len(cancelled),
+                "execution_progress": round(len(done) / len(valid) * 100, 2) if valid else None,
+                "overdue": len(overdue),
+                "late_completed": len(late),
+                "without_due_date": len(no_due),
+                "not_started": len(not_started),
+                "latest_sync_at": project.get("synced_at"),
+                "objectives": [self._row(row) for row in objective_rows if row["plane_project_ref_id"] == pid],
+            }
+            projects.append(health)
+            for kind, label, values in (("overdue", "Quá hạn", overdue), ("late_completed", "Hoàn thành muộn", late), ("without_due_date", "Chưa có hạn", no_due), ("not_started", "Chưa bắt đầu", not_started)):
+                for item in values:
+                    alerts.append({"type": kind, "severity": "warning", "project_id": pid, "work_item_id": item["remote_id"], "title": item.get("title"), "message": label})
+        return {"schema_version": 1, "generated_at": generated, "projects": projects, "alerts": alerts}
+
     def capture_execution_snapshots(self) -> int:
         objectives = [node for node in self.list_nodes({"kind": "objective"}) if node.get("plane_project_ref_id")]
         captured = 0
@@ -600,7 +692,8 @@ class SqliteStrategyRepository(StrategyRepository):
         work_items=[item for item in objects if item["kind"]=="work_item"]
         states={}
         for item in work_items: states[item.get("state_group") or "unknown"]=states.get(item.get("state_group") or "unknown",0)+1
-        return {"nodes":nodes,"metrics":metrics,"plane_objects":objects,"links":links,"work_item_states":states,"sync":queues,"generated_at":now()}
+        health = self.project_execution_health()
+        return {"nodes":nodes,"metrics":metrics,"plane_objects":objects,"links":links,"work_item_states":states,"sync":queues,"project_health":health,"alerts":health["alerts"],"generated_at":now()}
 
     def sync_status(self) -> dict[str, list[dict[str, Any]]]:
         """Return queue diagnostics without exposing payloads or credentials."""

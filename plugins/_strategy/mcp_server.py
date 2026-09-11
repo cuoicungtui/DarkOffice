@@ -47,6 +47,11 @@ def get_execution_status(objective_id: str) -> str:
     return _json(services.execution_status(objective_id))
 
 
+def get_project_execution_health(project_id: str | None = None) -> str:
+    """Return project-level execution counts and normalized alerts."""
+    return _json(services.project_execution_health(project_id))
+
+
 def get_sync_status() -> str:
     """Read sync queue diagnostics without exposing webhook or PAT secrets."""
     return _json(services.repository().sync_status())
@@ -146,7 +151,7 @@ def main() -> None:
     server = FastMCP("DarkOffice Strategy")
     for tool in (
         get_strategy_dashboard, list_strategy_nodes, get_strategy_node,
-        list_available_plane_projects, get_execution_status, get_sync_status,
+        list_available_plane_projects, get_execution_status, get_project_execution_health, get_sync_status,
         create_strategy_node, update_strategy_node, archive_strategy_node,
         link_objective_to_plane_project, create_metric, record_metric_checkin,
         refresh_plane_projection, create_execution_run, record_execution_item,
