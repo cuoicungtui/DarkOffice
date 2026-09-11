@@ -17,12 +17,36 @@ def repository() -> SqliteStrategyRepository:
         _repository=SqliteStrategyRepository()
         gateway=HttpPlaneGateway.from_environment()
         if gateway:
-            _repository.ensure_connection({"api_base_url":gateway.api_base_url,"public_base_url":os.environ.get("PLANE_PUBLIC_BASE_URL",gateway.api_base_url),"workspace_slug":gateway.workspace_slug,"credential_ref":"env:PLANE_API_KEY","webhook_secret_ref":"env:PLANE_WEBHOOK_SECRET"})
+            _repository.ensure_connection({"api_base_url":gateway.api_base_url,"public_base_url":os.environ.get("PLANE_PUBLIC_BASE_URL",gateway.api_base_url),"workspace_slug":gateway.workspace_slug,"agent_project_name":os.environ.get("DARKOFFICE_AGENT_PROJECT_NAME", "default"),"credential_ref":"env:PLANE_API_KEY","webhook_secret_ref":"env:PLANE_WEBHOOK_SECRET"})
     return _repository
 
 
 def create_node(values: dict[str, Any], actor: str) -> dict[str, Any]:
     return repository().create_node(values, actor=actor)
+
+
+def list_strategies(agent_project_name: str | None = None) -> list[dict[str, Any]]:
+    return repository().list_strategies(agent_project_name or os.environ.get("DARKOFFICE_AGENT_PROJECT_NAME", "default"))
+
+
+def list_plane_workspaces() -> list[dict[str, Any]]:
+    return repository().list_plane_workspaces()
+
+
+def get_active_strategy(agent_project_name: str | None = None) -> dict[str, Any] | None:
+    return repository().get_active_strategy(agent_project_name or os.environ.get("DARKOFFICE_AGENT_PROJECT_NAME", "default"))
+
+
+def activate_strategy(strategy_id: str, actor: str) -> dict[str, Any]:
+    return repository().activate_strategy(strategy_id, actor=actor)
+
+
+def create_strategy(values: dict[str, Any], actor: str) -> dict[str, Any]:
+    return repository().create_strategy(values, actor=actor)
+
+
+def clone_strategy(strategy_id: str, actor: str) -> dict[str, Any]:
+    return repository().clone_strategy(strategy_id, actor=actor)
 
 
 def update_node(identifier: str, values: dict[str, Any], actor: str) -> dict[str, Any]:
@@ -41,8 +65,10 @@ def process_sync(limit: int = 20) -> dict[str, int]:
             if kind == "project": project_id=data.get("id")
             # Webhooks are signals only. Re-read the current project state so an
             # old or abbreviated event can never overwrite the projection.
-            if gateway and project_id:
-                _sync_project(repo,gateway,message["connection_id"],str(project_id))
+            connection = repo.connection_by_id(message["connection_id"])
+            scoped_gateway = _gateway_for_connection(connection) if connection else gateway
+            if scoped_gateway and project_id:
+                _sync_project(repo,scoped_gateway,message["connection_id"],str(project_id))
             elif data.get("id"):
                 repo.upsert_plane_object(message["connection_id"],data,kind)
             repo.finish_inbox(message["id"]); processed["inbox"]+=1
@@ -53,8 +79,10 @@ def process_sync(limit: int = 20) -> dict[str, int]:
     return processed
 
 
-def sync_projects() -> int:
-    repo=repository(); gateway=HttpPlaneGateway.from_environment(); connection=repo.connection()
+def sync_projects(agent_project_name: str | None = None) -> int:
+    repo=repository()
+    connection = repo.connection_by_agent_project(agent_project_name) if agent_project_name else repo.connection()
+    gateway = _gateway_for_connection(connection) if connection else None
     if not gateway or not connection: return 0
     count=0
     projects=gateway.list_projects()
@@ -65,9 +93,16 @@ def sync_projects() -> int:
     return count
 
 
-def reconcile_plane() -> dict[str, Any]:
-    result = {"processed": process_sync(), "imported": sync_projects(), "broken_execution_mappings": repository().broken_execution_mappings()}
-    result["project_health"] = repository().project_execution_health()
+def _gateway_for_connection(connection: dict[str, Any] | None) -> HttpPlaneGateway | None:
+    if not connection:
+        return None
+    api_key = os.environ.get("PLANE_API_KEY", "")
+    return HttpPlaneGateway(connection["api_base_url"].rstrip("/"), connection["workspace_slug"], api_key) if api_key else None
+
+
+def reconcile_plane(agent_project_name: str | None = None) -> dict[str, Any]:
+    result = {"processed": process_sync(), "imported": sync_projects(agent_project_name), "broken_execution_mappings": repository().broken_execution_mappings()}
+    result["project_health"] = repository().project_execution_health(agent_project_name=agent_project_name)
     result["alerts"] = result["project_health"]["alerts"]
     return result
 
@@ -96,16 +131,27 @@ def public_dashboard(filters: dict[str, Any] | None = None) -> dict[str, Any]:
     return repository().dashboard(filters)
 
 
-def list_available_plane_projects() -> list[dict[str, Any]]:
-    return repository().list_plane_projects()
+def list_available_plane_projects(agent_project_name: str | None = None) -> list[dict[str, Any]]:
+    return repository().list_plane_projects(agent_project_name)
+
+
+def project_context(agent_project_name: str | None) -> dict[str, Any]:
+    if not agent_project_name:
+        return {"agent_project": None, "plane_workspace": None, "active_strategy": None, "plane_projects": []}
+    workspace = next((item for item in repository().list_plane_workspaces() if item["agent_project_name"] == agent_project_name and item["enabled"]), None)
+    return {"agent_project": {"name": agent_project_name}, "plane_workspace": workspace, "active_strategy": get_active_strategy(agent_project_name), "plane_projects": list_available_plane_projects(agent_project_name)}
+
+
+def connection_by_workspace(workspace_slug: str) -> dict[str, Any] | None:
+    return repository().connection_by_workspace(workspace_slug)
 
 
 def execution_status(objective_id: str) -> dict[str, Any]:
     return repository().execution_status(objective_id)
 
 
-def project_execution_health(project_id: str | None = None) -> dict[str, Any]:
-    return repository().project_execution_health(project_id)
+def project_execution_health(project_id: str | None = None, agent_project_name: str | None = None) -> dict[str, Any]:
+    return repository().project_execution_health(project_id, agent_project_name)
 
 
 def link_objective_to_plane_project(
@@ -113,8 +159,13 @@ def link_objective_to_plane_project(
 ) -> dict[str, Any]:
     # Refresh first so a project just created through Plane MCP can be validated
     # against the local projection before the one-to-one link is persisted.
-    sync_projects()
-    project_ids = {project["remote_id"] for project in repository().list_plane_projects()}
+    objective = repository().get_node(objective_id)
+    if not objective:
+        raise KeyError("Strategy node not found")
+    strategy = repository().get_strategy(objective["strategy_id"])
+    agent_project_name = strategy["agent_project_name"]
+    sync_projects(agent_project_name)
+    project_ids = {project["remote_id"] for project in repository().list_plane_projects(agent_project_name)}
     if plane_project_ref_id not in project_ids:
         raise ValueError("Plane project is not available in the current projection")
     changes: dict[str, Any] = {"plane_project_ref_id": plane_project_ref_id}

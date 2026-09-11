@@ -244,6 +244,9 @@ const model = {
       );
     }
     await this.loadProjectsList();
+    window.dispatchEvent(new CustomEvent("agent-project-changed", {
+      detail: { agentProjectName: chatsStore.selectedContext?.project?.name || null }
+    }));
   },
 
   async deactivateProject() {
@@ -283,6 +286,7 @@ const model = {
       );
     }
     await this.loadProjectsList();
+    window.dispatchEvent(new CustomEvent("agent-project-changed", { detail: { agentProjectName: null } }));
   },
 
   async deleteProjectAndCloseModal() {

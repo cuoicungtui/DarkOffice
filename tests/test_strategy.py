@@ -25,6 +25,35 @@ def test_only_one_active_north_star_is_allowed(repository: SqliteStrategyReposit
         repository.create_node({"kind": "north_star", "title": "Another direction"}, actor="test")
 
 
+def test_each_agent_project_gets_its_own_active_strategy(repository: SqliteStrategyRepository) -> None:
+    first = repository.ensure_connection({"agent_project_name": "Project A", "api_base_url": "http://plane-a", "public_base_url": "http://plane-a", "workspace_slug": "workspace-a"})
+    second = repository.ensure_connection({"agent_project_name": "Project B", "api_base_url": "http://plane-b", "public_base_url": "http://plane-b", "workspace_slug": "workspace-b"})
+
+    strategy_a = repository.get_active_strategy("Project A")
+    strategy_b = repository.get_active_strategy("Project B")
+    assert strategy_a and strategy_b and strategy_a["id"] != strategy_b["id"]
+
+    north_a = repository.create_node({"agent_project_name": "Project A", "kind": "north_star", "title": "A direction"}, actor="test")
+    north_b = repository.create_node({"agent_project_name": "Project B", "kind": "north_star", "title": "B direction"}, actor="test")
+    assert north_a["strategy_id"] == strategy_a["id"]
+    assert north_b["strategy_id"] == strategy_b["id"]
+    assert first["agent_project_name"] == "Project A"
+    assert second["agent_project_name"] == "Project B"
+
+    with pytest.raises(ValueError, match="already linked"):
+        repository.ensure_connection({"agent_project_name": "Project B", "api_base_url": "http://plane-a", "public_base_url": "http://plane-a", "workspace_slug": "workspace-a"})
+
+
+def test_list_nodes_can_isolate_agent_project(repository: SqliteStrategyRepository) -> None:
+    repository.ensure_connection({"agent_project_name": "Project A", "api_base_url": "http://plane-a", "public_base_url": "http://plane-a", "workspace_slug": "workspace-a"})
+    repository.ensure_connection({"agent_project_name": "Project B", "api_base_url": "http://plane-b", "public_base_url": "http://plane-b", "workspace_slug": "workspace-b"})
+    node_a = repository.create_node({"agent_project_name": "Project A", "kind": "north_star", "title": "A"}, actor="test")
+    node_b = repository.create_node({"agent_project_name": "Project B", "kind": "north_star", "title": "B"}, actor="test")
+
+    assert [node["id"] for node in repository.list_nodes({"agent_project_name": "Project A"})] == [node_a["id"]]
+    assert [node["id"] for node in repository.list_nodes({"agent_project_name": "Project B"})] == [node_b["id"]]
+
+
 def test_nested_objective_requires_its_own_plane_project_without_enqueuing_work(repository: SqliteStrategyRepository) -> None:
     north = repository.create_node({"kind": "north_star", "title": "North"}, actor="test")
     pillar = repository.create_node({"kind": "pillar", "title": "Growth", "parent_id": north["id"]}, actor="test")

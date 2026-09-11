@@ -631,6 +631,13 @@ export const setContext = function (id) {
   chatsStore.setSelected(id);
   tasksStore.setSelected(id);
 
+  // Strategy/project surfaces are scoped to the current chat context. Notify
+  // them through the canonical context switch path instead of relying on DOM
+  // click selectors, which vary between chat and task rows.
+  window.dispatchEvent(new CustomEvent("darkoffice-context-changed", {
+    detail: { contextId: id || null },
+  }));
+
   // Trigger a new WS handshake for the newly selected context (push-based sync).
   // This keeps the UI current without needing /poll during healthy operation.
   try {

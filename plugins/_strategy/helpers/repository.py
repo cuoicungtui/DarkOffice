@@ -44,13 +44,13 @@ class StrategyRepository(ABC):
     def get_node(self, identifier: str) -> dict[str, Any] | None: ...
 
     @abstractmethod
-    def list_plane_projects(self) -> list[dict[str, Any]]: ...
+    def list_plane_projects(self, agent_project_name: str | None = None) -> list[dict[str, Any]]: ...
 
     @abstractmethod
     def execution_status(self, node_id: str) -> dict[str, Any]: ...
 
     @abstractmethod
-    def project_execution_health(self, project_id: str | None = None) -> dict[str, Any]: ...
+    def project_execution_health(self, project_id: str | None = None, agent_project_name: str | None = None) -> dict[str, Any]: ...
 
     @abstractmethod
     def create_execution_run(self, values: dict[str, Any], *, actor: str) -> dict[str, Any]: ...
@@ -63,6 +63,13 @@ class StrategyRepository(ABC):
 
     @abstractmethod
     def list_execution_runs(self, objective_id: str | None = None) -> list[dict[str, Any]]: ...
+
+    @abstractmethod
+    def list_strategies(self, agent_project_name: str) -> list[dict[str, Any]]: ...
+
+    @abstractmethod
+    def get_active_strategy(self, agent_project_name: str) -> dict[str, Any] | None: ...
+    def get_strategy(self, strategy_id: str) -> dict[str, Any] | None: ...
 
 
 class UnitOfWork(ABC):
@@ -87,7 +94,7 @@ class SqliteUnitOfWork(UnitOfWork):
 class SqliteStrategyRepository(StrategyRepository):
     """SQLite implementation. No caller receives a SQLite cursor or connection."""
 
-    SCHEMA_VERSION = "3"
+    SCHEMA_VERSION = "4"
 
     def __init__(self, database_path: str | None = None):
         default = Path(os.environ.get("DARKOFFICE_STRATEGY_DB", "usr/strategy/strategy.sqlite3"))
@@ -123,6 +130,9 @@ class SqliteStrategyRepository(StrategyRepository):
             "CREATE TABLE IF NOT EXISTS schema_migrations (version TEXT PRIMARY KEY, checksum TEXT NOT NULL, applied_at TEXT NOT NULL)",
             "CREATE TABLE IF NOT EXISTS org_units (id TEXT PRIMARY KEY, parent_id TEXT REFERENCES org_units(id), name TEXT NOT NULL, created_at TEXT NOT NULL)",
             "CREATE TABLE IF NOT EXISTS strategy_periods (id TEXT PRIMARY KEY, name TEXT NOT NULL, start_date TEXT, end_date TEXT, status TEXT NOT NULL DEFAULT 'active', created_at TEXT NOT NULL)",
+            "CREATE TABLE IF NOT EXISTS strategies (id TEXT PRIMARY KEY, agent_project_name TEXT NOT NULL, name TEXT NOT NULL, period_id TEXT REFERENCES strategy_periods(id), status TEXT NOT NULL DEFAULT 'draft', version INTEGER NOT NULL DEFAULT 1, description TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL, activated_at TEXT, archived_at TEXT, updated_at TEXT NOT NULL, UNIQUE(agent_project_name, name, version))",
+            "CREATE UNIQUE INDEX IF NOT EXISTS idx_strategies_one_active ON strategies(agent_project_name) WHERE status='active'",
+            "CREATE TABLE IF NOT EXISTS agent_project_plane_workspaces (id TEXT PRIMARY KEY, agent_project_name TEXT NOT NULL UNIQUE, plane_workspace_id TEXT, plane_workspace_slug TEXT NOT NULL UNIQUE, api_base_url TEXT NOT NULL, public_base_url TEXT NOT NULL, credential_ref TEXT, webhook_secret_ref TEXT, enabled INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
             "CREATE TABLE IF NOT EXISTS strategy_nodes (id TEXT PRIMARY KEY, parent_id TEXT REFERENCES strategy_nodes(id), kind TEXT NOT NULL, title TEXT NOT NULL, description TEXT NOT NULL DEFAULT '', period_id TEXT REFERENCES strategy_periods(id), org_unit_id TEXT REFERENCES org_units(id), owner_ref TEXT, sort_order INTEGER NOT NULL DEFAULT 0, lifecycle TEXT NOT NULL DEFAULT 'draft', plane_project_ref_id TEXT, version INTEGER NOT NULL DEFAULT 1, archived_at TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
             "CREATE INDEX IF NOT EXISTS idx_strategy_nodes_parent ON strategy_nodes(parent_id, sort_order)",
             "CREATE TABLE IF NOT EXISTS strategy_alignments (id TEXT PRIMARY KEY, from_node_id TEXT NOT NULL REFERENCES strategy_nodes(id), to_node_id TEXT NOT NULL REFERENCES strategy_nodes(id), relation_type TEXT NOT NULL, created_at TEXT NOT NULL, UNIQUE(from_node_id, to_node_id, relation_type))",
@@ -149,6 +159,25 @@ class SqliteStrategyRepository(StrategyRepository):
             try:
                 for statement in statements:
                     connection.execute(statement)
+                columns = {row[1] for row in connection.execute("PRAGMA table_info(strategy_nodes)").fetchall()}
+                if "strategy_id" not in columns:
+                    connection.execute("ALTER TABLE strategy_nodes ADD COLUMN strategy_id TEXT REFERENCES strategies(id)")
+                connection_columns = {row[1] for row in connection.execute("PRAGMA table_info(plane_connections)").fetchall()}
+                if "agent_project_name" not in connection_columns:
+                    connection.execute("ALTER TABLE plane_connections ADD COLUMN agent_project_name TEXT")
+                default_project = os.environ.get("DARKOFFICE_AGENT_PROJECT_NAME", "default")
+                connection.execute(
+                    "INSERT OR IGNORE INTO strategies(id,agent_project_name,name,status,version,description,created_at,updated_at,activated_at) VALUES (?,?,?,?,?,?,?,?,?)",
+                    ("default-strategy", default_project, "Chiến lược hiện tại", "active", 1, "", now(), now(), now()),
+                )
+                connection.execute("UPDATE strategy_nodes SET strategy_id=? WHERE strategy_id IS NULL", ("default-strategy",))
+                connection.execute("UPDATE plane_connections SET agent_project_name=? WHERE agent_project_name IS NULL", (default_project,))
+                rows = connection.execute("SELECT * FROM plane_connections").fetchall()
+                for row in rows:
+                    connection.execute(
+                        "INSERT OR IGNORE INTO agent_project_plane_workspaces(id,agent_project_name,plane_workspace_id,plane_workspace_slug,api_base_url,public_base_url,credential_ref,webhook_secret_ref,enabled,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                        (row["id"], row["agent_project_name"] or default_project, row["workspace_id"], row["workspace_slug"], row["api_base_url"], row["public_base_url"], row["credential_ref"], row["webhook_secret_ref"], row["enabled"], row["created_at"], row["updated_at"]),
+                    )
                 # Convert only known, early sample labels.  This is idempotent and
                 # leaves user-created titles and Plane-sourced project names intact.
                 for old_title, new_title in {
@@ -177,18 +206,51 @@ class SqliteStrategyRepository(StrategyRepository):
 
     def ensure_connection(self, values: dict[str, Any]) -> dict[str, Any]:
         with self.transaction() as connection:
+            project_name = values.get("agent_project_name") or os.environ.get("DARKOFFICE_AGENT_PROJECT_NAME", "default")
+            mapped = connection.execute("SELECT agent_project_name FROM agent_project_plane_workspaces WHERE plane_workspace_slug=?", (values["workspace_slug"],)).fetchone()
+            if mapped and mapped["agent_project_name"] != project_name:
+                raise ValueError("Plane Workspace is already linked to another Agent Project")
             existing = connection.execute("SELECT * FROM plane_connections WHERE workspace_slug = ?", (values["workspace_slug"],)).fetchone()
             timestamp = now()
             if existing:
-                connection.execute("UPDATE plane_connections SET api_base_url=?, public_base_url=?, enabled=?, updated_at=? WHERE id=?", (values["api_base_url"], values["public_base_url"], int(values.get("enabled", True)), timestamp, existing["id"]))
+                connection.execute("UPDATE plane_connections SET api_base_url=?, public_base_url=?, agent_project_name=?, enabled=?, updated_at=? WHERE id=?", (values["api_base_url"], values["public_base_url"], project_name, int(values.get("enabled", True)), timestamp, existing["id"]))
+                connection.execute("UPDATE agent_project_plane_workspaces SET agent_project_name=?, api_base_url=?, public_base_url=?, updated_at=? WHERE id=?", (project_name, values["api_base_url"], values["public_base_url"], timestamp, existing["id"]))
+                self._ensure_project_strategy(connection, project_name)
                 return self._row(connection.execute("SELECT * FROM plane_connections WHERE id=?", (existing["id"],)).fetchone())
             identifier = new_id()
-            connection.execute("INSERT INTO plane_connections(id, api_base_url, public_base_url, workspace_slug, credential_ref, webhook_secret_ref, enabled, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (identifier, values["api_base_url"], values["public_base_url"], values["workspace_slug"], values.get("credential_ref"), values.get("webhook_secret_ref"), int(values.get("enabled", True)), timestamp, timestamp))
+            connection.execute("INSERT INTO plane_connections(id, api_base_url, public_base_url, workspace_slug, agent_project_name, credential_ref, webhook_secret_ref, enabled, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (identifier, values["api_base_url"], values["public_base_url"], values["workspace_slug"], project_name, values.get("credential_ref"), values.get("webhook_secret_ref"), int(values.get("enabled", True)), timestamp, timestamp))
+            connection.execute("INSERT INTO agent_project_plane_workspaces(id,agent_project_name,plane_workspace_slug,api_base_url,public_base_url,credential_ref,webhook_secret_ref,enabled,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?)", (identifier, project_name, values["workspace_slug"], values["api_base_url"], values["public_base_url"], values.get("credential_ref"), values.get("webhook_secret_ref"), int(values.get("enabled", True)), timestamp, timestamp))
+            self._ensure_project_strategy(connection, project_name)
             return self._row(connection.execute("SELECT * FROM plane_connections WHERE id=?", (identifier,)).fetchone())
+
+    def _ensure_project_strategy(self, connection: sqlite3.Connection, project_name: str) -> None:
+        """Give every mapped Agent Project one usable initial Strategy."""
+        if connection.execute("SELECT 1 FROM strategies WHERE agent_project_name=? LIMIT 1", (project_name,)).fetchone():
+            return
+        identifier, timestamp = ("default-strategy", now()) if project_name == "default" else (new_id(), now())
+        connection.execute(
+            "INSERT INTO strategies(id,agent_project_name,name,status,version,description,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?)",
+            (identifier, project_name, "Chiến lược hiện tại", "active", 1, "", timestamp, timestamp),
+        )
 
     def connection(self) -> dict[str, Any] | None:
         with self._connect() as connection:
             row = connection.execute("SELECT * FROM plane_connections WHERE enabled=1 ORDER BY updated_at DESC LIMIT 1").fetchone()
+            return self._row(row) if row else None
+
+    def connection_by_workspace(self, workspace_slug: str) -> dict[str, Any] | None:
+        with self._connect() as connection:
+            row = connection.execute("SELECT * FROM plane_connections WHERE workspace_slug=? AND enabled=1 LIMIT 1", (workspace_slug,)).fetchone()
+            return self._row(row) if row else None
+
+    def connection_by_agent_project(self, agent_project_name: str) -> dict[str, Any] | None:
+        with self._connect() as connection:
+            row = connection.execute("SELECT * FROM plane_connections WHERE agent_project_name=? AND enabled=1 LIMIT 1", (agent_project_name,)).fetchone()
+            return self._row(row) if row else None
+
+    def connection_by_id(self, identifier: str) -> dict[str, Any] | None:
+        with self._connect() as connection:
+            row = connection.execute("SELECT * FROM plane_connections WHERE id=? AND enabled=1", (identifier,)).fetchone()
             return self._row(row) if row else None
 
     def create_node(self, values: dict[str, Any], *, actor: str) -> dict[str, Any]:
@@ -200,12 +262,25 @@ class SqliteStrategyRepository(StrategyRepository):
         if lifecycle not in LIFECYCLES:
             raise ValueError("Unsupported lifecycle")
         identifier, timestamp = new_id(), now()
-        node = {"id": identifier, "parent_id": values.get("parent_id") or None, "kind": kind, "title": title, "description": str(values.get("description") or ""), "period_id": values.get("period_id") or None, "org_unit_id": values.get("org_unit_id") or None, "owner_ref": values.get("owner_ref") or None, "sort_order": int(values.get("sort_order") or 0), "lifecycle": lifecycle, "plane_project_ref_id": values.get("plane_project_ref_id") or None, "created_at": timestamp, "updated_at": timestamp}
+        strategy_id = values.get("strategy_id")
+        node = {"id": identifier, "strategy_id": strategy_id, "parent_id": values.get("parent_id") or None, "kind": kind, "title": title, "description": str(values.get("description") or ""), "period_id": values.get("period_id") or None, "org_unit_id": values.get("org_unit_id") or None, "owner_ref": values.get("owner_ref") or None, "sort_order": int(values.get("sort_order") or 0), "lifecycle": lifecycle, "plane_project_ref_id": values.get("plane_project_ref_id") or None, "created_at": timestamp, "updated_at": timestamp}
         with self.transaction() as connection:
+            if not strategy_id:
+                project_name = values.get("agent_project_name") or os.environ.get("DARKOFFICE_AGENT_PROJECT_NAME", "default")
+                active = connection.execute("SELECT id FROM strategies WHERE agent_project_name=? AND status='active' LIMIT 1", (project_name,)).fetchone()
+                if not active:
+                    raise ValueError("No active strategy for Agent Project")
+                strategy_id = active["id"]
+                node["strategy_id"] = strategy_id
+            strategy = connection.execute("SELECT * FROM strategies WHERE id=?", (strategy_id,)).fetchone()
+            if not strategy:
+                raise ValueError("Strategy not found")
+            if strategy["status"] in {"archived", "discarded"}:
+                raise ValueError("Archived strategy is read-only")
             if kind == "north_star" and connection.execute(
-                "SELECT 1 FROM strategy_nodes WHERE kind='north_star' AND archived_at IS NULL"
+                "SELECT 1 FROM strategy_nodes WHERE strategy_id=? AND kind='north_star' AND archived_at IS NULL", (strategy_id,)
             ).fetchone():
-                raise ValueError("Only one active North Star is allowed")
+                raise ValueError("Only one active North Star is allowed per strategy")
             self._validate_parent(connection, node["parent_id"], kind, identifier)
             if kind == "objective" and not node["plane_project_ref_id"]:
                 raise ValueError("Objective requires a Plane project")
@@ -216,7 +291,7 @@ class SqliteStrategyRepository(StrategyRepository):
                 node["plane_project_ref_id"] = inherited
             if kind == "objective":
                 self._assert_objective_project_available(connection, node["plane_project_ref_id"], identifier)
-            connection.execute("INSERT INTO strategy_nodes(id,parent_id,kind,title,description,period_id,org_unit_id,owner_ref,sort_order,lifecycle,plane_project_ref_id,created_at,updated_at) VALUES (:id,:parent_id,:kind,:title,:description,:period_id,:org_unit_id,:owner_ref,:sort_order,:lifecycle,:plane_project_ref_id,:created_at,:updated_at)", node)
+            connection.execute("INSERT INTO strategy_nodes(id,strategy_id,parent_id,kind,title,description,period_id,org_unit_id,owner_ref,sort_order,lifecycle,plane_project_ref_id,created_at,updated_at) VALUES (:id,:strategy_id,:parent_id,:kind,:title,:description,:period_id,:org_unit_id,:owner_ref,:sort_order,:lifecycle,:plane_project_ref_id,:created_at,:updated_at)", node)
             if kind == "objective":
                 self._record_objective_project_history(connection, identifier, str(node["plane_project_ref_id"]), actor)
             self._audit(connection, actor, "strategy_node.created", "strategy_node", identifier, node)
@@ -271,8 +346,69 @@ class SqliteStrategyRepository(StrategyRepository):
             if filters.get(field):
                 clauses.append(f"{field}=?")
                 params.append(filters[field])
+        if filters.get("strategy_id"):
+            clauses.append("strategy_id=?")
+            params.append(filters["strategy_id"])
+        if filters.get("agent_project_name"):
+            clauses.append("strategy_id IN (SELECT id FROM strategies WHERE agent_project_name=?)")
+            params.append(filters["agent_project_name"])
         with self._connect() as connection:
             return [self._row(row) for row in connection.execute(f"SELECT * FROM strategy_nodes WHERE {' AND '.join(clauses)} ORDER BY sort_order, created_at", params).fetchall()]
+
+    def list_strategies(self, agent_project_name: str) -> list[dict[str, Any]]:
+        with self._connect() as connection:
+            return [self._row(row) for row in connection.execute("SELECT * FROM strategies WHERE agent_project_name=? ORDER BY created_at DESC", (agent_project_name,)).fetchall()]
+
+    def list_plane_workspaces(self) -> list[dict[str, Any]]:
+        with self._connect() as connection:
+            return [self._row(row) for row in connection.execute("SELECT id,agent_project_name,plane_workspace_id,plane_workspace_slug,api_base_url,public_base_url,enabled,created_at,updated_at FROM agent_project_plane_workspaces ORDER BY agent_project_name").fetchall()]
+
+    def get_active_strategy(self, agent_project_name: str) -> dict[str, Any] | None:
+        with self._connect() as connection:
+            row = connection.execute("SELECT * FROM strategies WHERE agent_project_name=? AND status='active' LIMIT 1", (agent_project_name,)).fetchone()
+            return self._row(row) if row else None
+
+    def get_strategy(self, strategy_id: str) -> dict[str, Any] | None:
+        with self._connect() as connection:
+            row = connection.execute("SELECT * FROM strategies WHERE id=?", (strategy_id,)).fetchone()
+            return self._row(row) if row else None
+
+    def create_strategy(self, values: dict[str, Any], *, actor: str) -> dict[str, Any]:
+        identifier, stamp = new_id(), now()
+        project = str(values.get("agent_project_name") or os.environ.get("DARKOFFICE_AGENT_PROJECT_NAME", "default"))
+        name = str(values.get("name") or "").strip()
+        if not name:
+            raise ValueError("Strategy name is required")
+        with self.transaction() as connection:
+            connection.execute("INSERT INTO strategies(id,agent_project_name,name,period_id,status,version,description,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?)", (identifier, project, name, values.get("period_id"), "draft", 1, str(values.get("description") or ""), stamp, stamp))
+            self._audit(connection, actor, "strategy.created", "strategy", identifier, {"agent_project_name": project, "name": name})
+            return self._row(connection.execute("SELECT * FROM strategies WHERE id=?", (identifier,)).fetchone())
+
+    def clone_strategy(self, strategy_id: str, *, actor: str) -> dict[str, Any]:
+        with self.transaction() as connection:
+            source = connection.execute("SELECT * FROM strategies WHERE id=?", (strategy_id,)).fetchone()
+            if not source:
+                raise KeyError("Strategy not found")
+            identifier, stamp = new_id(), now()
+            connection.execute("INSERT INTO strategies(id,agent_project_name,name,period_id,status,version,description,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?)", (identifier, source["agent_project_name"], f"{source['name']} - Bản nháp", source["period_id"], "draft", source["version"] + 1, source["description"], stamp, stamp))
+            mapping = {}
+            source_nodes = connection.execute("SELECT * FROM strategy_nodes WHERE strategy_id=? ORDER BY created_at", (strategy_id,)).fetchall()
+            for node in source_nodes:
+                copied_id = new_id(); mapping[node["id"]] = copied_id
+                connection.execute("INSERT INTO strategy_nodes(id,strategy_id,parent_id,kind,title,description,period_id,org_unit_id,owner_ref,sort_order,lifecycle,plane_project_ref_id,version,archived_at,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (copied_id, identifier, mapping.get(node["parent_id"], node["parent_id"]), node["kind"], node["title"], node["description"], node["period_id"], node["org_unit_id"], node["owner_ref"], node["sort_order"], node["lifecycle"], node["plane_project_ref_id"], node["version"], node["archived_at"], node["created_at"], stamp))
+            self._audit(connection, actor, "strategy.cloned", "strategy", identifier, {"source_id": strategy_id})
+            return self._row(connection.execute("SELECT * FROM strategies WHERE id=?", (identifier,)).fetchone())
+
+    def activate_strategy(self, strategy_id: str, *, actor: str) -> dict[str, Any]:
+        with self.transaction() as connection:
+            strategy = connection.execute("SELECT * FROM strategies WHERE id=?", (strategy_id,)).fetchone()
+            if not strategy or strategy["status"] in {"archived", "discarded"}:
+                raise ValueError("Strategy is not activatable")
+            stamp = now()
+            connection.execute("UPDATE strategies SET status='archived', archived_at=?, updated_at=? WHERE agent_project_name=? AND status='active'", (stamp, stamp, strategy["agent_project_name"]))
+            connection.execute("UPDATE strategies SET status='active', activated_at=?, updated_at=?, version=version+1 WHERE id=?", (stamp, stamp, strategy_id))
+            self._audit(connection, actor, "strategy.activated", "strategy", strategy_id, {})
+            return self._row(connection.execute("SELECT * FROM strategies WHERE id=?", (strategy_id,)).fetchone())
 
     def create_checkin(self, values: dict[str, Any], *, actor: str) -> dict[str, Any]:
         metric_id = str(values.get("metric_id") or "")
@@ -349,12 +485,13 @@ class SqliteStrategyRepository(StrategyRepository):
             row=connection.execute("SELECT * FROM strategy_nodes WHERE id=?",(identifier,)).fetchone()
             return self._row(row) if row else None
 
-    def list_plane_projects(self) -> list[dict[str, Any]]:
+    def list_plane_projects(self, agent_project_name: str | None = None) -> list[dict[str, Any]]:
         with self._connect() as connection:
             return [
                 self._row(row)
                 for row in connection.execute(
-                    "SELECT * FROM plane_objects WHERE kind='project' AND deleted_at IS NULL ORDER BY title"
+                    "SELECT po.* FROM plane_objects po JOIN plane_connections pc ON pc.id=po.connection_id WHERE po.kind='project' AND po.deleted_at IS NULL " + ("AND pc.agent_project_name=? " if agent_project_name else "") + "ORDER BY po.title",
+                    (agent_project_name,) if agent_project_name else (),
                 ).fetchall()
             ]
 
@@ -397,22 +534,24 @@ class SqliteStrategyRepository(StrategyRepository):
             "counts": {"total": len(valid), "completed": len(completed), "cancelled": cancelled},
         }
 
-    def project_execution_health(self, project_id: str | None = None) -> dict[str, Any]:
+    def project_execution_health(self, project_id: str | None = None, agent_project_name: str | None = None) -> dict[str, Any]:
         """Return one source of truth for project execution monitoring."""
         generated = now()
         today = datetime.now(timezone.utc).date()
         with self._connect() as connection:
             project_rows = connection.execute(
                 "SELECT * FROM plane_objects WHERE kind='project' AND deleted_at IS NULL "
-                + ("AND remote_id=? " if project_id else "") + "ORDER BY title",
-                (project_id,) if project_id else (),
+                + ("AND remote_id=? " if project_id else "") + ("AND connection_id IN (SELECT id FROM plane_connections WHERE agent_project_name=?) " if agent_project_name else "") + "ORDER BY title",
+                tuple(value for value in (project_id, agent_project_name) if value is not None),
             ).fetchall()
             work_rows = connection.execute(
-                "SELECT * FROM plane_objects WHERE kind='work_item' AND deleted_at IS NULL"
+                "SELECT * FROM plane_objects WHERE kind='work_item' AND deleted_at IS NULL " + ("AND connection_id IN (SELECT id FROM plane_connections WHERE agent_project_name=?)" if agent_project_name else ""),
+                (agent_project_name,) if agent_project_name else (),
             ).fetchall()
             objective_rows = connection.execute(
                 "SELECT id,title,plane_project_ref_id FROM strategy_nodes "
-                "WHERE kind='objective' AND archived_at IS NULL AND plane_project_ref_id IS NOT NULL"
+                "WHERE kind='objective' AND archived_at IS NULL AND plane_project_ref_id IS NOT NULL " + ("AND strategy_id IN (SELECT id FROM strategies WHERE agent_project_name=?)" if agent_project_name else ""),
+                (agent_project_name,) if agent_project_name else (),
             ).fetchall()
         objects = [self._row(row) for row in work_rows]
         projects: list[dict[str, Any]] = []
@@ -683,16 +822,18 @@ class SqliteStrategyRepository(StrategyRepository):
             return str(row["remote_id"]) if row else None
 
     def dashboard(self, filters: dict[str, Any] | None = None) -> dict[str, Any]:
+        filters = filters or {}
         nodes=self.list_nodes(filters)
+        agent_project = filters.get("agent_project_name")
         with self._connect() as connection:
-            metrics=[self._row(row) for row in connection.execute("SELECT m.*, (SELECT max(x.observed_at) FROM metric_checkins x WHERE x.metric_id=m.id) AS last_checkin_at, (SELECT x.value FROM metric_checkins x WHERE x.metric_id=m.id ORDER BY x.observed_at DESC LIMIT 1) AS current_value FROM metric_definitions m").fetchall()]
-            objects=[self._row(row) for row in connection.execute("SELECT * FROM plane_objects WHERE deleted_at IS NULL ORDER BY synced_at DESC").fetchall()]
-            links=[self._row(row) for row in connection.execute("SELECT * FROM strategy_plane_links").fetchall()]
+            metrics=[self._row(row) for row in connection.execute("SELECT m.*, (SELECT max(x.observed_at) FROM metric_checkins x WHERE x.metric_id=m.id) AS last_checkin_at, (SELECT x.value FROM metric_checkins x WHERE x.metric_id=m.id ORDER BY x.observed_at DESC LIMIT 1) AS current_value FROM metric_definitions m JOIN strategy_nodes n ON n.id=m.node_id WHERE (? IS NULL OR n.strategy_id IN (SELECT id FROM strategies WHERE agent_project_name=?))", (agent_project, agent_project)).fetchall()]
+            objects=[self._row(row) for row in connection.execute("SELECT po.* FROM plane_objects po JOIN plane_connections pc ON pc.id=po.connection_id WHERE po.deleted_at IS NULL AND (? IS NULL OR pc.agent_project_name=?) ORDER BY po.synced_at DESC", (agent_project, agent_project)).fetchall()]
+            links=[self._row(row) for row in connection.execute("SELECT l.* FROM strategy_plane_links l JOIN strategy_nodes n ON n.id=l.node_id WHERE (? IS NULL OR n.strategy_id IN (SELECT id FROM strategies WHERE agent_project_name=?))", (agent_project, agent_project)).fetchall()]
             queues={"inbox_pending":connection.execute("SELECT count(*) FROM sync_inbox WHERE status!='complete'").fetchone()[0],"outbox_pending":connection.execute("SELECT count(*) FROM sync_outbox WHERE status!='complete'").fetchone()[0]}
         work_items=[item for item in objects if item["kind"]=="work_item"]
         states={}
         for item in work_items: states[item.get("state_group") or "unknown"]=states.get(item.get("state_group") or "unknown",0)+1
-        health = self.project_execution_health()
+        health = self.project_execution_health(agent_project_name=agent_project)
         return {"nodes":nodes,"metrics":metrics,"plane_objects":objects,"links":links,"work_item_states":states,"sync":queues,"project_health":health,"alerts":health["alerts"],"generated_at":now()}
 
     def sync_status(self) -> dict[str, list[dict[str, Any]]]:

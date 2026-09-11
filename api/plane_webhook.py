@@ -27,12 +27,12 @@ class PlaneWebhook(ApiHandler):
         if not hmac.compare_digest(expected,signature): return FlaskResponse("Invalid Plane webhook signature",403)
         try: payload=json.loads(raw)
         except json.JSONDecodeError: return FlaskResponse("Invalid JSON",400)
-        connection=services.repository().connection()
         workspace=payload.get("workspace") if isinstance(payload.get("workspace"),dict) else {}
         webhook=payload.get("webhook") if isinstance(payload.get("webhook"),dict) else {}
         webhook_workspace=webhook.get("workspace") if isinstance(webhook.get("workspace"),dict) else {}
         workspace_slug=payload.get("workspace_slug") or workspace.get("slug") or webhook_workspace.get("slug")
-        if not connection or workspace_slug != connection.get("workspace_slug"):
+        connection=services.connection_by_workspace(str(workspace_slug or ""))
+        if not connection:
             return FlaskResponse("Unknown Plane workspace",403)
         accepted=services.repository().receive_webhook(connection["id"],request.headers.get("X-Plane-Delivery"),str(payload.get("event") or ""),payload)
         return {"ok":True,"accepted":accepted}

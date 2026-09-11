@@ -67,7 +67,7 @@ jobs:
             -v "${{ github.workspace }}:/a0" \
             -w /a0 \
             "$DARKOFFICE_BASE_IMAGE" \
-            bash -lc 'source /opt/venv-a0/bin/activate && python -m pip install pytest && python -m pytest tests/test_skills_runtime.py tests/test_docker_initialize_limits.py tests/test_run_ui_config.py tests/test_strategy.py -q'
+            bash -lc 'source /opt/venv-a0/bin/activate && python -m pip install pytest && python -m pytest tests/test_skills_runtime.py tests/test_docker_initialize_limits.py tests/test_run_ui_config.py tests/test_strategy.py tests/test_strategy_delivery.py tests/test_strategy_skill_bootstrap.py -q'
 
       - name: Compile core Python sources in runtime image
         run: |
