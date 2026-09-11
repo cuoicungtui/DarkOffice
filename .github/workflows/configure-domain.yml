@@ -51,22 +51,21 @@ jobs:
           command -v nginx >/dev/null
           sudo -n true >/dev/null 2>&1
           sudo install -d -m 755 /etc/nginx/sites-available /etc/nginx/sites-enabled
-          sudo tee "/etc/nginx/sites-available/darkoffice-${PUBLIC_DOMAIN}" >/dev/null <<NGINX
-          server {
-              listen 80;
-              server_name ${PUBLIC_DOMAIN};
-              location / {
-                  proxy_pass http://127.0.0.1:5080;
-                  proxy_http_version 1.1;
-                  proxy_set_header Host \$host;
-                  proxy_set_header X-Real-IP \$remote_addr;
-                  proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-                  proxy_set_header X-Forwarded-Proto \$scheme;
-                  proxy_set_header Upgrade \$http_upgrade;
-                  proxy_set_header Connection "upgrade";
-              }
-          }
-NGINX
+          printf '%s\n' \
+            'server {' \
+            '    listen 80;' \
+            "    server_name ${PUBLIC_DOMAIN};" \
+            '    location / {' \
+            '        proxy_pass http://127.0.0.1:5080;' \
+            '        proxy_http_version 1.1;' \
+            '        proxy_set_header Host $host;' \
+            '        proxy_set_header X-Real-IP $remote_addr;' \
+            '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' \
+            '        proxy_set_header X-Forwarded-Proto $scheme;' \
+            '        proxy_set_header Upgrade $http_upgrade;' \
+            '        proxy_set_header Connection "upgrade";' \
+            '    }' \
+            '}' | sudo tee "/etc/nginx/sites-available/darkoffice-${PUBLIC_DOMAIN}" >/dev/null
           sudo ln -sfn "/etc/nginx/sites-available/darkoffice-${PUBLIC_DOMAIN}" "/etc/nginx/sites-enabled/darkoffice-${PUBLIC_DOMAIN}"
           sudo nginx -t
           sudo systemctl reload nginx
