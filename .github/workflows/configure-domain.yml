@@ -44,8 +44,9 @@ jobs:
           SSH_PORT="${SERVER_SSH_PORT:-22}"
           SSH_TARGET="${SERVER_USER}@${SERVER_HOST}"
           SSH_OPTS="-i ~/.ssh/darkoffice_key -p ${SSH_PORT} -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=20"
+          SCP_OPTS="-i ~/.ssh/darkoffice_key -P ${SSH_PORT} -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=20"
           case "$PUBLIC_DOMAIN" in *[!A-Za-z0-9.-]*|'') echo 'domain must be a hostname' >&2; exit 1;; esac
-          scp $SSH_OPTS docker/plane/Caddyfile "$SSH_TARGET:/opt/plane/Caddyfile"
+          scp $SCP_OPTS docker/plane/Caddyfile "$SSH_TARGET:/opt/plane/Caddyfile"
           ssh $SSH_OPTS "$SSH_TARGET" "PUBLIC_DOMAIN='$PUBLIC_DOMAIN' bash -s" <<'REMOTE'
           set -eu
           cd /opt/plane
