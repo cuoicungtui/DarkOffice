@@ -6,6 +6,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from plugins._strategy.helpers.repository import SqliteStrategyRepository
+from plugins._strategy.helpers import services
 
 
 @pytest.fixture
@@ -52,6 +53,31 @@ def test_list_nodes_can_isolate_agent_project(repository: SqliteStrategyReposito
 
     assert [node["id"] for node in repository.list_nodes({"agent_project_name": "Project A"})] == [node_a["id"]]
     assert [node["id"] for node in repository.list_nodes({"agent_project_name": "Project B"})] == [node_b["id"]]
+
+
+def test_project_context_uses_legacy_default_only_for_one_mapping(
+    repository: SqliteStrategyRepository, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository.ensure_connection({"agent_project_name": "default", "api_base_url": "http://plane", "public_base_url": "http://plane", "workspace_slug": "darkoffice"})
+    monkeypatch.setattr(services, "repository", lambda: repository)
+
+    context = services.project_context(None)
+
+    assert context["agent_project"] == {"name": "default", "legacy_fallback": True}
+    assert context["plane_workspace"]["plane_workspace_slug"] == "darkoffice"
+
+
+def test_project_context_does_not_guess_with_multiple_mappings(
+    repository: SqliteStrategyRepository, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository.ensure_connection({"agent_project_name": "default", "api_base_url": "http://plane-default", "public_base_url": "http://plane-default", "workspace_slug": "default"})
+    repository.ensure_connection({"agent_project_name": "Project A", "api_base_url": "http://plane-a", "public_base_url": "http://plane-a", "workspace_slug": "workspace-a"})
+    monkeypatch.setattr(services, "repository", lambda: repository)
+
+    context = services.project_context(None)
+
+    assert context["agent_project"] is None
+    assert context["plane_workspace"] is None
 
 
 def test_nested_objective_requires_its_own_plane_project_without_enqueuing_work(repository: SqliteStrategyRepository) -> None:

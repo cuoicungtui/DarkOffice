@@ -135,11 +135,28 @@ def list_available_plane_projects(agent_project_name: str | None = None) -> list
     return repository().list_plane_projects(agent_project_name)
 
 
+def resolve_agent_project_name(agent_project_name: str | None) -> tuple[str | None, bool]:
+    """Resolve the selected project without exposing legacy data cross-project.
+
+    Older installations stored Strategy data under the implicit ``default``
+    project, before Agent Project selection existed. It can only be surfaced
+    when that is the sole enabled mapping; otherwise a user must choose a
+    project explicitly.
+    """
+    if agent_project_name:
+        return agent_project_name, False
+    workspaces = [item for item in repository().list_plane_workspaces() if item["enabled"]]
+    if len(workspaces) == 1 and workspaces[0]["agent_project_name"] == "default":
+        return "default", True
+    return None, False
+
+
 def project_context(agent_project_name: str | None) -> dict[str, Any]:
-    if not agent_project_name:
+    resolved_project_name, legacy_fallback = resolve_agent_project_name(agent_project_name)
+    if not resolved_project_name:
         return {"agent_project": None, "plane_workspace": None, "active_strategy": None, "plane_projects": []}
-    workspace = next((item for item in repository().list_plane_workspaces() if item["agent_project_name"] == agent_project_name and item["enabled"]), None)
-    return {"agent_project": {"name": agent_project_name}, "plane_workspace": workspace, "active_strategy": get_active_strategy(agent_project_name), "plane_projects": list_available_plane_projects(agent_project_name)}
+    workspace = next((item for item in repository().list_plane_workspaces() if item["agent_project_name"] == resolved_project_name and item["enabled"]), None)
+    return {"agent_project": {"name": resolved_project_name, "legacy_fallback": legacy_fallback}, "plane_workspace": workspace, "active_strategy": get_active_strategy(resolved_project_name), "plane_projects": list_available_plane_projects(resolved_project_name)}
 
 
 def connection_by_workspace(workspace_slug: str) -> dict[str, Any] | None:
