@@ -34,43 +34,49 @@ jobs:
           chmod 600 ~/.ssh/darkoffice_key
           ssh-keyscan -p "$SSH_PORT" -H "$SERVER_HOST" >> ~/.ssh/known_hosts
 
-      - name: Configure reverse proxy without deploying code
+      - name: Configure Plane Caddy route without deploying code
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
           SERVER_USER: ${{ secrets.SERVER_USER }}
-          SERVER_APP_PORT: ${{ secrets.SERVER_PORT }}
           PUBLIC_DOMAIN: ${{ inputs.domain }}
         run: |
           SSH_PORT="${SERVER_SSH_PORT:-22}"
           SSH_TARGET="${SERVER_USER}@${SERVER_HOST}"
           SSH_OPTS="-i ~/.ssh/darkoffice_key -p ${SSH_PORT} -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=20"
-          APP_PORT="${SERVER_APP_PORT:-5080}"
           case "$PUBLIC_DOMAIN" in *[!A-Za-z0-9.-]*|'') echo 'domain must be a hostname' >&2; exit 1;; esac
-          ssh $SSH_OPTS "$SSH_TARGET" "PUBLIC_DOMAIN='$PUBLIC_DOMAIN' APP_PORT='$APP_PORT' bash -s" <<'REMOTE'
+          ssh $SSH_OPTS "$SSH_TARGET" "PUBLIC_DOMAIN='$PUBLIC_DOMAIN' bash -s" <<'REMOTE'
           set -eu
-          curl -fsS "http://127.0.0.1:${APP_PORT}/api/health" >/dev/null
-          command -v nginx >/dev/null
-          sudo -n true >/dev/null 2>&1
-          sudo install -d -m 755 /etc/nginx/sites-available /etc/nginx/sites-enabled
-          printf '%s\n' \
-            'server {' \
-            '    listen 80;' \
-            "    server_name ${PUBLIC_DOMAIN};" \
-            '    location / {' \
-            "        proxy_pass http://127.0.0.1:${APP_PORT};" \
-            '        proxy_http_version 1.1;' \
-            '        proxy_set_header Host $host;' \
-            '        proxy_set_header X-Real-IP $remote_addr;' \
-            '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' \
-            '        proxy_set_header X-Forwarded-Proto $scheme;' \
-            '        proxy_set_header Upgrade $http_upgrade;' \
-            '        proxy_set_header Connection "upgrade";' \
-            '    }' \
-            '}' | sudo tee "/etc/nginx/sites-available/darkoffice-${PUBLIC_DOMAIN}" >/dev/null
-          sudo ln -sfn "/etc/nginx/sites-available/darkoffice-${PUBLIC_DOMAIN}" "/etc/nginx/sites-enabled/darkoffice-${PUBLIC_DOMAIN}"
-          sudo nginx -t
-          sudo systemctl reload nginx
+          cd /opt/plane
+          test -f docker-compose.plane.yml
+          test -f Caddyfile
+          test -f .env
+          grep -q 'DARKOFFICE_DOMAIN' Caddyfile
+
+          if grep -q '^DARKOFFICE_DOMAIN=' .env; then
+            sed -i "s/^DARKOFFICE_DOMAIN=.*/DARKOFFICE_DOMAIN=${PUBLIC_DOMAIN}/" .env
+          else
+            printf 'DARKOFFICE_DOMAIN=%s\n' "$PUBLIC_DOMAIN" >> .env
+          fi
+
+          if docker compose version >/dev/null 2>&1; then
+            COMPOSE='docker compose'
+          elif command -v docker-compose >/dev/null 2>&1; then
+            COMPOSE='docker-compose'
+          else
+            echo 'Docker Compose is required to update the Plane Caddy route.' >&2
+            exit 1
+          fi
+
+          $COMPOSE --env-file .env -f docker-compose.plane.yml up -d proxy
+          for attempt in $(seq 1 12); do
+            if curl -fsS -H "Host: ${PUBLIC_DOMAIN}" http://127.0.0.1/api/health >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          $COMPOSE --env-file .env -f docker-compose.plane.yml logs --tail=100 proxy
+          exit 1
           REMOTE
 
       - name: Verify public domain

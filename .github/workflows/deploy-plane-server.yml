@@ -12,6 +12,11 @@ on:
         description: Public Plane URL, for example https://plane.example.com
         required: true
         type: string
+      darkoffice_domain:
+        description: Existing HTTP hostname routed to DarkOffice
+        required: false
+        default: work.haivan.one
+        type: string
 
 permissions:
   contents: read
@@ -74,7 +79,7 @@ jobs:
           SSH_OPTS="-i ~/.ssh/darkoffice_key -p ${SERVER_SSH_PORT:-22} -o BatchMode=yes -o IdentitiesOnly=yes"
           SSH_TARGET="${SERVER_USER}@${SERVER_HOST}"
           ssh $SSH_OPTS "$SSH_TARGET" "mkdir -p '${PLANE_SERVER_ROOT}'"
-          tar -C docker/plane -czf - docker-compose.plane.yml | ssh $SSH_OPTS "$SSH_TARGET" "tar -xzf - -C '${PLANE_SERVER_ROOT}'"
+          tar -C docker/plane -czf - docker-compose.plane.yml Caddyfile | ssh $SSH_OPTS "$SSH_TARGET" "tar -xzf - -C '${PLANE_SERVER_ROOT}'"
 
       - name: Write protected Plane environment
         env:
@@ -82,6 +87,7 @@ jobs:
           SERVER_SSH_PORT: ${{ secrets.SERVER_SSH_PORT }}
           SERVER_USER: ${{ secrets.SERVER_USER }}
           PUBLIC_URL: ${{ inputs.public_url }}
+          DARKOFFICE_DOMAIN: ${{ inputs.darkoffice_domain }}
           POSTGRES_PASSWORD: ${{ secrets.PLANE_POSTGRES_PASSWORD }}
           RABBITMQ_PASSWORD: ${{ secrets.PLANE_RABBITMQ_PASSWORD }}
           AWS_ACCESS_KEY_ID: ${{ secrets.PLANE_MINIO_ACCESS_KEY }}
@@ -91,8 +97,9 @@ jobs:
         run: |
           set -eu
           case "$PUBLIC_URL" in http://*|https://*) ;; *) echo 'public_url must start with http:// or https://' >&2; exit 1;; esac
-          APP_DOMAIN="$(python3 -c 'from urllib.parse import urlsplit; import os; print(urlsplit(os.environ["PUBLIC_URL"]).hostname or "")')"
-          test -n "$APP_DOMAIN"
+            APP_DOMAIN="$(python3 -c 'from urllib.parse import urlsplit; import os; print(urlsplit(os.environ["PUBLIC_URL"]).hostname or "")')"
+            test -n "$APP_DOMAIN"
+            case "$DARKOFFICE_DOMAIN" in *[!A-Za-z0-9.-]*|'') echo 'darkoffice_domain must be a hostname' >&2; exit 1;; esac
           DB_PASSWORD="$(python3 -c 'from urllib.parse import quote; import os; print(quote(os.environ["POSTGRES_PASSWORD"], safe=""))')"
           MQ_PASSWORD="$(python3 -c 'from urllib.parse import quote; import os; print(quote(os.environ["RABBITMQ_PASSWORD"], safe=""))')"
           {
@@ -100,11 +107,11 @@ jobs:
             printf 'APP_DOMAIN=%s\n' "$APP_DOMAIN"
             printf 'APP_RELEASE=v1.4.2\n'
             printf 'LISTEN_HTTP_PORT=%s\n' "$PLANE_HTTP_PORT"
-            printf 'LISTEN_HTTPS_PORT=443\n'
             printf 'WEB_URL=%s\n' "$PUBLIC_URL"
             printf 'CORS_ALLOWED_ORIGINS=%s\n' "$PUBLIC_URL"
             printf 'API_BASE_URL=%s/api\n' "$PUBLIC_URL"
             printf 'SITE_ADDRESS=:80\nDEBUG=0\nUSE_MINIO=1\n'
+            printf 'ENABLE_SIGNUP=1\nENABLE_EMAIL_PASSWORD=1\nENABLE_MAGIC_LINK_LOGIN=0\n'
             printf 'PGHOST=plane-db\nPGDATABASE=plane\nPOSTGRES_USER=plane\nPOSTGRES_DB=plane\nPOSTGRES_PORT=5432\n'
             printf 'POSTGRES_PASSWORD=%s\n' "$POSTGRES_PASSWORD"
             printf 'DATABASE_URL=postgresql://plane:%s@plane-db/plane\n' "$DB_PASSWORD"
@@ -114,6 +121,7 @@ jobs:
             printf 'SECRET_KEY=%s\nLIVE_SERVER_SECRET_KEY=%s\n' "$SECRET_KEY" "$LIVE_SERVER_SECRET_KEY"
             printf 'AWS_ACCESS_KEY_ID=%s\nAWS_SECRET_ACCESS_KEY=%s\nAWS_S3_ENDPOINT_URL=http://plane-minio:9000\nAWS_S3_BUCKET_NAME=uploads\n' "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY"
             printf 'MINIO_ENDPOINT_SSL=0\nWEBHOOK_ALLOWED_HOSTS=darkoffice\nWEBHOOK_ALLOWED_IPS=\n'
+            printf 'DARKOFFICE_DOMAIN=%s\n' "$DARKOFFICE_DOMAIN"
             # Compose interpolates a missing value as empty. Caddy requires a
             # concrete ACME endpoint when the proxy environment includes it.
             printf 'CERT_EMAIL=\nCERT_ACME_CA=https://acme-v02.api.letsencrypt.org/directory\nCERT_ACME_DNS=\nPLANE_DARKOFFICE_NETWORK=%s\n' "$PLANE_DARKOFFICE_NETWORK"

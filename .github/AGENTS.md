@@ -36,6 +36,10 @@
 - Plane deployment and its one-time data cutover are independent from the
   DarkOffice release workflow. The workflow may pass Plane integration values
   only from server secrets; migration backups are never uploaded to git.
+- On the shared production host, Plane Caddy owns public port 80. The
+  `configure-domain.yml` workflow updates its `DARKOFFICE_DOMAIN` route; the
+  DarkOffice deploy workflow only verifies that route and must not configure
+  Nginx or another listener on port 80.
 - `workflows/deploy-plane-server.yml` deploys the checked-in Plane image
   manifest manually and requires a public Plane URL as an explicit input.
 - The Plane deploy workflow supports both Docker Compose v2 and legacy

@@ -14,7 +14,7 @@ name: Deploy DarkOffice Server
         default: false
         type: boolean
       domain:
-        description: "Public domain to reverse proxy to DarkOffice (leave empty to skip)"
+        description: "Existing domain routed by the Plane Caddy proxy (leave empty to skip)"
         required: false
         default: work.haivan.one
         type: string
@@ -232,7 +232,7 @@ jobs:
             ls -1dt '${DARKOFFICE_SERVER_ROOT}'/releases/* | tail -n +6 | xargs -r rm -rf
           "
 
-      - name: Configure HTTP reverse proxy
+      - name: Verify Plane Caddy route
         if: ${{ inputs.domain != '' }}
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
@@ -250,40 +250,19 @@ jobs:
 
           ssh $SSH_OPTS "$SSH_TARGET" "PUBLIC_DOMAIN='$PUBLIC_DOMAIN' bash -s" <<'REMOTE'
             set -eu
-            test -x "$(command -v nginx || true)" || {
-              echo 'Nginx is not installed on the server. Install nginx, then rerun this workflow.' >&2
+            test -f /opt/plane/Caddyfile || {
+              echo 'Plane Caddy configuration is missing. Run Configure DarkOffice Domain first.' >&2
               exit 1
             }
-            sudo -n true >/dev/null 2>&1 || {
-              echo 'SSH user needs passwordless sudo to configure Nginx.' >&2
+            grep -q 'DARKOFFICE_DOMAIN' /opt/plane/Caddyfile || {
+              echo 'Plane Caddy configuration cannot route DarkOffice. Run Configure DarkOffice Domain first.' >&2
               exit 1
             }
-            sudo install -d -m 755 /etc/nginx/sites-available /etc/nginx/sites-enabled
-            sudo tee "/etc/nginx/sites-available/darkoffice-${PUBLIC_DOMAIN}" >/dev/null <<NGINX
-            server {
-                listen 80;
-                server_name ${PUBLIC_DOMAIN};
-
-                location / {
-                    proxy_pass http://127.0.0.1:5080;
-                    proxy_http_version 1.1;
-                    proxy_set_header Host \$host;
-                    proxy_set_header X-Real-IP \$remote_addr;
-                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-                    proxy_set_header X-Forwarded-Proto \$scheme;
-                    proxy_set_header Upgrade \$http_upgrade;
-                    proxy_set_header Connection "upgrade";
-                }
+            curl -fsS -H "Host: ${PUBLIC_DOMAIN}" http://127.0.0.1/api/health >/dev/null || {
+              echo 'Plane Caddy is not routing this DarkOffice domain. Run Configure DarkOffice Domain first.' >&2
+              exit 1
             }
-NGINX
-            sudo ln -sfn "/etc/nginx/sites-available/darkoffice-${PUBLIC_DOMAIN}" \
-              "/etc/nginx/sites-enabled/darkoffice-${PUBLIC_DOMAIN}"
-            sudo nginx -t
-            sudo systemctl reload nginx
-            if command -v ufw >/dev/null 2>&1 && sudo ufw status | grep -q 'Status: active'; then
-              sudo ufw allow 80/tcp
-            fi
-REMOTE
+          REMOTE
 
       - name: Smoke test public domain
         if: ${{ inputs.domain != '' }}
