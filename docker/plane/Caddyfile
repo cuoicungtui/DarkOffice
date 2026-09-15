@@ -1,40 +1,39 @@
 {
-  auto_https off
+	servers {
+		max_header_size 25MB
+		client_ip_headers X-Forwarded-For X-Real-IP
+		trusted_proxies static {$TRUSTED_PROXIES:0.0.0.0/0}
+	}
+}
 
-  servers {
-    max_header_size 25MB
-    client_ip_headers X-Forwarded-For X-Real-IP
-    trusted_proxies static {$TRUSTED_PROXIES:0.0.0.0/0}
-  }
+http://{$DARKOFFICE_DOMAIN:work.haivan.one} {
+	redir https://{host}{uri} permanent
+}
+
+https://{$DARKOFFICE_DOMAIN:work.haivan.one} {
+	reverse_proxy darkoffice:80
 }
 
 :80 {
-  # This deployment intentionally serves HTTP only; do not cache an HTTPS upgrade.
-  header {
-    -Strict-Transport-Security
-  }
+	# Plane remains available on its existing HTTP address. The DarkOffice host
+	# is handled by the exact HTTP/HTTPS sites above.
 
-  @darkoffice host {$DARKOFFICE_DOMAIN:work.haivan.one}
-  handle @darkoffice {
-    reverse_proxy darkoffice:80
-  }
+	handle {
+		request_body {
+			max_size {$FILE_SIZE_LIMIT:5242880}
+		}
 
-  handle {
-    request_body {
-      max_size {$FILE_SIZE_LIMIT:5242880}
-    }
+		redir /spaces /spaces/ permanent
+		redir /god-mode /god-mode/ permanent
 
-    redir /spaces /spaces/ permanent
-    redir /god-mode /god-mode/ permanent
-
-    reverse_proxy /spaces/* space:3000
-    reverse_proxy /god-mode/* admin:3000
-    reverse_proxy /live/* live:3000
-    reverse_proxy /api/* api:8000
-    reverse_proxy /auth/* api:8000
-    reverse_proxy /static/* api:8000
-    reverse_proxy /{$BUCKET_NAME:uploads}/* plane-minio:9000
-    reverse_proxy /{$BUCKET_NAME:uploads} plane-minio:9000
-    reverse_proxy /* web:3000
-  }
+		reverse_proxy /spaces/* space:3000
+		reverse_proxy /god-mode/* admin:3000
+		reverse_proxy /live/* live:3000
+		reverse_proxy /api/* api:8000
+		reverse_proxy /auth/* api:8000
+		reverse_proxy /static/* api:8000
+		reverse_proxy /{$BUCKET_NAME:uploads}/* plane-minio:9000
+		reverse_proxy /{$BUCKET_NAME:uploads} plane-minio:9000
+		reverse_proxy /* web:3000
+	}
 }

@@ -45,6 +45,7 @@ jobs:
           SSH_TARGET="${SERVER_USER}@${SERVER_HOST}"
           SSH_OPTS="-i ~/.ssh/darkoffice_key -p ${SSH_PORT} -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=20"
           case "$PUBLIC_DOMAIN" in *[!A-Za-z0-9.-]*|'') echo 'domain must be a hostname' >&2; exit 1;; esac
+          scp $SSH_OPTS docker/plane/Caddyfile "$SSH_TARGET:/opt/plane/Caddyfile"
           ssh $SSH_OPTS "$SSH_TARGET" "PUBLIC_DOMAIN='$PUBLIC_DOMAIN' bash -s" <<'REMOTE'
           set -eu
           cd /opt/plane
@@ -69,8 +70,8 @@ jobs:
           fi
 
           $COMPOSE --env-file .env -f docker-compose.plane.yml up -d proxy
-          for attempt in $(seq 1 12); do
-            if curl -fsS -H "Host: ${PUBLIC_DOMAIN}" http://127.0.0.1/api/health >/dev/null; then
+          for attempt in $(seq 1 45); do
+            if curl -fsS --resolve "${PUBLIC_DOMAIN}:443:127.0.0.1" "https://${PUBLIC_DOMAIN}/api/health" >/dev/null; then
               exit 0
             fi
             sleep 2

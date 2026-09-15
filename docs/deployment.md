@@ -20,6 +20,13 @@ The default local URL is:
 http://127.0.0.1:5080
 ```
 
+## Production Domain Routing
+
+Plane Caddy owns ports `80` and `443` on the shared production host. The
+`work.haivan.one` hostname is redirected from HTTP to HTTPS and reverse-proxied
+to the DarkOffice container. Plane remains available at its configured public
+URL; do not introduce Nginx or another listener on either public port.
+
 Check health and login:
 
 ```bash
