@@ -65,14 +65,23 @@ jobs:
 
           if docker compose version >/dev/null 2>&1; then
             COMPOSE='docker compose'
+            LEGACY_COMPOSE=0
           elif command -v docker-compose >/dev/null 2>&1; then
             COMPOSE='docker-compose'
+            LEGACY_COMPOSE=1
           else
             echo 'Docker Compose is required to update the Plane Caddy route.' >&2
             exit 1
           fi
 
-          $COMPOSE --env-file .env -f docker-compose.plane.yml up -d --force-recreate proxy
+          if [ "$LEGACY_COMPOSE" = 1 ]; then
+            # docker-compose 1.29 cannot recreate containers on this Docker
+            # Engine (KeyError: ContainerConfig). Replace only the proxy.
+            $COMPOSE --env-file .env -f docker-compose.plane.yml rm -sf proxy
+            $COMPOSE --env-file .env -f docker-compose.plane.yml up -d --no-deps proxy
+          else
+            $COMPOSE --env-file .env -f docker-compose.plane.yml up -d --force-recreate --no-deps proxy
+          fi
           for attempt in $(seq 1 45); do
             if curl -fsS --resolve "${PUBLIC_DOMAIN}:443:127.0.0.1" "https://${PUBLIC_DOMAIN}/api/health" >/dev/null; then
               exit 0
