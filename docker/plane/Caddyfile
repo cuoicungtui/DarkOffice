@@ -11,12 +11,21 @@ http://{$DARKOFFICE_DOMAIN:work.haivan.one} {
 }
 
 https://{$DARKOFFICE_DOMAIN:work.haivan.one} {
+	redir /mcp /mcp/ permanent
+	handle_path /mcp/* {
+		reverse_proxy plane-mcp:8211
+	}
 	reverse_proxy darkoffice:80
 }
 
 :80 {
 	# Plane remains available on its existing HTTP address. The DarkOffice host
-	# is handled by the exact HTTP/HTTPS sites above.
+	# is handled by the exact HTTP/HTTPS sites above. IP clients, including the
+	# current Plane address, use this catch-all HTTP site.
+	redir /mcp /mcp/ permanent
+	handle_path /mcp/* {
+		reverse_proxy plane-mcp:8211
+	}
 
 	handle {
 		request_body {

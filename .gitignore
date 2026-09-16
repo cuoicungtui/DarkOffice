@@ -52,3 +52,6 @@ agent_history.gif
 /AGENTS.local.md
 .claude/**
 .playwright-cli/
+
+# Local MCP client configuration may contain a Plane PAT.
+/plane-mcp-client.json

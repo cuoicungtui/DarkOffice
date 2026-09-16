@@ -65,9 +65,23 @@ x-app-env: &app-env
   WEBHOOK_ALLOWED_IPS: ${WEBHOOK_ALLOWED_IPS:-}
   WEBHOOK_ALLOWED_HOSTS: ${WEBHOOK_ALLOWED_HOSTS:-}
 
+x-mcp-env: &mcp-env
+  # The MCP server talks to Plane through the Compose network. Override the
+  # issuer only when an HTTPS OAuth base URL is actually available. PAT clients
+  # use the Caddy route independently of this bootstrap value.
+  PLANE_BASE_URL: ${PLANE_MCP_BASE_URL:-http://api:8000}
+  PLANE_INTERNAL_BASE_URL: ${PLANE_MCP_INTERNAL_BASE_URL:-http://api:8000}
+  PLANE_OAUTH_PROVIDER_BASE_URL: ${PLANE_MCP_OAUTH_BASE_URL:-https://example.invalid/mcp}
+  PLANE_OAUTH_PROVIDER_CLIENT_ID: ${PLANE_MCP_OAUTH_CLIENT_ID:-}
+  PLANE_OAUTH_PROVIDER_CLIENT_SECRET: ${PLANE_MCP_OAUTH_CLIENT_SECRET:-}
+  PLANE_OAUTH_PROVIDER_ENABLE_CIMD: ${PLANE_MCP_ENABLE_CIMD:-false}
+  MCP_PATH_PREFIX: ${PLANE_MCP_PATH_PREFIX:-}
+  LOG_PAYLOADS: ${PLANE_MCP_LOG_PAYLOADS:-false}
+
 services:
   web:
     image: makeplane/plane-frontend@sha256:22fd2434fb8d6658439f669ab72f999ce0773abe587663da21a77d70bd63ff61
+    restart: unless-stopped
     deploy:
       replicas: ${WEB_REPLICAS:-1}
       restart_policy:
@@ -78,6 +92,7 @@ services:
 
   space:
     image: makeplane/plane-space@sha256:f8f842f05f41a16e9fe8c4f5e17a3bb175338ccdc094620e58ae49764ffbd671
+    restart: unless-stopped
     deploy:
       replicas: ${SPACE_REPLICAS:-1}
       restart_policy:
@@ -89,6 +104,7 @@ services:
 
   admin:
     image: makeplane/plane-admin@sha256:6e1bb1d800d3c7ce84a09f810d5588db8613b35d4464e722a1bec12556ca0ebb
+    restart: unless-stopped
     deploy:
       replicas: ${ADMIN_REPLICAS:-1}
       restart_policy:
@@ -99,6 +115,7 @@ services:
 
   live:
     image: makeplane/plane-live@sha256:cbb630ccaea24bb9998040cb45c11619a7501e8b6c75d449df2f8fd9b9cddbd0
+    restart: unless-stopped
     environment:
       <<: [*live-env, *redis-env]
     deploy:
@@ -111,6 +128,7 @@ services:
 
   api:
     image: makeplane/plane-backend@sha256:90032ce088708889b60c00d491897916f4deb882facda27db59fd10fb68729ef
+    restart: unless-stopped
     command: ./bin/docker-entrypoint-api.sh
     deploy:
       replicas: ${API_REPLICAS:-1}
@@ -130,8 +148,31 @@ services:
         aliases:
           - plane-api
 
+  # Optional HTTP transport for clients that cannot start a local stdio
+  # process. It is intentionally profile-gated and has no direct public host
+  # port; DarkOffice reaches it as http://plane-mcp:8211 on plane-integration,
+  # while external clients enter through Caddy /mcp/.
+  plane-mcp:
+    image: ${PLANE_MCP_IMAGE:-makeplane/plane-mcp-server@sha256:bed2527e6718d3a905fc913955a8493e423314fa880a92db7d11d3b38cc19623}
+    profiles:
+      - mcp-http
+    restart: unless-stopped
+    command: ["http"]
+    environment:
+      <<: *mcp-env
+    expose:
+      - "8211"
+    depends_on:
+      - api
+    networks:
+      default:
+      plane-integration:
+        aliases:
+          - plane-mcp
+
   worker:
     image: makeplane/plane-backend@sha256:90032ce088708889b60c00d491897916f4deb882facda27db59fd10fb68729ef
+    restart: unless-stopped
     command: ./bin/docker-entrypoint-worker.sh
     deploy:
       replicas: ${WORKER_REPLICAS:-1}
@@ -154,6 +195,7 @@ services:
 
   beat-worker:
     image: makeplane/plane-backend@sha256:90032ce088708889b60c00d491897916f4deb882facda27db59fd10fb68729ef
+    restart: unless-stopped
     command: ./bin/docker-entrypoint-beat.sh
     deploy:
       replicas: ${BEAT_WORKER_REPLICAS:-1}
@@ -187,6 +229,7 @@ services:
   # Comment this if you already have a database running
   plane-db:
     image: postgres@sha256:468d34fefd6338031787c7b8e94078975b3aaf4d66c7ead25c39cd3ba46a15c6
+    restart: unless-stopped
     command: postgres -c 'max_connections=1000'
     deploy:
       replicas: 1
@@ -199,6 +242,7 @@ services:
 
   plane-redis:
     image: valkey/valkey@sha256:10328d00120dc14fbc87b2ed61b7677ddbb0d011e705361b4788329a0ec69a93
+    restart: unless-stopped
     deploy:
       replicas: 1
       restart_policy:
@@ -208,6 +252,7 @@ services:
 
   plane-mq:
     image: rabbitmq@sha256:611107e29cce05c2acd968325d5dcbde7e2fee404970f1ead75fdb22be2821b3
+    restart: unless-stopped
     deploy:
       replicas: 1
       restart_policy:
@@ -220,6 +265,7 @@ services:
   # Comment this if you using any external s3 compatible storage
   plane-minio:
     image: minio/minio@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
+    restart: unless-stopped
     command: server /export --console-address ":9090"
     deploy:
       replicas: 1
@@ -233,6 +279,7 @@ services:
   # Comment this if you already have a reverse proxy running
   proxy:
     image: makeplane/plane-proxy@sha256:47e651c56749c287710cc26f82dc5d1046a2af76a332aa048ab7adb881cc4cd0
+    restart: unless-stopped
     deploy:
       replicas: 1
       restart_policy:

@@ -9,13 +9,23 @@ on:
         default: main
         type: string
       public_url:
-        description: Public Plane URL, for example https://plane.example.com
+        description: Public Plane URL, for example http://221.132.16.189
         required: true
         type: string
       darkoffice_domain:
-        description: Existing HTTP hostname routed to DarkOffice
+        description: Optional DarkOffice hostname; leave unchanged for an IP-only Plane endpoint
         required: false
         default: work.haivan.one
+        type: string
+      enable_mcp_http:
+        description: Start the internal Plane MCP HTTP service on plane-integration
+        required: false
+        default: false
+        type: boolean
+      mcp_public_url:
+        description: External MCP client URL including /mcp, for example http://221.132.16.189/mcp
+        required: false
+        default: http://221.132.16.189/mcp
         type: string
 
 permissions:
@@ -27,7 +37,7 @@ concurrency:
 
 env:
   PLANE_SERVER_ROOT: /opt/plane
-  PLANE_HTTP_PORT: "13200"
+  PLANE_HTTP_PORT: "80"
   PLANE_DARKOFFICE_NETWORK: plane-integration
 
 jobs:
@@ -55,6 +65,9 @@ jobs:
           CERT_ACME_CA: ""
           CERT_ACME_DNS: ""
           WEBHOOK_ALLOWED_HOSTS: darkoffice
+          PLANE_MCP_OAUTH_BASE_URL: https://example.invalid/mcp
+          PLANE_MCP_OAUTH_CLIENT_ID: placeholder
+          PLANE_MCP_OAUTH_CLIENT_SECRET: placeholder
         run: docker compose -f docker/plane/docker-compose.plane.yml config >/dev/null
 
       - name: Configure SSH
@@ -94,6 +107,10 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PLANE_MINIO_SECRET_KEY }}
           SECRET_KEY: ${{ secrets.PLANE_SECRET_KEY }}
           LIVE_SERVER_SECRET_KEY: ${{ secrets.PLANE_LIVE_SERVER_SECRET_KEY }}
+          ENABLE_MCP_HTTP: ${{ inputs.enable_mcp_http }}
+          MCP_PUBLIC_URL: ${{ inputs.mcp_public_url }}
+          MCP_OAUTH_CLIENT_ID: ${{ secrets.PLANE_MCP_OAUTH_CLIENT_ID }}
+          MCP_OAUTH_CLIENT_SECRET: ${{ secrets.PLANE_MCP_OAUTH_CLIENT_SECRET }}
         run: |
           set -eu
           case "$PUBLIC_URL" in http://*|https://*) ;; *) echo 'public_url must start with http:// or https://' >&2; exit 1;; esac
@@ -102,6 +119,20 @@ jobs:
             case "$DARKOFFICE_DOMAIN" in *[!A-Za-z0-9.-]*|'') echo 'darkoffice_domain must be a hostname' >&2; exit 1;; esac
           DB_PASSWORD="$(python3 -c 'from urllib.parse import quote; import os; print(quote(os.environ["POSTGRES_PASSWORD"], safe=""))')"
           MQ_PASSWORD="$(python3 -c 'from urllib.parse import quote; import os; print(quote(os.environ["RABBITMQ_PASSWORD"], safe=""))')"
+          MCP_COMPOSE_PROFILES=""
+          MCP_OAUTH_BASE_URL="https://example.invalid/mcp"
+          if [ "$ENABLE_MCP_HTTP" = "true" ]; then
+            test -n "$MCP_OAUTH_CLIENT_ID" || { echo 'enable_mcp_http requires the PLANE_MCP_OAUTH_CLIENT_ID secret.' >&2; exit 1; }
+            test -n "$MCP_OAUTH_CLIENT_SECRET" || { echo 'enable_mcp_http requires the PLANE_MCP_OAUTH_CLIENT_SECRET secret.' >&2; exit 1; }
+            if [ -n "$MCP_PUBLIC_URL" ]; then
+              case "$MCP_PUBLIC_URL" in http://*|https://*) ;; *) echo 'mcp_public_url must start with http:// or https://' >&2; exit 1;; esac
+              case "$MCP_PUBLIC_URL" in
+                https://*) MCP_OAUTH_BASE_URL="$MCP_PUBLIC_URL" ;;
+                http://*) echo 'mcp_public_url is HTTP; using https://example.invalid/mcp only as the unused OAuth bootstrap issuer.' >&2 ;;
+              esac
+            fi
+            MCP_COMPOSE_PROFILES="mcp-http"
+          fi
           {
             printf 'COMPOSE_PROJECT_NAME=plane\n'
             printf 'APP_DOMAIN=%s\n' "$APP_DOMAIN"
@@ -122,6 +153,10 @@ jobs:
             printf 'AWS_ACCESS_KEY_ID=%s\nAWS_SECRET_ACCESS_KEY=%s\nAWS_S3_ENDPOINT_URL=http://plane-minio:9000\nAWS_S3_BUCKET_NAME=uploads\n' "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY"
             printf 'MINIO_ENDPOINT_SSL=0\nWEBHOOK_ALLOWED_HOSTS=darkoffice\nWEBHOOK_ALLOWED_IPS=\n'
             printf 'DARKOFFICE_DOMAIN=%s\n' "$DARKOFFICE_DOMAIN"
+            printf 'COMPOSE_PROFILES=%s\n' "$MCP_COMPOSE_PROFILES"
+            printf 'PLANE_MCP_OAUTH_BASE_URL=%s\n' "$MCP_OAUTH_BASE_URL"
+            printf 'PLANE_MCP_OAUTH_CLIENT_ID=%s\n' "$MCP_OAUTH_CLIENT_ID"
+            printf 'PLANE_MCP_OAUTH_CLIENT_SECRET=%s\n' "$MCP_OAUTH_CLIENT_SECRET"
             # Compose interpolates a missing value as empty. Caddy requires a
             # concrete ACME endpoint when the proxy environment includes it.
             printf 'CERT_EMAIL=\nCERT_ACME_CA=https://acme-v02.api.letsencrypt.org/directory\nCERT_ACME_DNS=\nPLANE_DARKOFFICE_NETWORK=%s\n' "$PLANE_DARKOFFICE_NETWORK"
@@ -154,7 +189,27 @@ jobs:
               \$COMPOSE --env-file .env -f docker-compose.plane.yml down --remove-orphans
             fi
             \$COMPOSE --env-file .env -f docker-compose.plane.yml up -d --remove-orphans
-            for attempt in \$(seq 1 30); do curl -fsS 'http://127.0.0.1:${PLANE_HTTP_PORT}/' >/dev/null && exit 0; sleep 2; done
+            for attempt in \$(seq 1 30); do curl -fsS 'http://127.0.0.1:${PLANE_HTTP_PORT}/' >/dev/null && break; sleep 2; done
+            if grep -qx 'COMPOSE_PROFILES=mcp-http' .env; then
+              MCP_STATUS=\"\"
+              for attempt in \$(seq 1 30); do
+                MCP_STATUS=\$(curl -sS -o /dev/null -w '%{http_code}' \
+                  -X POST \
+                  -H 'Content-Type: application/json' \
+                  -H 'Accept: application/json, text/event-stream' \
+                  --data-raw '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"plane-deploy-smoke-test","version":"1.0"}}}' \
+                  'http://127.0.0.1:${PLANE_HTTP_PORT}/mcp/http/api-key/mcp' || true)
+                case "\$MCP_STATUS" in
+                  200|400|401|403) break ;;
+                esac
+                sleep 2
+              done
+              case "\$MCP_STATUS" in
+                200|400|401|403) ;;
+                *) echo \"MCP HTTP smoke test failed with status \$MCP_STATUS\" >&2; exit 1 ;;
+              esac
+            fi
+            if curl -fsS 'http://127.0.0.1:${PLANE_HTTP_PORT}/' >/dev/null; then exit 0; fi
             \$COMPOSE --env-file .env -f docker-compose.plane.yml ps
             \$COMPOSE --env-file .env -f docker-compose.plane.yml logs --tail=120 proxy api migrator
             exit 1
